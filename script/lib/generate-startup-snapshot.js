@@ -56,33 +56,6 @@ module.exports = function(packagedAppPath) {
           path.join('..', 'node_modules', 'dugite')
         ) ||
         requiredModuleRelativePath.startsWith(
-          path.join(
-            '..',
-            'node_modules',
-            'markdown-preview',
-            'node_modules',
-            'yaml-front-matter'
-          )
-        ) ||
-        requiredModuleRelativePath.startsWith(
-          path.join(
-            '..',
-            'node_modules',
-            'markdown-preview',
-            'node_modules',
-            'cheerio'
-          )
-        ) ||
-        requiredModuleRelativePath.startsWith(
-          path.join(
-            '..',
-            'node_modules',
-            'markdown-preview',
-            'node_modules',
-            'marked'
-          )
-        ) ||
-        requiredModuleRelativePath.startsWith(
           path.join('..', 'node_modules', 'typescript-simple')
         ) ||
         requiredModuleRelativePath.endsWith(
@@ -179,41 +152,6 @@ module.exports = function(packagedAppPath) {
             'node_modules',
             'glob',
             'glob.js'
-          ) ||
-        requiredModuleRelativePath ===
-          path.join(
-            '..',
-            'node_modules',
-            'spell-check',
-            'lib',
-            'locale-checker.js'
-          ) ||
-        requiredModuleRelativePath ===
-          path.join(
-            '..',
-            'node_modules',
-            'spell-check',
-            'lib',
-            'system-checker.js'
-          ) ||
-        requiredModuleRelativePath ===
-          path.join(
-            '..',
-            'node_modules',
-            'spellchecker',
-            'lib',
-            'spellchecker.js'
-          ) ||
-        requiredModuleRelativePath ===
-          path.join(
-            '..',
-            'node_modules',
-            'spelling-manager',
-            'node_modules',
-            'natural',
-            'lib',
-            'natural',
-            'index.js'
           ) ||
         requiredModuleRelativePath ===
           path.join('..', 'node_modules', 'tar', 'tar.js') ||
