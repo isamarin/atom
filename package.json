@@ -12,7 +12,7 @@
     "url": "https://github.com/atom/atom/issues"
   },
   "license": "MIT",
-  "electronVersion": "11.5.0",
+  "electronVersion": "28.3.3",
   "dependencies": {
     "@atom/fuzzy-native": "^1.2.1",
     "@atom/nsfw": "^1.0.28",
@@ -36,7 +36,7 @@
     "color": "3.1.3",
     "command-palette": "git+https://github.com/isamarin/command-palette.git#e8920c8",
     "dedent": "^0.7.0",
-    "devtron": "1.4.0",
+    "@electron/remote": "^2.1.2",
     "document-register-element": "^1.14.10",
     "electron-notarize": "1.2.2",
     "electron-osx-sign": "0.6.0",

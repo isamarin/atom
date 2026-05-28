@@ -13,7 +13,7 @@
   let blobStore = null;
   let useSnapshot = false;
 
-  const startupMarkers = electron.remote.getCurrentWindow().startupMarkers;
+  const startupMarkers = require('@electron/remote').getCurrentWindow().startupMarkers;
 
   if (startupMarkers) {
     StartupTime.importData(startupMarkers);
@@ -121,7 +121,7 @@
   }
 
   function handleSetupError(error) {
-    const currentWindow = electron.remote.getCurrentWindow();
+    const currentWindow = require('@electron/remote').getCurrentWindow();
     currentWindow.setSize(800, 600);
     currentWindow.center();
     currentWindow.show();
@@ -210,7 +210,7 @@
       });
     }
 
-    const webContents = electron.remote.getCurrentWindow().webContents;
+    const webContents = require('@electron/remote').getCurrentWindow().webContents;
     if (webContents.devToolsWebContents) {
       profile();
     } else {

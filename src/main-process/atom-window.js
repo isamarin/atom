@@ -55,10 +55,9 @@ module.exports = class AtomWindow extends EventEmitter {
         // (Ref: https://github.com/atom/atom/pull/12696#issuecomment-290496960)
         disableBlinkFeatures: 'Auxclick',
         nodeIntegration: true,
+        contextIsolation: false,
+        sandbox: false,
         webviewTag: true,
-
-        // TodoElectronIssue: remote module is deprecated https://www.electronjs.org/docs/breaking-changes#default-changed-enableremotemodule-defaults-to-false
-        enableRemoteModule: true,
         // node support in threads
         nodeIntegrationInWorker: true
       },
@@ -77,6 +76,8 @@ module.exports = class AtomWindow extends EventEmitter {
     const BrowserWindowConstructor =
       settings.browserWindowConstructor || BrowserWindow;
     this.browserWindow = new BrowserWindowConstructor(options);
+
+    require('@electron/remote/main').enable(this.browserWindow.webContents);
 
     Object.defineProperty(this.browserWindow, 'loadSettingsJSON', {
       get: () =>
@@ -165,7 +166,7 @@ module.exports = class AtomWindow extends EventEmitter {
 
     this.browserWindow.showSaveDialog = this.showSaveDialog.bind(this);
 
-    if (this.isSpec) this.browserWindow.focusOnWebView();
+    if (this.isSpec) this.browserWindow.webContents.focus();
 
     const hasPathToOpen = !(
       locationsToOpen.length === 1 && locationsToOpen[0].pathToOpen == null
@@ -272,7 +273,7 @@ module.exports = class AtomWindow extends EventEmitter {
 
     // Spec window's web view should always have focus
     if (this.isSpec)
-      this.browserWindow.on('blur', () => this.browserWindow.focusOnWebView());
+      this.browserWindow.on('blur', () => this.browserWindow.webContents.focus());
   }
 
   async prepareToUnload() {
@@ -459,7 +460,7 @@ module.exports = class AtomWindow extends EventEmitter {
   }
 
   isWebViewFocused() {
-    return this.browserWindow.isWebViewFocused();
+    return this.browserWindow.webContents.isFocused();
   }
 
   isSpecWindow() {
@@ -526,7 +527,7 @@ module.exports = class AtomWindow extends EventEmitter {
   }
 
   copy() {
-    return this.browserWindow.copy();
+    return this.browserWindow.webContents.copy();
   }
 
   disableZoom() {

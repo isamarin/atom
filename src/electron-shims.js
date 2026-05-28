@@ -43,55 +43,56 @@ electron.ipcRenderer.sendChannel = function() {
   return this.send.apply(this, arguments);
 };
 
-const remoteRequire = electron.remote.require;
-electron.remote.require = function(moduleName) {
+const electronRemote = require('@electron/remote');
+const remoteRequire = electronRemote.require;
+electronRemote.require = function(moduleName) {
   const Grim = require('grim');
   switch (moduleName) {
     case 'menu':
       Grim.deprecate('Use `remote.Menu` instead of `remote.require("menu")`');
-      return this.Menu;
+      return electronRemote.Menu;
     case 'menu-item':
       Grim.deprecate(
         'Use `remote.MenuItem` instead of `remote.require("menu-item")`'
       );
-      return this.MenuItem;
+      return electronRemote.MenuItem;
     case 'browser-window':
       Grim.deprecate(
         'Use `remote.BrowserWindow` instead of `remote.require("browser-window")`'
       );
-      return this.BrowserWindow;
+      return electronRemote.BrowserWindow;
     case 'dialog':
       Grim.deprecate(
         'Use `remote.Dialog` instead of `remote.require("dialog")`'
       );
-      return this.Dialog;
+      return electronRemote.Dialog;
     case 'app':
       Grim.deprecate('Use `remote.app` instead of `remote.require("app")`');
-      return this.app;
+      return electronRemote.app;
     case 'crash-reporter':
       Grim.deprecate(
         'Use `remote.crashReporter` instead of `remote.require("crashReporter")`'
       );
-      return this.crashReporter;
+      return electronRemote.crashReporter;
     case 'global-shortcut':
       Grim.deprecate(
         'Use `remote.globalShortcut` instead of `remote.require("global-shortcut")`'
       );
-      return this.globalShortcut;
+      return electronRemote.globalShortcut;
     case 'clipboard':
       Grim.deprecate(
         'Use `remote.clipboard` instead of `remote.require("clipboard")`'
       );
-      return this.clipboard;
+      return electronRemote.clipboard;
     case 'native-image':
       Grim.deprecate(
         'Use `remote.nativeImage` instead of `remote.require("native-image")`'
       );
-      return this.nativeImage;
+      return electronRemote.nativeImage;
     case 'tray':
       Grim.deprecate('Use `remote.Tray` instead of `remote.require("tray")`');
-      return this.Tray;
+      return electronRemote.Tray;
     default:
-      return remoteRequire.call(this, moduleName);
+      return remoteRequire.call(electronRemote, moduleName);
   }
 };

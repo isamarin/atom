@@ -13,7 +13,9 @@ module.exports = function(packagedAppPath) {
     'shell',
     'WNdb',
     'lapack',
-    'remote'
+    'remote',
+    '@electron/remote',
+    '@electron/remote/main'
   ]);
   const baseDirPath = path.join(CONFIG.intermediateAppPath, 'static');
   let processedFiles = 0;

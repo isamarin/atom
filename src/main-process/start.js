@@ -37,9 +37,6 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
     }
   });
 
-  // TodoElectronIssue this should be set to true before Electron 12 - https://github.com/electron/electron/issues/18397
-  app.allowRendererProcessReuse = false;
-
   app.commandLine.appendSwitch('enable-experimental-web-platform-features');
 
   const args = parseCommandLine(process.argv.slice(1));
@@ -115,6 +112,8 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   } else if (args.test || args.benchmark || args.benchmarkTest) {
     app.setPath('userData', temp.mkdirSync('atom-test-data'));
   }
+
+  require('@electron/remote/main').initialize();
 
   StartupTime.addMarker('main-process:electron-onready:start');
   app.on('ready', function() {
