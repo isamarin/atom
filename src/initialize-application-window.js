@@ -45,14 +45,20 @@ const clipboard = new Clipboard();
 TextEditor.setClipboard(clipboard);
 TextEditor.viewForItem = item => atom.views.getView(item);
 
+const StartupTime = require('./startup-time');
+
+StartupTime.addMarker('window:new-atom-environment:start');
 global.atom = new AtomEnvironment({
   clipboard,
   applicationDelegate: new ApplicationDelegate(),
   enablePersistence: true
 });
+StartupTime.addMarker('window:new-atom-environment:end');
 
 TextEditor.setScheduler(global.atom.views);
+StartupTime.addMarker('window:preload-packages:start');
 global.atom.preloadPackages();
+StartupTime.addMarker('window:preload-packages:end');
 
 // Like sands through the hourglass, so are the days of our lives.
 module.exports = function({ blobStore }) {

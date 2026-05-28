@@ -765,6 +765,16 @@ module.exports = class PackageManager {
       this.triggerDeferredActivationHooks();
       this.initialPackagesActivated = true;
       this.emitter.emit('did-activate-initial-packages');
+      if (this._packageTimings && this._packageTimings.length) {
+        this._packageTimings.sort((a, b) => b.time - a.time);
+        const lines = ['\n=== Package Activation Times ==='];
+        for (const { name, time } of this._packageTimings) {
+          const bar = '\u2588'.repeat(Math.min(Math.round(time / 5), 40));
+          lines.push(`  ${String(time).padStart(4)}ms  ${name} ${bar}`);
+        }
+        lines.push('');
+        console.log(lines.join('\n'));
+      }
       this.activatePromise = null;
     });
     return this.activatePromise;
@@ -809,7 +819,13 @@ module.exports = class PackageManager {
     }
 
     this.activatingPackages[pack.name] = pack;
+    const activateStart = Date.now();
     const activationPromise = pack.activate().then(() => {
+      const activateTime = Date.now() - activateStart;
+      if (activateTime > 5) {
+        if (!this._packageTimings) this._packageTimings = [];
+        this._packageTimings.push({ name: pack.name, time: activateTime });
+      }
       if (this.activatingPackages[pack.name] != null) {
         delete this.activatingPackages[pack.name];
         this.activePackages[pack.name] = pack;

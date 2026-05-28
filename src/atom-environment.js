@@ -1053,6 +1053,7 @@ class AtomEnvironment {
     ]);
 
     StartupTime.addMarker('window:environment:start-editor-window:end');
+    StartupTime.printReport();
 
     return output;
   }
