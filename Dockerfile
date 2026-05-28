@@ -1,14 +1,16 @@
-# VERSION:        0.2
-# DESCRIPTION:    Image to build Atom
+# VERSION:        0.3
+# DESCRIPTION:    Image to build Atom (Electron 28 / Node 18)
 
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
-# Install dependencies
+# Install system dependencies
 RUN apt-get update && \
     DEBIAN_FRONTEND="noninteractive" \
     apt-get install -y \
         build-essential \
         git \
+        curl \
+        python3 \
         libsecret-1-dev \
         fakeroot \
         rpm \
@@ -17,15 +19,16 @@ RUN apt-get update && \
         libgdk-pixbuf2.0-dev \
         libgtk-3-dev \
         libxss-dev \
-        libasound2-dev \
-        npm && \
+        libasound2-dev && \
     rm -rf /var/lib/apt/lists/*
 
-# Update npm and dependencies
-RUN npm install -g npm --loglevel error
+# Install Node.js 18 LTS via NodeSource
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
 
-# Use python2 by default
-RUN npm config set python /usr/bin/python2 -g
+# Use python3 for node-gyp
+RUN npm config set python /usr/bin/python3 -g
 
 ENTRYPOINT ["/usr/bin/env", "sh", "-c"]
 CMD ["bash"]
