@@ -1,31 +1,32 @@
 {
   "extends": [
-    "./script/node_modules/eslint-config-standard/eslintrc.json",
-    "./script/node_modules/eslint-config-prettier/index.js",
-    "./script/node_modules/eslint-config-prettier/standard.js"
+    "standard",
+    "prettier"
   ],
   "plugins": [
     "prettier"
   ],
   "env": {
     "browser": true,
-    "node": true
+    "node": true,
+    "es2022": true
   },
-  "parser": "babel-eslint",
+  "parser": "@babel/eslint-parser",
   "parserOptions": {
-    "ecmaVersion": 8,
+    "ecmaVersion": 2022,
+    "requireConfigFile": false,
     "ecmaFeatures": {
       "jsx": true
     }
   },
   "globals": {
-    "atom": true,
-    "snapshotResult": true
+    "atom": "writable",
+    "snapshotResult": "readonly"
   },
   "rules": {
-    "standard/no-callback-literal": ["off"],
-    "node/no-deprecated-api": ["off"],
-    "prettier/prettier": ["error"]
+    "n/no-callback-literal": "off",
+    "n/no-deprecated-api": "off",
+    "prettier/prettier": "error"
   },
   "overrides": [
     {
@@ -34,10 +35,10 @@
         "jasmine": true
       },
       "globals": {
-        "advanceClock": true,
-        "fakeClearInterval": true,
-        "fakeSetInterval": true,
-        "waitsForPromise": true
+        "advanceClock": "readonly",
+        "fakeClearInterval": "readonly",
+        "fakeSetInterval": "readonly",
+        "waitsForPromise": "readonly"
       }
     }
   ]

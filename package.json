@@ -179,18 +179,5 @@
   "scripts": {
     "preinstall": "node -e 'process.exit(0)'",
     "test": "node script/test"
-  },
-  "standard-engine": "./script/node_modules/standard",
-  "standard": {
-    "env": {
-      "atomtest": true,
-      "browser": true,
-      "jasmine": true,
-      "node": true
-    },
-    "globals": [
-      "atom",
-      "snapshotResult"
-    ]
   }
 }
