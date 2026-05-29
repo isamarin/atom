@@ -12,32 +12,34 @@ describe('PanelContainerElement', () => {
     connectedCallback() {
       this.classList.add('test-root');
     }
+
     initialize(model) {
       this.model = model;
       return this;
     }
+
     focus() {}
   }
 
   window.customElements.define(
     'atom-test-container-item-element',
-    TestPanelContainerItemElement_
+    TestPanelContainerItemElement_,
   );
 
   const TestPanelContainerItemElement = document.createElement(
-    'atom-test-container-item-element'
+    'atom-test-container-item-element',
   );
 
   beforeEach(() => {
     jasmineContent = document.body.querySelector('#jasmine-content');
 
-    atom.views.addViewProvider(TestPanelContainerItem, model =>
-      TestPanelContainerItemElement.initialize(model)
+    atom.views.addViewProvider(TestPanelContainerItem, (model) =>
+      TestPanelContainerItemElement.initialize(model),
     );
 
     container = new PanelContainer({
       viewRegistry: atom.views,
-      location: 'left'
+      location: 'left',
     });
     element = container.getElement();
     jasmineContent.appendChild(element);
@@ -57,15 +59,15 @@ describe('PanelContainerElement', () => {
     it('allows panels to be inserted at any position', () => {
       const panel1 = new Panel(
         { item: new TestPanelContainerItem(), priority: 10 },
-        atom.views
+        atom.views,
       );
       const panel2 = new Panel(
         { item: new TestPanelContainerItem(), priority: 5 },
-        atom.views
+        atom.views,
       );
       const panel3 = new Panel(
         { item: new TestPanelContainerItem(), priority: 8 },
-        atom.views
+        atom.views,
       );
 
       container.addPanel(panel1);
@@ -83,7 +85,7 @@ describe('PanelContainerElement', () => {
 
         const panel1 = new Panel(
           { item: new TestPanelContainerItem() },
-          atom.views
+          atom.views,
         );
         container.addPanel(panel1);
         expect(element.childNodes.length).toBe(1);
@@ -95,7 +97,7 @@ describe('PanelContainerElement', () => {
 
         const panel2 = new Panel(
           { item: new TestPanelContainerItem() },
-          atom.views
+          atom.views,
         );
         container.addPanel(panel2);
         expect(element.childNodes.length).toBe(2);
@@ -114,7 +116,7 @@ describe('PanelContainerElement', () => {
       beforeEach(() => {
         container = new PanelContainer({
           viewRegistry: atom.views,
-          location: 'bottom'
+          location: 'bottom',
         });
         element = container.getElement();
         jasmineContent.appendChild(element);
@@ -125,7 +127,7 @@ describe('PanelContainerElement', () => {
 
         const panel1 = new Panel(
           { item: new TestPanelContainerItem(), className: 'one' },
-          atom.views
+          atom.views,
         );
         container.addPanel(panel1);
         expect(element.childNodes.length).toBe(1);
@@ -137,7 +139,7 @@ describe('PanelContainerElement', () => {
 
         const panel2 = new Panel(
           { item: new TestPanelContainerItem(), className: 'two' },
-          atom.views
+          atom.views,
         );
         container.addPanel(panel2);
         expect(element.childNodes.length).toBe(2);
@@ -156,7 +158,7 @@ describe('PanelContainerElement', () => {
     beforeEach(() => {
       container = new PanelContainer({
         viewRegistry: atom.views,
-        location: 'modal'
+        location: 'modal',
       });
       element = container.getElement();
       jasmineContent.appendChild(element);
@@ -165,7 +167,7 @@ describe('PanelContainerElement', () => {
     it('allows only one panel to be visible at a time', () => {
       const panel1 = new Panel(
         { item: new TestPanelContainerItem() },
-        atom.views
+        atom.views,
       );
       container.addPanel(panel1);
 
@@ -173,7 +175,7 @@ describe('PanelContainerElement', () => {
 
       const panel2 = new Panel(
         { item: new TestPanelContainerItem() },
-        atom.views
+        atom.views,
       );
       container.addPanel(panel2);
 
@@ -189,7 +191,7 @@ describe('PanelContainerElement', () => {
     it("adds the 'modal' class to panels", () => {
       const panel1 = new Panel(
         { item: new TestPanelContainerItem() },
-        atom.views
+        atom.views,
       );
       container.addPanel(panel1);
 
@@ -206,10 +208,10 @@ describe('PanelContainerElement', () => {
         const panel = new Panel(
           {
             item: new TestPanelContainerItem(),
-            autoFocus: autoFocus,
-            visible: false
+            autoFocus,
+            visible: false,
           },
-          atom.views
+          atom.views,
         );
 
         container.addPanel(panel);

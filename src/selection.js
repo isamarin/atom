@@ -18,9 +18,9 @@ module.exports = class Selection {
     this.cursor.selection = this;
     this.decoration = this.editor.decorateMarker(this.marker, {
       type: 'highlight',
-      class: 'selection'
+      class: 'selection',
     });
-    this.marker.onDidChange(e => this.markerDidChange(e));
+    this.marker.onDidChange((e) => this.markerDidChange(e));
     this.marker.onDidDestroy(() => this.markerDidDestroy());
   }
 
@@ -76,7 +76,7 @@ module.exports = class Selection {
   setScreenRange(screenRange, options) {
     return this.setBufferRange(
       this.editor.bufferRangeForScreenRange(screenRange),
-      options
+      options,
     );
   }
 
@@ -102,7 +102,7 @@ module.exports = class Selection {
     if (!options.preserveFolds)
       this.editor.destroyFoldsContainingBufferPositions(
         [bufferRange.start, bufferRange.end],
-        true
+        true,
       );
     this.modifySelection(() => {
       const needsFlash = options.flash;
@@ -198,7 +198,7 @@ module.exports = class Selection {
   intersectsWith(otherSelection, exclusive) {
     return this.getBufferRange().intersectsWith(
       otherSelection.getBufferRange(),
-      exclusive
+      exclusive,
     );
   }
 
@@ -234,12 +234,12 @@ module.exports = class Selection {
       if (this.initialScreenRange) {
         if (position.isLessThan(this.initialScreenRange.start)) {
           this.marker.setScreenRange([position, this.initialScreenRange.end], {
-            reversed: true
+            reversed: true,
           });
         } else {
           this.marker.setScreenRange(
             [this.initialScreenRange.start, position],
-            { reversed: false }
+            { reversed: false },
           );
         }
       } else {
@@ -379,7 +379,7 @@ module.exports = class Selection {
   // beginning of the previous paragraph.
   selectToBeginningOfPreviousParagraph() {
     this.modifySelection(() =>
-      this.cursor.moveToBeginningOfPreviousParagraph()
+      this.cursor.moveToBeginningOfPreviousParagraph(),
     );
   }
 
@@ -394,7 +394,7 @@ module.exports = class Selection {
 
     this.setBufferRange(
       this.cursor.getCurrentWordBufferRange(options),
-      options
+      options,
     );
     this.wordwise = true;
     this.initialScreenRange = this.getScreenRange();
@@ -405,7 +405,7 @@ module.exports = class Selection {
   expandOverWord(options) {
     this.setBufferRange(
       this.getBufferRange().union(this.cursor.getCurrentWordBufferRange()),
-      { autoscroll: false }
+      { autoscroll: false },
     );
     const autoscroll =
       options && options.autoscroll != null
@@ -421,15 +421,15 @@ module.exports = class Selection {
     if (row != null) {
       this.setBufferRange(
         this.editor.bufferRangeForBufferRow(row, { includeNewline: true }),
-        options
+        options,
       );
     } else {
       const startRange = this.editor.bufferRangeForBufferRow(
-        this.marker.getStartBufferPosition().row
+        this.marker.getStartBufferPosition().row,
       );
       const endRange = this.editor.bufferRangeForBufferRow(
         this.marker.getEndBufferPosition().row,
-        { includeNewline: true }
+        { includeNewline: true },
       );
       this.setBufferRange(startRange.union(endRange), options);
     }
@@ -445,7 +445,7 @@ module.exports = class Selection {
   // It also includes the newline character.
   expandOverLine(options) {
     const range = this.getBufferRange().union(
-      this.cursor.getCurrentLineBufferRange({ includeNewline: true })
+      this.cursor.getCurrentLineBufferRange({ includeNewline: true }),
     );
     this.setBufferRange(range, { autoscroll: false });
     const autoscroll =
@@ -461,7 +461,7 @@ module.exports = class Selection {
     if (!opts.bypassReadOnly && this.editor.isReadOnly()) {
       if (atom.inDevMode() || atom.inSpecMode()) {
         const e = new Error(
-          'Attempt to mutate a read-only TextEditor through a Selection'
+          'Attempt to mutate a read-only TextEditor through a Selection',
         );
         e.detail =
           `Your package is attempting to call ${methodName} on a selection within an editor that has been marked ` +
@@ -509,7 +509,7 @@ module.exports = class Selection {
     let autoIndentFirstLine = false;
     const precedingText = this.editor.getTextInRange([
       [oldBufferRange.start.row, 0],
-      oldBufferRange.start
+      oldBufferRange.start,
     ]);
     const remainingLines = text.split('\n');
     const firstInsertedLine = remainingLines.shift();
@@ -539,7 +539,7 @@ module.exports = class Selection {
         languageMode.suggestedIndentForLineAtBufferRow(
           oldBufferRange.start.row,
           firstLine,
-          this.editor.getTabLength()
+          this.editor.getTabLength(),
         );
       if (desiredIndentLevel != null) {
         indentAdjustment =
@@ -554,7 +554,7 @@ module.exports = class Selection {
     const newBufferRange = this.editor.buffer.setTextInRange(
       oldBufferRange,
       text,
-      pick(options, 'undo', 'normalizeLineEndings')
+      pick(options, 'undo', 'normalizeLineEndings'),
     );
 
     if (options.select) {
@@ -566,14 +566,14 @@ module.exports = class Selection {
     if (autoIndentFirstLine) {
       this.editor.setIndentationForBufferRow(
         oldBufferRange.start.row,
-        desiredIndentLevel
+        desiredIndentLevel,
       );
     }
 
     if (options.autoIndentNewline && text === '\n') {
       this.editor.autoIndentBufferRow(newBufferRange.end.row, {
         preserveLeadingWhitespace: true,
-        skipBlankLines: false
+        skipBlankLines: false,
       });
     } else if (options.autoDecreaseIndent && NonWhitespaceRegExp.test(text)) {
       this.editor.autoDecreaseIndentForBufferRow(newBufferRange.start.row);
@@ -747,7 +747,7 @@ module.exports = class Selection {
     }
     this.cursor.setBufferPosition({
       row: this.cursor.getBufferRow(),
-      column: range.start.column
+      column: range.start.column,
     });
   }
 
@@ -766,7 +766,7 @@ module.exports = class Selection {
       if (selectedRange.start.row === this.editor.buffer.getLastRow()) return;
     } else {
       joinMarker = this.editor.markBufferRange(selectedRange, {
-        invalidate: 'never'
+        invalidate: 'never',
       });
     }
 
@@ -822,12 +822,15 @@ module.exports = class Selection {
     const [start, end] = this.getBufferRowRange();
     const { buffer } = this.editor;
     const leadingTabRegex = new RegExp(
-      `^( {1,${this.editor.getTabLength()}}|\t)`
+      `^( {1,${this.editor.getTabLength()}}|\t)`,
     );
     for (let row = start; row <= end; row++) {
       const match = buffer.lineForRow(row).match(leadingTabRegex);
       if (match && match[0].length > 0) {
-        buffer.delete([[row, 0], [row, match[0].length]]);
+        buffer.delete([
+          [row, 0],
+          [row, match[0].length],
+        ]);
       }
     }
   }
@@ -852,10 +855,10 @@ module.exports = class Selection {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
   toggleLineComments(options = {}) {
     if (!this.ensureWritable('toggleLineComments', options)) return;
-    let bufferRowRange = this.getBufferRowRange() || [null, null];
+    const bufferRowRange = this.getBufferRowRange() || [null, null];
     this.editor.toggleLineCommentsForBufferRows(...bufferRowRange, {
       correctSelection: true,
-      selection: this
+      selection: this,
     });
   }
 
@@ -909,33 +912,31 @@ module.exports = class Selection {
     const startLevel = this.editor.indentLevelForLine(precedingText);
 
     if (maintainClipboard) {
-      let {
-        text: clipboardText,
-        metadata
-      } = this.editor.constructor.clipboard.readWithMetadata();
+      let { text: clipboardText, metadata } =
+        this.editor.constructor.clipboard.readWithMetadata();
       if (!metadata) metadata = {};
       if (!metadata.selections) {
         metadata.selections = [
           {
             text: clipboardText,
             indentBasis: metadata.indentBasis,
-            fullLine: metadata.fullLine
-          }
+            fullLine: metadata.fullLine,
+          },
         ];
       }
       metadata.selections.push({
         text: selectionText,
         indentBasis: startLevel,
-        fullLine
+        fullLine,
       });
       this.editor.constructor.clipboard.write(
         [clipboardText, selectionText].join('\n'),
-        metadata
+        metadata,
       );
     } else {
       this.editor.constructor.clipboard.write(selectionText, {
         indentBasis: startLevel,
-        fullLine
+        fullLine,
       });
     }
   }
@@ -963,7 +964,7 @@ module.exports = class Selection {
         const indentLevel = Math.max(0, currentIndentLevel + indentAdjustment);
         lines[i] = line.replace(
           /^[\t ]+/,
-          this.editor.buildIndentString(indentLevel)
+          this.editor.buildIndentString(indentLevel),
         );
       }
     }
@@ -991,12 +992,12 @@ module.exports = class Selection {
       if (autoIndent && delta > 0) {
         if (!this.editor.getSoftTabs()) delta = Math.max(delta, 1);
         this.insertText(this.editor.buildIndentString(delta), {
-          bypassReadOnly
+          bypassReadOnly,
         });
       } else {
         this.insertText(
           this.editor.buildIndentString(1, this.cursor.getBufferColumn()),
-          { bypassReadOnly }
+          { bypassReadOnly },
         );
       }
     } else {
@@ -1035,7 +1036,7 @@ module.exports = class Selection {
       range.start.row = row;
       range.end.row = row;
       const clippedRange = this.editor.clipScreenRange(range, {
-        skipSoftWrapIndentation: true
+        skipSoftWrapIndentation: true,
       });
 
       if (range.isEmpty()) {
@@ -1044,9 +1045,10 @@ module.exports = class Selection {
         if (clippedRange.isEmpty()) continue;
       }
 
-      const containingSelections = this.editor.selectionsMarkerLayer.findMarkers(
-        { containsScreenRange: clippedRange }
-      );
+      const containingSelections =
+        this.editor.selectionsMarkerLayer.findMarkers({
+          containsScreenRange: clippedRange,
+        });
       if (containingSelections.length === 0) {
         const selection = this.editor.addSelectionForScreenRange(clippedRange);
         selection.setGoalScreenRange(range);
@@ -1065,7 +1067,7 @@ module.exports = class Selection {
       range.start.row = row;
       range.end.row = row;
       const clippedRange = this.editor.clipScreenRange(range, {
-        skipSoftWrapIndentation: true
+        skipSoftWrapIndentation: true,
       });
 
       if (range.isEmpty()) {
@@ -1074,9 +1076,10 @@ module.exports = class Selection {
         if (clippedRange.isEmpty()) continue;
       }
 
-      const containingSelections = this.editor.selectionsMarkerLayer.findMarkers(
-        { containsScreenRange: clippedRange }
-      );
+      const containingSelections =
+        this.editor.selectionsMarkerLayer.findMarkers({
+          containsScreenRange: clippedRange,
+        });
       if (containingSelections.length === 0) {
         const selection = this.editor.addSelectionForScreenRange(clippedRange);
         selection.setGoalScreenRange(range);
@@ -1102,11 +1105,11 @@ module.exports = class Selection {
     }
 
     const bufferRange = this.getBufferRange().union(
-      otherSelection.getBufferRange()
+      otherSelection.getBufferRange(),
     );
     this.setBufferRange(
       bufferRange,
-      Object.assign({ autoscroll: false }, options)
+      Object.assign({ autoscroll: false }, options),
     );
     otherSelection.destroy();
   }
@@ -1141,12 +1144,12 @@ module.exports = class Selection {
     const {
       oldHeadBufferPosition,
       oldTailBufferPosition,
-      newHeadBufferPosition
+      newHeadBufferPosition,
     } = e;
     const {
       oldHeadScreenPosition,
       oldTailScreenPosition,
-      newHeadScreenPosition
+      newHeadScreenPosition,
     } = e;
     const { textChanged } = e;
 
@@ -1158,7 +1161,7 @@ module.exports = class Selection {
         newBufferPosition: newHeadBufferPosition,
         newScreenPosition: newHeadScreenPosition,
         textChanged,
-        cursor: this.cursor
+        cursor: this.cursor,
       };
       this.cursor.emitter.emit('did-change-position', cursorMovedEvent);
       this.editor.cursorMoved(cursorMovedEvent);
@@ -1169,7 +1172,7 @@ module.exports = class Selection {
       oldScreenRange: new Range(oldHeadScreenPosition, oldTailScreenPosition),
       newBufferRange: this.getBufferRange(),
       newScreenRange: this.getScreenRange(),
-      selection: this
+      selection: this,
     };
     this.emitter.emit('did-change-range', rangeChangedEvent);
     this.editor.selectionRangeChanged(rangeChangedEvent);
@@ -1207,7 +1210,7 @@ module.exports = class Selection {
     if (this.marker.hasTail()) {
       this.editor.scrollToScreenRange(
         this.getScreenRange(),
-        Object.assign({ reversed: this.isReversed() }, options)
+        Object.assign({ reversed: this.isReversed() }, options),
       );
     } else {
       this.cursor.autoscroll(options);

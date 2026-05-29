@@ -2,7 +2,7 @@ module.exports = require('electron').clipboard;
 
 const Grim = require('grim');
 Grim.deprecate(
-  'Use `require("electron").clipboard` instead of `require("clipboard")`'
+  'Use `require("electron").clipboard` instead of `require("clipboard")`',
 );
 
 // Ensure each package that requires this shim causes a deprecation warning

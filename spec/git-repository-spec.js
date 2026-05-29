@@ -25,7 +25,7 @@ describe('GitRepository', () => {
   describe('new GitRepository(path)', () => {
     it('throws an exception when no repository is found', () => {
       expect(
-        () => new GitRepository(path.join(temp.dir, 'nogit.txt'))
+        () => new GitRepository(path.join(temp.dir, 'nogit.txt')),
       ).toThrow();
     });
   });
@@ -33,19 +33,19 @@ describe('GitRepository', () => {
   describe('.getPath()', () => {
     it('returns the repository path for a .git directory path with a directory', () => {
       repo = new GitRepository(
-        path.join(__dirname, 'fixtures', 'git', 'master.git', 'objects')
+        path.join(__dirname, 'fixtures', 'git', 'master.git', 'objects'),
       );
       expect(repo.getPath()).toBe(
-        path.join(__dirname, 'fixtures', 'git', 'master.git')
+        path.join(__dirname, 'fixtures', 'git', 'master.git'),
       );
     });
 
     it('returns the repository path for a repository path', () => {
       repo = new GitRepository(
-        path.join(__dirname, 'fixtures', 'git', 'master.git')
+        path.join(__dirname, 'fixtures', 'git', 'master.git'),
       );
       expect(repo.getPath()).toBe(
-        path.join(__dirname, 'fixtures', 'git', 'master.git')
+        path.join(__dirname, 'fixtures', 'git', 'master.git'),
       );
     });
   });
@@ -53,14 +53,14 @@ describe('GitRepository', () => {
   describe('.isPathIgnored(path)', () => {
     it('returns true for an ignored path', () => {
       repo = new GitRepository(
-        path.join(__dirname, 'fixtures', 'git', 'ignore.git')
+        path.join(__dirname, 'fixtures', 'git', 'ignore.git'),
       );
       expect(repo.isPathIgnored('a.txt')).toBeTruthy();
     });
 
     it('returns false for a non-ignored path', () => {
       repo = new GitRepository(
-        path.join(__dirname, 'fixtures', 'git', 'ignore.git')
+        path.join(__dirname, 'fixtures', 'git', 'ignore.git'),
       );
       expect(repo.isPathIgnored('b.txt')).toBeFalsy();
     });
@@ -151,7 +151,7 @@ describe('GitRepository', () => {
       expect(statusHandler.callCount).toBe(1);
       expect(statusHandler.argsForCall[0][0]).toEqual({
         path: filePath,
-        pathStatus: 0
+        pathStatus: 0,
       });
 
       repo.checkoutHead(filePath);
@@ -169,7 +169,7 @@ describe('GitRepository', () => {
       repo = new GitRepository(workingDirPath, {
         project: atom.project,
         config: atom.config,
-        confirm: atom.confirm
+        confirm: atom.confirm,
       });
       filePath = path.join(workingDirPath, 'a.txt');
       fs.writeFileSync(filePath, 'ch ch changes');
@@ -204,7 +204,7 @@ describe('GitRepository', () => {
   describe('.destroy()', () => {
     it('throws an exception when any method is called after it is called', () => {
       repo = new GitRepository(
-        path.join(__dirname, 'fixtures', 'git', 'master.git')
+        path.join(__dirname, 'fixtures', 'git', 'master.git'),
       );
       repo.destroy();
       expect(() => repo.getShortHead()).toThrow();
@@ -228,7 +228,7 @@ describe('GitRepository', () => {
       expect(statusHandler.callCount).toBe(1);
       expect(statusHandler.argsForCall[0][0]).toEqual({
         path: filePath,
-        pathStatus: status
+        pathStatus: status,
       });
 
       fs.writeFileSync(filePath, 'abc');
@@ -249,12 +249,12 @@ describe('GitRepository', () => {
 
     it('gets the status based on the files inside the directory', () => {
       expect(
-        repo.isStatusModified(repo.getDirectoryStatus(directoryPath))
+        repo.isStatusModified(repo.getDirectoryStatus(directoryPath)),
       ).toBe(false);
       fs.writeFileSync(filePath, 'abc');
       repo.getPathStatus(filePath);
       expect(
-        repo.isStatusModified(repo.getDirectoryStatus(directoryPath))
+        repo.isStatusModified(repo.getDirectoryStatus(directoryPath)),
       ).toBe(true);
     });
   });
@@ -266,7 +266,7 @@ describe('GitRepository', () => {
       workingDirectory = copyRepository();
       repo = new GitRepository(workingDirectory, {
         project: atom.project,
-        config: atom.config
+        config: atom.config,
       });
       modifiedPath = path.join(workingDirectory, 'file.txt');
       newPath = path.join(workingDirectory, 'untracked.txt');
@@ -286,7 +286,7 @@ describe('GitRepository', () => {
       expect(repo.getCachedPathStatus(cleanPath)).toBeUndefined();
       expect(repo.isStatusNew(repo.getCachedPathStatus(newPath))).toBeTruthy();
       expect(
-        repo.isStatusModified(repo.getCachedPathStatus(modifiedPath))
+        repo.isStatusModified(repo.getCachedPathStatus(modifiedPath)),
       ).toBeTruthy();
     });
 
@@ -313,7 +313,7 @@ describe('GitRepository', () => {
       expect(repo.getCachedPathStatus(cleanPath)).toBeUndefined();
       expect(repo.isStatusNew(repo.getCachedPathStatus(newPath))).toBeTruthy();
       expect(
-        repo.isStatusModified(repo.getCachedPathStatus(modifiedPath))
+        repo.isStatusModified(repo.getCachedPathStatus(modifiedPath)),
       ).toBeTruthy();
     });
 
@@ -325,7 +325,7 @@ describe('GitRepository', () => {
       fs.writeFileSync(modifiedPath, originalContent);
       await repo.refreshStatus();
       expect(
-        repo.isStatusModified(repo.getCachedPathStatus(modifiedPath))
+        repo.isStatusModified(repo.getCachedPathStatus(modifiedPath)),
       ).toBeFalsy();
     });
   });
@@ -335,8 +335,8 @@ describe('GitRepository', () => {
 
     beforeEach(async () => {
       atom.project.setPaths([copyRepository()]);
-      const refreshPromise = new Promise(resolve =>
-        atom.project.getRepositories()[0].onDidChangeStatuses(resolve)
+      const refreshPromise = new Promise((resolve) =>
+        atom.project.getRepositories()[0].onDidChangeStatuses(resolve),
       );
       editor = await atom.workspace.open('other.txt');
       await refreshPromise;
@@ -352,7 +352,7 @@ describe('GitRepository', () => {
       expect(statusHandler.callCount).toBe(1);
       expect(statusHandler).toHaveBeenCalledWith({
         path: editor.getPath(),
-        pathStatus: 256
+        pathStatus: 256,
       });
     });
 
@@ -366,7 +366,7 @@ describe('GitRepository', () => {
       expect(statusHandler.callCount).toBe(1);
       expect(statusHandler).toHaveBeenCalledWith({
         path: editor.getPath(),
-        pathStatus: 256
+        pathStatus: 256,
       });
 
       await editor.getBuffer().reload();
@@ -382,7 +382,7 @@ describe('GitRepository', () => {
       expect(statusHandler.callCount).toBe(1);
       expect(statusHandler).toHaveBeenCalledWith({
         path: editor.getPath(),
-        pathStatus: 256
+        pathStatus: 256,
       });
       editor.getBuffer().emitter.emit('did-change-path');
       expect(statusHandler.callCount).toBe(1);
@@ -411,10 +411,10 @@ describe('GitRepository', () => {
         packageManager: atom.packages,
         confirm: atom.confirm,
         grammarRegistry: atom.grammars,
-        applicationDelegate: atom.applicationDelegate
+        applicationDelegate: atom.applicationDelegate,
       });
       await project2.deserialize(
-        atom.project.serialize({ isUnloading: false })
+        atom.project.serialize({ isUnloading: false }),
       );
 
       buffer = project2.getBuffers()[0];
@@ -427,7 +427,7 @@ describe('GitRepository', () => {
       expect(statusHandler.callCount).toBe(1);
       expect(statusHandler).toHaveBeenCalledWith({
         path: buffer.getPath(),
-        pathStatus: 256
+        pathStatus: 256,
       });
     });
   });
@@ -437,11 +437,11 @@ function copyRepository() {
   const workingDirPath = temp.mkdirSync('atom-spec-git');
   fs.copySync(
     path.join(__dirname, 'fixtures', 'git', 'working-dir'),
-    workingDirPath
+    workingDirPath,
   );
   fs.renameSync(
     path.join(workingDirPath, 'git.git'),
-    path.join(workingDirPath, '.git')
+    path.join(workingDirPath, '.git'),
   );
   return workingDirPath;
 }

@@ -14,7 +14,7 @@ class PaneAxisElement extends HTMLElement {
   disconnectedCallback() {
     this.subscriptions.dispose();
     this.subscriptions = null;
-    this.model.getChildren().map(child => this.childRemoved({ child }));
+    this.model.getChildren().map((child) => this.childRemoved({ child }));
   }
 
   initialize(model, viewRegistry) {
@@ -44,13 +44,13 @@ class PaneAxisElement extends HTMLElement {
     const subscriptions = new CompositeDisposable();
     subscriptions.add(this.model.onDidAddChild(this.childAdded.bind(this)));
     subscriptions.add(
-      this.model.onDidRemoveChild(this.childRemoved.bind(this))
+      this.model.onDidRemoveChild(this.childRemoved.bind(this)),
     );
     subscriptions.add(
-      this.model.onDidReplaceChild(this.childReplaced.bind(this))
+      this.model.onDidReplaceChild(this.childReplaced.bind(this)),
     );
     subscriptions.add(
-      this.model.observeFlexScale(this.flexScaleChanged.bind(this))
+      this.model.observeFlexScale(this.flexScaleChanged.bind(this)),
     );
     return subscriptions;
   }
@@ -122,5 +122,5 @@ function createPaneAxisElement() {
 }
 
 module.exports = {
-  createPaneAxisElement
+  createPaneAxisElement,
 };

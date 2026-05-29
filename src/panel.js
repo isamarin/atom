@@ -93,7 +93,7 @@ module.exports = class Panel {
 
   // Public: Hide this panel
   hide() {
-    let wasVisible = this.visible;
+    const wasVisible = this.visible;
     this.visible = false;
     if (this.element) this.element.style.display = 'none';
     if (wasVisible) this.emitter.emit('did-change-visible', this.visible);
@@ -101,7 +101,7 @@ module.exports = class Panel {
 
   // Public: Show this panel
   show() {
-    let wasVisible = this.visible;
+    const wasVisible = this.visible;
     this.visible = true;
     if (this.element) this.element.style.display = null;
     if (!wasVisible) this.emitter.emit('did-change-visible', this.visible);

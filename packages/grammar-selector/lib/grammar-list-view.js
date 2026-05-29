@@ -6,8 +6,8 @@ module.exports = class GrammarListView {
     this.selectListView = new SelectListView({
       itemsClassList: ['mark-active'],
       items: [],
-      filterKeyForItem: grammar => grammar.name,
-      elementForItem: grammar => {
+      filterKeyForItem: (grammar) => grammar.name,
+      elementForItem: (grammar) => {
         const grammarName = grammar.name || grammar.scopeName;
         const element = document.createElement('li');
         if (grammar === this.currentGrammar) {
@@ -24,12 +24,12 @@ module.exports = class GrammarListView {
           parser.classList.add(
             'grammar-selector-parser',
             'badge',
-            'badge-success'
+            'badge-success',
           );
           parser.textContent = 'Tree-sitter';
           parser.setAttribute(
             'title',
-            '(Recommended) A faster parser with improved syntax highlighting & code navigation support.'
+            '(Recommended) A faster parser with improved syntax highlighting & code navigation support.',
           );
           div.appendChild(parser);
         }
@@ -44,7 +44,7 @@ module.exports = class GrammarListView {
 
         return element;
       },
-      didConfirmSelection: grammar => {
+      didConfirmSelection: (grammar) => {
         this.cancel();
         if (grammar === this.autoDetect) {
           atom.textEditors.clearGrammarOverride(this.editor);
@@ -54,7 +54,7 @@ module.exports = class GrammarListView {
       },
       didCancelSelection: () => {
         this.cancel();
-      }
+      },
     });
     this.selectListView.element.classList.add('grammar-selector');
   }
@@ -101,19 +101,19 @@ module.exports = class GrammarListView {
 
       let grammars = atom.grammars
         .getGrammars({ includeTreeSitter: true })
-        .filter(grammar => {
+        .filter((grammar) => {
           return grammar !== atom.grammars.nullGrammar && grammar.name;
         });
 
       if (atom.config.get('grammar-selector.hideDuplicateTextMateGrammars')) {
         const blacklist = new Set();
-        grammars.forEach(grammar => {
+        grammars.forEach((grammar) => {
           if (isTreeSitter(grammar)) {
             blacklist.add(grammar.name);
           }
         });
         grammars = grammars.filter(
-          grammar => isTreeSitter(grammar) || !blacklist.has(grammar.name)
+          (grammar) => isTreeSitter(grammar) || !blacklist.has(grammar.name),
         );
       }
 

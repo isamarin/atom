@@ -10,7 +10,7 @@ const fileIconPath = `"${Path.join(
   '..',
   'resources',
   'cli',
-  'file.ico'
+  'file.ico',
 )}"`;
 
 class ShellOption {
@@ -26,32 +26,32 @@ class ShellOption {
   isRegistered(callback) {
     new Registry({
       hive: 'HKCU',
-      key: `${this.key}\\${this.parts[0].key}`
+      key: `${this.key}\\${this.parts[0].key}`,
     }).get(this.parts[0].name, (err, val) =>
-      callback(err == null && val != null && val.value === this.parts[0].value)
+      callback(err == null && val != null && val.value === this.parts[0].value),
     );
   }
 
   register(callback) {
     let doneCount = this.parts.length;
-    this.parts.forEach(part => {
-      let reg = new Registry({
+    this.parts.forEach((part) => {
+      const reg = new Registry({
         hive: 'HKCU',
-        key: part.key != null ? `${this.key}\\${part.key}` : this.key
+        key: part.key != null ? `${this.key}\\${part.key}` : this.key,
       });
       return reg.create(() =>
         reg.set(part.name, Registry.REG_SZ, part.value, () => {
           if (--doneCount === 0) return callback();
-        })
+        }),
       );
     });
   }
 
   deregister(callback) {
-    this.isRegistered(isRegistered => {
+    this.isRegistered((isRegistered) => {
       if (isRegistered) {
         new Registry({ hive: 'HKCU', key: this.key }).destroy(() =>
-          callback(null, true)
+          callback(null, true),
         );
       } else {
         callback(null, false);
@@ -62,7 +62,7 @@ class ShellOption {
   update(callback) {
     new Registry({
       hive: 'HKCU',
-      key: `${this.key}\\${this.parts[0].key}`
+      key: `${this.key}\\${this.parts[0].key}`,
     }).get(this.parts[0].name, (err, val) => {
       if (err != null || val == null) {
         callback(err);
@@ -80,25 +80,25 @@ exports.fileHandler = new ShellOption(
   [
     { key: 'shell\\open\\command', name: '', value: `${appPath} "%1"` },
     { key: 'shell\\open', name: 'FriendlyAppName', value: `${appName}` },
-    { key: 'DefaultIcon', name: '', value: `${fileIconPath}` }
-  ]
+    { key: 'DefaultIcon', name: '', value: `${fileIconPath}` },
+  ],
 );
 
-let contextParts = [
+const contextParts = [
   { key: 'command', name: '', value: `${appPath} "%1"` },
   { name: '', value: `Open with ${appName}` },
-  { name: 'Icon', value: `${appPath}` }
+  { name: 'Icon', value: `${appPath}` },
 ];
 
 exports.fileContextMenu = new ShellOption(
   `\\Software\\Classes\\*\\shell\\${appName}`,
-  contextParts
+  contextParts,
 );
 exports.folderContextMenu = new ShellOption(
   `\\Software\\Classes\\Directory\\shell\\${appName}`,
-  contextParts
+  contextParts,
 );
 exports.folderBackgroundContextMenu = new ShellOption(
   `\\Software\\Classes\\Directory\\background\\shell\\${appName}`,
-  JSON.parse(JSON.stringify(contextParts).replace('%1', '%V'))
+  JSON.parse(JSON.stringify(contextParts).replace('%1', '%V')),
 );

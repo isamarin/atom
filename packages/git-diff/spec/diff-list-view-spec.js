@@ -10,7 +10,7 @@ describe('git-diff:toggle-diff-list', () => {
     fs.copySync(path.join(__dirname, 'fixtures', 'working-dir'), projectPath);
     fs.moveSync(
       path.join(projectPath, 'git.git'),
-      path.join(projectPath, '.git')
+      path.join(projectPath, '.git'),
     );
     atom.project.setPaths([projectPath]);
 
@@ -36,7 +36,7 @@ describe('git-diff:toggle-diff-list', () => {
   it('shows a list of all diff hunks', () => {
     diffListView = document.querySelector('.diff-list-view ol');
     expect(diffListView.textContent).toBe(
-      'while (items.length > 0) {a-9,1 +9,1'
+      'while (items.length > 0) {a-9,1 +9,1',
     );
   });
 
@@ -44,7 +44,7 @@ describe('git-diff:toggle-diff-list', () => {
     editor.setCursorBufferPosition([0, 0]);
     atom.commands.dispatch(
       document.querySelector('.diff-list-view'),
-      'core:confirm'
+      'core:confirm',
     );
     expect(editor.getCursorBufferPosition()).toEqual([8, 4]);
   });

@@ -39,12 +39,12 @@ module.exports = class DecorationManager {
   getDecorations(propertyFilter) {
     let allDecorations = [];
 
-    this.decorationsByMarker.forEach(decorations => {
-      decorations.forEach(decoration => allDecorations.push(decoration));
+    this.decorationsByMarker.forEach((decorations) => {
+      decorations.forEach((decoration) => allDecorations.push(decoration));
     });
     if (propertyFilter != null) {
-      allDecorations = allDecorations.filter(function(decoration) {
-        for (let key in propertyFilter) {
+      allDecorations = allDecorations.filter(function (decoration) {
+        for (const key in propertyFilter) {
           const value = propertyFilter[key];
           if (decoration.properties[key] !== value) return false;
         }
@@ -55,20 +55,20 @@ module.exports = class DecorationManager {
   }
 
   getLineDecorations(propertyFilter) {
-    return this.getDecorations(propertyFilter).filter(decoration =>
-      decoration.isType('line')
+    return this.getDecorations(propertyFilter).filter((decoration) =>
+      decoration.isType('line'),
     );
   }
 
   getLineNumberDecorations(propertyFilter) {
-    return this.getDecorations(propertyFilter).filter(decoration =>
-      decoration.isType('line-number')
+    return this.getDecorations(propertyFilter).filter((decoration) =>
+      decoration.isType('line-number'),
     );
   }
 
   getHighlightDecorations(propertyFilter) {
-    return this.getDecorations(propertyFilter).filter(decoration =>
-      decoration.isType('highlight')
+    return this.getDecorations(propertyFilter).filter((decoration) =>
+      decoration.isType('highlight'),
     );
   }
 
@@ -76,8 +76,8 @@ module.exports = class DecorationManager {
     const result = [];
     result.push(...Array.from(this.overlayDecorations));
     if (propertyFilter != null) {
-      return result.filter(function(decoration) {
-        for (let key in propertyFilter) {
+      return result.filter(function (decoration) {
+        for (const key in propertyFilter) {
           const value = propertyFilter[key];
           if (decoration.properties[key] !== value) {
             return false;
@@ -95,11 +95,10 @@ module.exports = class DecorationManager {
 
     this.decorationCountsByLayer.forEach((count, markerLayer) => {
       const markers = markerLayer.findMarkers({
-        intersectsScreenRowRange: [startScreenRow, endScreenRow - 1]
+        intersectsScreenRowRange: [startScreenRow, endScreenRow - 1],
       });
-      const layerDecorations = this.layerDecorationsByMarkerLayer.get(
-        markerLayer
-      );
+      const layerDecorations =
+        this.layerDecorationsByMarkerLayer.get(markerLayer);
       const hasMarkerDecorations =
         this.markerDecorationCountsByLayer.get(markerLayer) > 0;
 
@@ -107,19 +106,18 @@ module.exports = class DecorationManager {
         const marker = markers[i];
         if (!marker.isValid()) continue;
 
-        let decorationPropertiesForMarker = decorationPropertiesByMarker.get(
-          marker
-        );
+        let decorationPropertiesForMarker =
+          decorationPropertiesByMarker.get(marker);
         if (decorationPropertiesForMarker == null) {
           decorationPropertiesForMarker = [];
           decorationPropertiesByMarker.set(
             marker,
-            decorationPropertiesForMarker
+            decorationPropertiesForMarker,
           );
         }
 
         if (layerDecorations) {
-          layerDecorations.forEach(layerDecoration => {
+          layerDecorations.forEach((layerDecoration) => {
             const properties =
               layerDecoration.getPropertiesForMarker(marker) ||
               layerDecoration.getProperties();
@@ -130,7 +128,7 @@ module.exports = class DecorationManager {
         if (hasMarkerDecorations) {
           const decorationsForMarker = this.decorationsByMarker.get(marker);
           if (decorationsForMarker) {
-            decorationsForMarker.forEach(decoration => {
+            decorationsForMarker.forEach((decoration) => {
               decorationPropertiesForMarker.push(decoration.getProperties());
             });
           }
@@ -145,7 +143,7 @@ module.exports = class DecorationManager {
     const decorationsByMarkerId = {};
     for (const layer of this.decorationCountsByLayer.keys()) {
       for (const marker of layer.findMarkers({
-        intersectsScreenRowRange: [startScreenRow, endScreenRow]
+        intersectsScreenRowRange: [startScreenRow, endScreenRow],
       })) {
         const decorations = this.decorationsByMarker.get(marker);
         if (decorations) {
@@ -161,7 +159,7 @@ module.exports = class DecorationManager {
 
     for (const layer of this.decorationCountsByLayer.keys()) {
       for (const marker of layer.findMarkers({
-        intersectsScreenRowRange: [startScreenRow, endScreenRow]
+        intersectsScreenRowRange: [startScreenRow, endScreenRow],
       })) {
         if (marker.isValid()) {
           const screenRange = marker.getScreenRange();
@@ -170,21 +168,20 @@ module.exports = class DecorationManager {
 
           const decorations = this.decorationsByMarker.get(marker);
           if (decorations) {
-            decorations.forEach(decoration => {
+            decorations.forEach((decoration) => {
               decorationsState[decoration.id] = {
                 properties: decoration.properties,
                 screenRange,
                 bufferRange,
-                rangeIsReversed
+                rangeIsReversed,
               };
             });
           }
 
-          const layerDecorations = this.layerDecorationsByMarkerLayer.get(
-            layer
-          );
+          const layerDecorations =
+            this.layerDecorationsByMarkerLayer.get(layer);
           if (layerDecorations) {
-            layerDecorations.forEach(layerDecoration => {
+            layerDecorations.forEach((layerDecoration) => {
               const properties =
                 layerDecoration.getPropertiesForMarker(marker) ||
                 layerDecoration.getProperties();
@@ -192,7 +189,7 @@ module.exports = class DecorationManager {
                 properties,
                 screenRange,
                 bufferRange,
-                rangeIsReversed
+                rangeIsReversed,
               };
             });
           }
@@ -300,13 +297,13 @@ module.exports = class DecorationManager {
     if (newCount === 1) {
       this.layerUpdateDisposablesByLayer.set(
         layer,
-        layer.onDidUpdate(this.emitDidUpdateDecorations.bind(this))
+        layer.onDidUpdate(this.emitDidUpdateDecorations.bind(this)),
       );
     }
     if (isMarkerDecoration) {
       this.markerDecorationCountsByLayer.set(
         layer,
-        (this.markerDecorationCountsByLayer.get(layer) || 0) + 1
+        (this.markerDecorationCountsByLayer.get(layer) || 0) + 1,
       );
     }
   }
@@ -321,7 +318,7 @@ module.exports = class DecorationManager {
     }
     if (isMarkerDecoration) {
       this.markerDecorationCountsByLayer.set(
-        this.markerDecorationCountsByLayer.get(layer) - 1
+        this.markerDecorationCountsByLayer.get(layer) - 1,
       );
     }
   }

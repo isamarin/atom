@@ -6,18 +6,20 @@ const ModuleCache = require('../../src/module-cache');
 
 const CONFIG = require('../config');
 
-module.exports = function() {
+module.exports = function () {
   console.log(`Generating module cache for ${CONFIG.intermediateAppPath}`);
-  for (let packageName of Object.keys(CONFIG.appMetadata.packageDependencies)) {
+  for (const packageName of Object.keys(
+    CONFIG.appMetadata.packageDependencies,
+  )) {
     ModuleCache.create(
-      path.join(CONFIG.intermediateAppPath, 'node_modules', packageName)
+      path.join(CONFIG.intermediateAppPath, 'node_modules', packageName),
     );
   }
   ModuleCache.create(CONFIG.intermediateAppPath);
   const newMetadata = JSON.parse(
-    fs.readFileSync(path.join(CONFIG.intermediateAppPath, 'package.json'))
+    fs.readFileSync(path.join(CONFIG.intermediateAppPath, 'package.json')),
   );
-  for (let folder of newMetadata._atomModuleCache.folders) {
+  for (const folder of newMetadata._atomModuleCache.folders) {
     if (folder.paths.indexOf('') !== -1) {
       folder.paths = [
         '',
@@ -26,13 +28,13 @@ module.exports = function() {
         'src',
         'src/main-process',
         'static',
-        'vendor'
+        'vendor',
       ];
     }
   }
   CONFIG.appMetadata = newMetadata;
   fs.writeFileSync(
     path.join(CONFIG.intermediateAppPath, 'package.json'),
-    JSON.stringify(CONFIG.appMetadata)
+    JSON.stringify(CONFIG.appMetadata),
   );
 };

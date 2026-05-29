@@ -30,7 +30,7 @@ export function activate() {
           // make a Selector object
           selector = new Selector([
             { name: 'LF', value: '\n' },
-            { name: 'CRLF', value: '\r\n' }
+            { name: 'CRLF', value: '\r\n' },
           ]);
           // Add disposable for selector
           selectorDisposable = new Disposable(() => selector.dispose());
@@ -40,16 +40,16 @@ export function activate() {
         selector.show();
       },
 
-      'line-ending-selector:convert-to-LF': event => {
+      'line-ending-selector:convert-to-LF': (event) => {
         const editorElement = event.target.closest('atom-text-editor');
         setLineEnding(editorElement.getModel(), '\n');
       },
 
-      'line-ending-selector:convert-to-CRLF': event => {
+      'line-ending-selector:convert-to-CRLF': (event) => {
         const editorElement = event.target.closest('atom-text-editor');
         setLineEnding(editorElement.getModel(), '\r\n');
-      }
-    })
+      },
+    }),
   );
 }
 
@@ -58,14 +58,14 @@ export function deactivate() {
 }
 
 export function consumeStatusBar(statusBar) {
-  let statusBarItem = new StatusBarItem();
+  const statusBarItem = new StatusBarItem();
   let currentBufferDisposable = null;
   let tooltipDisposable = null;
 
-  const updateTile = _.debounce(buffer => {
-    getLineEndings(buffer).then(lineEndings => {
+  const updateTile = _.debounce((buffer) => {
+    getLineEndings(buffer).then((lineEndings) => {
       if (lineEndings.size === 0) {
-        let defaultLineEnding = getDefaultLineEnding();
+        const defaultLineEnding = getDefaultLineEnding();
         buffer.setPreferredLineEnding(defaultLineEnding);
         lineEndings = new Set().add(defaultLineEnding);
       }
@@ -74,11 +74,11 @@ export function consumeStatusBar(statusBar) {
   }, 0);
 
   disposables.add(
-    atom.workspace.observeActiveTextEditor(editor => {
+    atom.workspace.observeActiveTextEditor((editor) => {
       if (currentBufferDisposable) currentBufferDisposable.dispose();
 
       if (editor && editor.getBuffer) {
-        let buffer = editor.getBuffer();
+        const buffer = editor.getBuffer();
         updateTile(buffer);
         currentBufferDisposable = buffer.onDidChange(({ oldText, newText }) => {
           if (!statusBarItem.hasLineEnding('\n')) {
@@ -105,27 +105,27 @@ export function consumeStatusBar(statusBar) {
       tooltipDisposable = atom.tooltips.add(statusBarItem.element, {
         title() {
           return `File uses ${statusBarItem.description()} line endings`;
-        }
+        },
       });
       disposables.add(tooltipDisposable);
-    })
+    }),
   );
 
   disposables.add(
     new Disposable(() => {
       if (currentBufferDisposable) currentBufferDisposable.dispose();
-    })
+    }),
   );
 
   statusBarItem.onClick(() => {
     const editor = atom.workspace.getActiveTextEditor();
     atom.commands.dispatch(
       atom.views.getView(editor),
-      'line-ending-selector:show'
+      'line-ending-selector:show',
     );
   });
 
-  let tile = statusBar.addRightTile({ item: statusBarItem, priority: 200 });
+  const tile = statusBar.addRightTile({ item: statusBarItem, priority: 200 });
   disposables.add(new Disposable(() => tile.destroy()));
 }
 
@@ -149,10 +149,10 @@ function getLineEndings(buffer) {
         if (hasLF) result.add('\n');
         if (hasCRLF) result.add('\r\n');
         return result;
-      }
+      },
     );
   } else {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const result = new Set();
       for (let i = 0; i < buffer.getLineCount() - 1; i++) {
         result.add(buffer.lineEndingForRow(i));
@@ -164,7 +164,7 @@ function getLineEndings(buffer) {
 
 export function setLineEnding(item, lineEnding) {
   if (item && item.getBuffer) {
-    let buffer = item.getBuffer();
+    const buffer = item.getBuffer();
     buffer.setPreferredLineEnding(lineEnding);
     buffer.setText(buffer.getText().replace(LineEndingRegExp, lineEnding));
   }

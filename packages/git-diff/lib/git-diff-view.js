@@ -31,7 +31,7 @@ export default class GitDiffView {
     subscribeToRepository();
 
     this.subscriptions.add(
-      atom.project.onDidChangePaths(subscribeToRepository)
+      atom.project.onDidChangePaths(subscribeToRepository),
     );
   }
 
@@ -85,7 +85,7 @@ export default class GitDiffView {
     }
 
     // Don't cache the path unless we know we need it.
-    let editorPath = this.editor.getPath();
+    const editorPath = this.editor.getPath();
 
     this.repository = await repositoryForPath(editorPath);
     if (this.repository !== null) {
@@ -99,7 +99,7 @@ export default class GitDiffView {
       this._repoSubs = new CompositeDisposable(
         this.repository.onDidDestroy(subscribeToRepository),
         this.repository.onDidChangeStatuses(scheduleUpdate),
-        this.repository.onDidChangeStatus(changedPath => {
+        this.repository.onDidChangeStatus((changedPath) => {
           if (changedPath === this.editorPath) scheduleUpdate();
         }),
         this.editor.onDidStopChanging(scheduleUpdate),
@@ -111,19 +111,19 @@ export default class GitDiffView {
         atom.commands.add(
           this.editorElement,
           'git-diff:move-to-next-diff',
-          this.moveToNextDiff.bind(this)
+          this.moveToNextDiff.bind(this),
         ),
         atom.commands.add(
           this.editorElement,
           'git-diff:move-to-previous-diff',
-          this.moveToPreviousDiff.bind(this)
+          this.moveToPreviousDiff.bind(this),
         ),
         atom.config.onDidChange(
           'git-diff.showIconsInEditorGutter',
-          updateIconDecoration
+          updateIconDecoration,
         ),
         atom.config.onDidChange('editor.showLineNumbers', updateIconDecoration),
-        this.editorElement.onDidAttach(updateIconDecoration)
+        this.editorElement.onDidAttach(updateIconDecoration),
       );
 
       // Every time the repo is changed, the editor needs to be reinitialized.
@@ -258,9 +258,15 @@ export default class GitDiffView {
   }
 
   markRange(startRow, endRow, klass) {
-    const marker = this.editor.markBufferRange([[startRow, 0], [endRow, 0]], {
-      invalidate: 'never'
-    });
+    const marker = this.editor.markBufferRange(
+      [
+        [startRow, 0],
+        [endRow, 0],
+      ],
+      {
+        invalidate: 'never',
+      },
+    );
     this.editor.decorateMarker(marker, { type: 'line-number', class: klass });
     return marker;
   }

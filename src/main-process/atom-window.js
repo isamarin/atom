@@ -3,7 +3,7 @@ const {
   app,
   dialog,
   ipcMain,
-  nativeImage
+  nativeImage,
 } = require('electron');
 const getAppName = require('../get-app-name');
 const path = require('path');
@@ -33,10 +33,10 @@ module.exports = class AtomWindow extends EventEmitter {
 
     const locationsToOpen = settings.locationsToOpen || [];
 
-    this.loadedPromise = new Promise(resolve => {
+    this.loadedPromise = new Promise((resolve) => {
       this.resolveLoadedPromise = resolve;
     });
-    this.closedPromise = new Promise(resolve => {
+    this.closedPromise = new Promise((resolve) => {
       this.resolveClosedPromise = resolve;
     });
 
@@ -59,9 +59,9 @@ module.exports = class AtomWindow extends EventEmitter {
         sandbox: false,
         webviewTag: true,
         // node support in threads
-        nodeIntegrationInWorker: true
+        nodeIntegrationInWorker: true,
       },
-      simpleFullscreen: this.getSimpleFullscreen()
+      simpleFullscreen: this.getSimpleFullscreen(),
     };
 
     // Don't set icon on Windows so the exe's ico will be used as window and
@@ -86,11 +86,11 @@ module.exports = class AtomWindow extends EventEmitter {
             {
               userSettings: !this.isSpec
                 ? this.atomApplication.configFile.get()
-                : null
+                : null,
             },
-            this.loadSettings
-          )
-        )
+            this.loadSettings,
+          ),
+        ),
     });
 
     this.handleEvents();
@@ -108,7 +108,7 @@ module.exports = class AtomWindow extends EventEmitter {
     this.addLocationsToOpen(locationsToOpen);
 
     this.loadSettings.hasOpenFiles = locationsToOpen.some(
-      location => location.pathToOpen && !location.isDirectory
+      (location) => location.pathToOpen && !location.isDirectory,
     );
     this.loadSettings.initialProjectRoots = this.projectRoots;
 
@@ -125,7 +125,7 @@ module.exports = class AtomWindow extends EventEmitter {
         StartupTime.deleteData();
 
         return timingData;
-      }
+      },
     });
 
     // Only send to the first non-spec window created
@@ -160,8 +160,8 @@ module.exports = class AtomWindow extends EventEmitter {
       url.format({
         protocol: 'file',
         pathname: `${this.resourcePath}/static/index.html`,
-        slashes: true
-      })
+        slashes: true,
+      }),
     );
 
     this.browserWindow.showSaveDialog = this.showSaveDialog.bind(this);
@@ -182,19 +182,19 @@ module.exports = class AtomWindow extends EventEmitter {
   setupContextMenu() {
     const ContextMenu = require('./context-menu');
 
-    this.browserWindow.on('context-menu', menuTemplate => {
+    this.browserWindow.on('context-menu', (menuTemplate) => {
       return new ContextMenu(menuTemplate, this);
     });
   }
 
   containsLocations(locations) {
-    return locations.every(location => this.containsLocation(location));
+    return locations.every((location) => this.containsLocation(location));
   }
 
   containsLocation(location) {
     if (!location.pathToOpen) return false;
 
-    return this.projectRoots.some(projectPath => {
+    return this.projectRoots.some((projectPath) => {
       if (location.pathToOpen === projectPath) return true;
       if (location.pathToOpen.startsWith(path.join(projectPath, path.sep))) {
         if (!location.exists) return true;
@@ -205,7 +205,7 @@ module.exports = class AtomWindow extends EventEmitter {
   }
 
   handleEvents() {
-    this.browserWindow.on('close', async event => {
+    this.browserWindow.on('close', async (event) => {
       if (
         (!this.atomApplication.quitting ||
           this.atomApplication.quittingForUpdate) &&
@@ -232,7 +232,7 @@ module.exports = class AtomWindow extends EventEmitter {
         cancelId: 1, // Canceling should be the least destructive action
         message: 'Editor is not responding',
         detail:
-          'The editor is not responding. Would you like to force close it or just keep waiting?'
+          'The editor is not responding. Would you like to force close it or just keep waiting?',
       });
       if (result.response === 0) this.browserWindow.destroy();
     });
@@ -251,7 +251,7 @@ module.exports = class AtomWindow extends EventEmitter {
         buttons: ['Close Window', 'Reload', 'Keep It Open'],
         cancelId: 2, // Canceling should be the least destructive action
         message: 'The editor has crashed',
-        detail: 'Please report this issue to https://github.com/atom/atom'
+        detail: 'Please report this issue to https://github.com/atom/atom',
       });
 
       switch (result.response) {
@@ -273,13 +273,15 @@ module.exports = class AtomWindow extends EventEmitter {
 
     // Spec window's web view should always have focus
     if (this.isSpec)
-      this.browserWindow.on('blur', () => this.browserWindow.webContents.focus());
+      this.browserWindow.on('blur', () =>
+        this.browserWindow.webContents.focus(),
+      );
   }
 
   async prepareToUnload() {
     if (this.isSpecWindow()) return true;
 
-    this.lastPrepareToUnloadPromise = new Promise(resolve => {
+    this.lastPrepareToUnloadPromise = new Promise((resolve) => {
       const callback = (event, result) => {
         if (
           BrowserWindow.fromWebContents(event.sender) === this.browserWindow
@@ -334,14 +336,14 @@ module.exports = class AtomWindow extends EventEmitter {
       NODE_ENV,
       NODE_PATH,
       ATOM_HOME,
-      ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT
+      ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT,
     } = env;
 
     this.browserWindow.webContents.send('environment', {
       NODE_ENV,
       NODE_PATH,
       ATOM_HOME,
-      ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT
+      ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT,
     });
   }
 
@@ -468,10 +470,10 @@ module.exports = class AtomWindow extends EventEmitter {
   }
 
   reload() {
-    this.loadedPromise = new Promise(resolve => {
+    this.loadedPromise = new Promise((resolve) => {
       this.resolveLoadedPromise = resolve;
     });
-    this.prepareToUnload().then(canUnload => {
+    this.prepareToUnload().then((canUnload) => {
       if (canUnload) this.browserWindow.reload();
     });
     return this.loadedPromise;
@@ -481,9 +483,9 @@ module.exports = class AtomWindow extends EventEmitter {
     options = Object.assign(
       {
         title: 'Save File',
-        defaultPath: this.projectRoots[0]
+        defaultPath: this.projectRoots[0],
       },
-      options
+      options,
     );
 
     let promise = dialog.showSaveDialog(this.browserWindow, options);

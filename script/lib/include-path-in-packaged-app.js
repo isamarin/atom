@@ -3,7 +3,7 @@
 const path = require('path');
 const CONFIG = require('../config');
 
-module.exports = function(filePath) {
+module.exports = function (filePath) {
   return (
     !EXCLUDED_PATHS_REGEXP.test(filePath) ||
     INCLUDED_PATHS_REGEXP.test(filePath)
@@ -37,7 +37,7 @@ const EXCLUDE_REGEXPS_SOURCES = [
   escapeRegExp(path.join('pegjs', 'examples')),
   escapeRegExp(path.join('get-parameter-names', 'node_modules', 'testla')),
   escapeRegExp(
-    path.join('get-parameter-names', 'node_modules', '.bin', 'testla')
+    path.join('get-parameter-names', 'node_modules', '.bin', 'testla'),
   ),
   escapeRegExp(path.join('jasmine-reporters', 'ext')),
   escapeRegExp(path.join('node_modules', 'nan')) + '\\b',
@@ -57,7 +57,7 @@ const EXCLUDE_REGEXPS_SOURCES = [
   escapeRegExp(path.join('node_modules', 'pegjs')),
   escapeRegExp(path.join('node_modules', '.bin', 'pegjs')),
   escapeRegExp(
-    path.join('node_modules', 'spellchecker', 'vendor', 'hunspell') + path.sep
+    path.join('node_modules', 'spellchecker', 'vendor', 'hunspell') + path.sep,
   ) + '.*',
 
   // node_modules of the fuzzy-native package are only required for building it.
@@ -119,11 +119,11 @@ const EXCLUDE_REGEXPS_SOURCES = [
     'transforers' +
     escapeRegExp(path.sep) +
     'spec' +
-    escapeRegExp(path.sep)
+    escapeRegExp(path.sep),
 ];
 
 // Ignore spec directories in all bundled packages
-for (let packageName in CONFIG.appMetadata.packageDependencies) {
+for (const packageName in CONFIG.appMetadata.packageDependencies) {
   EXCLUDE_REGEXPS_SOURCES.push(
     '^' +
       escapeRegExp(
@@ -131,27 +131,27 @@ for (let packageName in CONFIG.appMetadata.packageDependencies) {
           CONFIG.repositoryRootPath,
           'node_modules',
           packageName,
-          'spec'
-        )
-      )
+          'spec',
+        ),
+      ),
   );
 }
 
 // Ignore Hunspell dictionaries only on macOS.
 if (process.platform === 'darwin') {
   EXCLUDE_REGEXPS_SOURCES.push(
-    escapeRegExp(path.join('spellchecker', 'vendor', 'hunspell_dictionaries'))
+    escapeRegExp(path.join('spellchecker', 'vendor', 'hunspell_dictionaries')),
   );
 }
 
 const EXCLUDED_PATHS_REGEXP = new RegExp(
-  EXCLUDE_REGEXPS_SOURCES.map(path => `(${path})`).join('|')
+  EXCLUDE_REGEXPS_SOURCES.map((path) => `(${path})`).join('|'),
 );
 
 const INCLUDED_PATHS_REGEXP = new RegExp(
   escapeRegExp(
-    path.join('node_modules', 'node-gyp', 'src', 'win_delay_load_hook.cc')
-  )
+    path.join('node_modules', 'node-gyp', 'src', 'win_delay_load_hook.cc'),
+  ),
 );
 
 function escapeRegExp(string) {

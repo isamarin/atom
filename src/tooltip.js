@@ -9,7 +9,7 @@ const listen = require('./delegated-listener');
 
 let followThroughTimer = null;
 
-const Tooltip = function(element, options, viewRegistry) {
+const Tooltip = function (element, options, viewRegistry) {
   this.options = null;
   this.enabled = null;
   this.timeout = null;
@@ -38,11 +38,11 @@ Tooltip.DEFAULTS = {
   container: false,
   viewport: {
     selector: 'body',
-    padding: 0
-  }
+    padding: 0,
+  },
 };
 
-Tooltip.prototype.init = function(element, options) {
+Tooltip.prototype.init = function (element, options) {
   this.enabled = true;
   this.element = element;
   this.options = this.getOptions(options);
@@ -54,7 +54,7 @@ Tooltip.prototype.init = function(element, options) {
       this.viewport = this.options.viewport.call(this, this.element);
     } else {
       this.viewport = document.querySelector(
-        this.options.viewport.selector || this.options.viewport
+        this.options.viewport.selector || this.options.viewport,
       );
     }
   }
@@ -62,14 +62,14 @@ Tooltip.prototype.init = function(element, options) {
 
   if (this.element instanceof document.constructor && !this.options.selector) {
     throw new Error(
-      '`selector` option must be specified when initializing tooltip on the window.document object!'
+      '`selector` option must be specified when initializing tooltip on the window.document object!',
     );
   }
 
   const triggers = this.options.trigger.split(' ');
 
   for (let i = triggers.length; i--; ) {
-    var trigger = triggers[i];
+    const trigger = triggers[i];
 
     if (trigger === 'click') {
       this.disposables.add(
@@ -77,10 +77,10 @@ Tooltip.prototype.init = function(element, options) {
           this.element,
           'click',
           this.options.selector,
-          this.toggle.bind(this)
-        )
+          this.toggle.bind(this),
+        ),
       );
-      this.hideOnClickOutsideOfTooltip = event => {
+      this.hideOnClickOutsideOfTooltip = (event) => {
         const tooltipElement = this.getTooltipElement();
         if (tooltipElement === event.target) return;
         if (tooltipElement.contains(event.target)) return;
@@ -112,16 +112,16 @@ Tooltip.prototype.init = function(element, options) {
           this.element,
           eventIn,
           this.options.selector,
-          this.enter.bind(this)
-        )
+          this.enter.bind(this),
+        ),
       );
       this.disposables.add(
         listen(
           this.element,
           eventOut,
           this.options.selector,
-          this.leave.bind(this)
-        )
+          this.leave.bind(this),
+        ),
       );
     }
   }
@@ -129,52 +129,52 @@ Tooltip.prototype.init = function(element, options) {
   this.options.selector
     ? (this._options = extend({}, this.options, {
         trigger: 'manual',
-        selector: ''
+        selector: '',
       }))
     : this.fixTitle();
 };
 
-Tooltip.prototype.startObservingMutations = function() {
+Tooltip.prototype.startObservingMutations = function () {
   this.mutationObserver.observe(this.getTooltipElement(), {
     attributes: true,
     childList: true,
     characterData: true,
-    subtree: true
+    subtree: true,
   });
 };
 
-Tooltip.prototype.stopObservingMutations = function() {
+Tooltip.prototype.stopObservingMutations = function () {
   this.mutationObserver.disconnect();
 };
 
-Tooltip.prototype.handleMutations = function() {
+Tooltip.prototype.handleMutations = function () {
   window.requestAnimationFrame(
-    function() {
+    function () {
       this.stopObservingMutations();
       this.recalculatePosition();
       this.startObservingMutations();
-    }.bind(this)
+    }.bind(this),
   );
 };
 
-Tooltip.prototype.getDefaults = function() {
+Tooltip.prototype.getDefaults = function () {
   return Tooltip.DEFAULTS;
 };
 
-Tooltip.prototype.getOptions = function(options) {
+Tooltip.prototype.getOptions = function (options) {
   options = extend({}, this.getDefaults(), options);
 
   if (options.delay && typeof options.delay === 'number') {
     options.delay = {
       show: options.delay,
-      hide: options.delay
+      hide: options.delay,
     };
   }
 
   return options;
 };
 
-Tooltip.prototype.getDelegateOptions = function() {
+Tooltip.prototype.getDelegateOptions = function () {
   const options = {};
   const defaults = this.getDefaults();
 
@@ -188,7 +188,7 @@ Tooltip.prototype.getDelegateOptions = function() {
   return options;
 };
 
-Tooltip.prototype.enter = function(event) {
+Tooltip.prototype.enter = function (event) {
   if (event) {
     if (event.currentTarget !== this.element) {
       this.getDelegateComponent(event.currentTarget).enter(event);
@@ -215,14 +215,14 @@ Tooltip.prototype.enter = function(event) {
   }
 
   this.timeout = setTimeout(
-    function() {
+    function () {
       if (this.hoverState === 'in') this.show();
     }.bind(this),
-    this.options.delay.show
+    this.options.delay.show,
   );
 };
 
-Tooltip.prototype.isInStateTrue = function() {
+Tooltip.prototype.isInStateTrue = function () {
   for (const key in this.inState) {
     if (this.inState[key]) return true;
   }
@@ -230,7 +230,7 @@ Tooltip.prototype.isInStateTrue = function() {
   return false;
 };
 
-Tooltip.prototype.leave = function(event) {
+Tooltip.prototype.leave = function (event) {
   if (event) {
     if (event.currentTarget !== this.element) {
       this.getDelegateComponent(event.currentTarget).leave(event);
@@ -249,18 +249,18 @@ Tooltip.prototype.leave = function(event) {
   if (!this.options.delay || !this.options.delay.hide) return this.hide();
 
   this.timeout = setTimeout(
-    function() {
+    function () {
       if (this.hoverState === 'out') this.hide();
     }.bind(this),
-    this.options.delay.hide
+    this.options.delay.hide,
   );
 };
 
-Tooltip.prototype.show = function() {
+Tooltip.prototype.show = function () {
   if (this.hasContent() && this.enabled) {
     if (this.hideOnClickOutsideOfTooltip) {
       window.addEventListener('click', this.hideOnClickOutsideOfTooltip, {
-        capture: true
+        capture: true,
       });
     }
 
@@ -268,7 +268,7 @@ Tooltip.prototype.show = function() {
       window.addEventListener(
         'keydown',
         this.hideOnKeydownOutsideOfTooltip,
-        true
+        true,
       );
     }
 
@@ -311,12 +311,14 @@ Tooltip.prototype.show = function() {
         placement === 'bottom' && pos.bottom + actualHeight > viewportDim.bottom
           ? 'top'
           : placement === 'top' && pos.top - actualHeight < viewportDim.top
-          ? 'bottom'
-          : placement === 'right' && pos.right + actualWidth > viewportDim.width
-          ? 'left'
-          : placement === 'left' && pos.left - actualWidth < viewportDim.left
-          ? 'right'
-          : placement;
+            ? 'bottom'
+            : placement === 'right' &&
+                pos.right + actualWidth > viewportDim.width
+              ? 'left'
+              : placement === 'left' &&
+                  pos.left - actualWidth < viewportDim.left
+                ? 'right'
+                : placement;
 
       tip.classList.remove(orgPlacement);
       tip.classList.add(placement);
@@ -326,7 +328,7 @@ Tooltip.prototype.show = function() {
       placement,
       pos,
       actualWidth,
-      actualHeight
+      actualHeight,
     );
 
     this.applyPlacement(calculatedOffset, placement);
@@ -338,7 +340,7 @@ Tooltip.prototype.show = function() {
   }
 };
 
-Tooltip.prototype.applyPlacement = function(offset, placement) {
+Tooltip.prototype.applyPlacement = function (offset, placement) {
   const tip = this.getTooltipElement();
 
   const width = tip.offsetWidth;
@@ -369,7 +371,7 @@ Tooltip.prototype.applyPlacement = function(offset, placement) {
     placement,
     offset,
     actualWidth,
-    actualHeight
+    actualHeight,
   );
 
   if (delta.left) offset.left += delta.left;
@@ -387,7 +389,7 @@ Tooltip.prototype.applyPlacement = function(offset, placement) {
   this.replaceArrow(arrowDelta, tip[arrowOffsetPosition], isVertical);
 };
 
-Tooltip.prototype.replaceArrow = function(delta, dimension, isVertical) {
+Tooltip.prototype.replaceArrow = function (delta, dimension, isVertical) {
   const arrow = this.getArrowElement();
   const amount = 50 * (1 - delta / dimension) + '%';
 
@@ -400,7 +402,7 @@ Tooltip.prototype.replaceArrow = function(delta, dimension, isVertical) {
   }
 };
 
-Tooltip.prototype.setContent = function() {
+Tooltip.prototype.setContent = function () {
   const tip = this.getTooltipElement();
 
   if (this.options.class) {
@@ -422,7 +424,7 @@ Tooltip.prototype.setContent = function() {
   tip.classList.remove('fade', 'in', 'top', 'bottom', 'left', 'right');
 };
 
-Tooltip.prototype.hide = function(callback) {
+Tooltip.prototype.hide = function (callback) {
   this.inState = {};
 
   if (this.hideOnClickOutsideOfTooltip) {
@@ -433,7 +435,7 @@ Tooltip.prototype.hide = function(callback) {
     window.removeEventListener(
       'keydown',
       this.hideOnKeydownOutsideOfTooltip,
-      true
+      true,
     );
   }
 
@@ -449,62 +451,62 @@ Tooltip.prototype.hide = function(callback) {
   this.hoverState = null;
 
   clearTimeout(followThroughTimer);
-  followThroughTimer = setTimeout(function() {
+  followThroughTimer = setTimeout(function () {
     followThroughTimer = null;
   }, Tooltip.FOLLOW_THROUGH_DURATION);
 
   return this;
 };
 
-Tooltip.prototype.fixTitle = function() {
+Tooltip.prototype.fixTitle = function () {
   if (
     this.element.getAttribute('title') ||
     typeof this.element.getAttribute('data-original-title') !== 'string'
   ) {
     this.element.setAttribute(
       'data-original-title',
-      this.element.getAttribute('title') || ''
+      this.element.getAttribute('title') || '',
     );
     this.element.setAttribute('title', '');
   }
 };
 
-Tooltip.prototype.hasContent = function() {
+Tooltip.prototype.hasContent = function () {
   return this.getTitle() || this.options.item;
 };
 
-Tooltip.prototype.getCalculatedOffset = function(
+Tooltip.prototype.getCalculatedOffset = function (
   placement,
   pos,
   actualWidth,
-  actualHeight
+  actualHeight,
 ) {
   return placement === 'bottom'
     ? {
         top: pos.top + pos.height,
-        left: pos.left + pos.width / 2 - actualWidth / 2
+        left: pos.left + pos.width / 2 - actualWidth / 2,
       }
     : placement === 'top'
-    ? {
-        top: pos.top - actualHeight,
-        left: pos.left + pos.width / 2 - actualWidth / 2
-      }
-    : placement === 'left'
-    ? {
-        top: pos.top + pos.height / 2 - actualHeight / 2,
-        left: pos.left - actualWidth
-      }
-    : /* placement === 'right' */ {
-        top: pos.top + pos.height / 2 - actualHeight / 2,
-        left: pos.left + pos.width
-      };
+      ? {
+          top: pos.top - actualHeight,
+          left: pos.left + pos.width / 2 - actualWidth / 2,
+        }
+      : placement === 'left'
+        ? {
+            top: pos.top + pos.height / 2 - actualHeight / 2,
+            left: pos.left - actualWidth,
+          }
+        : /* placement === 'right' */ {
+            top: pos.top + pos.height / 2 - actualHeight / 2,
+            left: pos.left + pos.width,
+          };
 };
 
-Tooltip.prototype.getViewportAdjustedDelta = function(
+Tooltip.prototype.getViewportAdjustedDelta = function (
   placement,
   pos,
   actualWidth,
-  actualHeight
+  actualHeight,
 ) {
   const delta = { top: 0, left: 0 };
   if (!this.viewport) return delta;
@@ -544,7 +546,7 @@ Tooltip.prototype.getViewportAdjustedDelta = function(
   return delta;
 };
 
-Tooltip.prototype.getTitle = function() {
+Tooltip.prototype.getTitle = function () {
   const title = this.element.getAttribute('data-original-title');
   if (title) {
     return title;
@@ -555,19 +557,19 @@ Tooltip.prototype.getTitle = function() {
   }
 };
 
-Tooltip.prototype.getUID = function(prefix) {
+Tooltip.prototype.getUID = function (prefix) {
   do prefix += ~~(Math.random() * 1000000);
   while (document.getElementById(prefix));
   return prefix;
 };
 
-Tooltip.prototype.getTooltipElement = function() {
+Tooltip.prototype.getTooltipElement = function () {
   if (!this.tip) {
-    let div = document.createElement('div');
+    const div = document.createElement('div');
     div.innerHTML = this.options.template;
     if (div.children.length !== 1) {
       throw new Error(
-        'Tooltip `template` option must consist of exactly 1 top-level element!'
+        'Tooltip `template` option must consist of exactly 1 top-level element!',
       );
     }
     this.tip = div.firstChild;
@@ -575,25 +577,25 @@ Tooltip.prototype.getTooltipElement = function() {
   return this.tip;
 };
 
-Tooltip.prototype.getArrowElement = function() {
+Tooltip.prototype.getArrowElement = function () {
   this.arrow =
     this.arrow || this.getTooltipElement().querySelector('.tooltip-arrow');
   return this.arrow;
 };
 
-Tooltip.prototype.enable = function() {
+Tooltip.prototype.enable = function () {
   this.enabled = true;
 };
 
-Tooltip.prototype.disable = function() {
+Tooltip.prototype.disable = function () {
   this.enabled = false;
 };
 
-Tooltip.prototype.toggleEnabled = function() {
+Tooltip.prototype.toggleEnabled = function () {
   this.enabled = !this.enabled;
 };
 
-Tooltip.prototype.toggle = function(event) {
+Tooltip.prototype.toggle = function (event) {
   if (event) {
     if (event.currentTarget !== this.element) {
       this.getDelegateComponent(event.currentTarget).toggle(event);
@@ -610,26 +612,26 @@ Tooltip.prototype.toggle = function(event) {
   }
 };
 
-Tooltip.prototype.destroy = function() {
+Tooltip.prototype.destroy = function () {
   clearTimeout(this.timeout);
   this.tip && this.tip.remove();
   this.disposables.dispose();
 };
 
-Tooltip.prototype.getDelegateComponent = function(element) {
+Tooltip.prototype.getDelegateComponent = function (element) {
   let component = tooltipComponentsByElement.get(element);
   if (!component) {
     component = new Tooltip(
       element,
       this.getDelegateOptions(),
-      this.viewRegistry
+      this.viewRegistry,
     );
     tooltipComponentsByElement.set(element, component);
   }
   return component;
 };
 
-Tooltip.prototype.recalculatePosition = function() {
+Tooltip.prototype.recalculatePosition = function () {
   const tip = this.getTooltipElement();
 
   let placement =
@@ -655,12 +657,12 @@ Tooltip.prototype.recalculatePosition = function() {
       placement === 'bottom' && pos.bottom + actualHeight > viewportDim.bottom
         ? 'top'
         : placement === 'top' && pos.top - actualHeight < viewportDim.top
-        ? 'bottom'
-        : placement === 'right' && pos.right + actualWidth > viewportDim.width
-        ? 'left'
-        : placement === 'left' && pos.left - actualWidth < viewportDim.left
-        ? 'right'
-        : placement;
+          ? 'bottom'
+          : placement === 'right' && pos.right + actualWidth > viewportDim.width
+            ? 'left'
+            : placement === 'left' && pos.left - actualWidth < viewportDim.left
+              ? 'right'
+              : placement;
 
     tip.classList.remove(orgPlacement);
     tip.classList.add(placement);
@@ -670,7 +672,7 @@ Tooltip.prototype.recalculatePosition = function() {
     placement,
     pos,
     actualWidth,
-    actualHeight
+    actualHeight,
   );
   this.applyPlacement(calculatedOffset, placement);
 };

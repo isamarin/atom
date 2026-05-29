@@ -16,26 +16,26 @@ const COMPILERS = {
   '.ts': packageTranspilationRegistry.wrapTranspiler(require('./typescript')),
   '.tsx': packageTranspilationRegistry.wrapTranspiler(require('./typescript')),
   '.coffee': packageTranspilationRegistry.wrapTranspiler(
-    require('./coffee-script')
-  )
+    require('./coffee-script'),
+  ),
 };
 
-exports.addTranspilerConfigForPath = function(
+exports.addTranspilerConfigForPath = function (
   packagePath,
   packageName,
   packageMeta,
-  config
+  config,
 ) {
   packagePath = fs.realpathSync(packagePath);
   packageTranspilationRegistry.addTranspilerConfigForPath(
     packagePath,
     packageName,
     packageMeta,
-    config
+    config,
   );
 };
 
-exports.removeTranspilerConfigForPath = function(packagePath) {
+exports.removeTranspilerConfigForPath = function (packagePath) {
   packagePath = fs.realpathSync(packagePath);
   packageTranspilationRegistry.removeTranspilerConfigForPath(packagePath);
 };
@@ -43,7 +43,7 @@ exports.removeTranspilerConfigForPath = function(packagePath) {
 const cacheStats = {};
 let cacheDirectory = null;
 
-exports.setAtomHomeDirectory = function(atomHome) {
+exports.setAtomHomeDirectory = function (atomHome) {
   let cacheDir = path.join(atomHome, 'compile-cache');
   if (
     process.env.USER === 'root' &&
@@ -55,15 +55,15 @@ exports.setAtomHomeDirectory = function(atomHome) {
   this.setCacheDirectory(cacheDir);
 };
 
-exports.setCacheDirectory = function(directory) {
+exports.setCacheDirectory = function (directory) {
   cacheDirectory = directory;
 };
 
-exports.getCacheDirectory = function() {
+exports.getCacheDirectory = function () {
   return cacheDirectory;
 };
 
-exports.addPathToCache = function(filePath, atomHome) {
+exports.addPathToCache = function (filePath, atomHome) {
   this.setAtomHomeDirectory(atomHome);
   const extension = path.extname(filePath);
 
@@ -81,15 +81,15 @@ exports.addPathToCache = function(filePath, atomHome) {
   }
 };
 
-exports.getCacheStats = function() {
+exports.getCacheStats = function () {
   return cacheStats;
 };
 
-exports.resetCacheStats = function() {
-  Object.keys(COMPILERS).forEach(function(extension) {
+exports.resetCacheStats = function () {
+  Object.keys(COMPILERS).forEach(function (extension) {
     cacheStats[extension] = {
       hits: 0,
-      misses: 0
+      misses: 0,
     };
   });
 };
@@ -128,7 +128,7 @@ function writeCachedJavaScript(relativeCachePath, code) {
 
 const INLINE_SOURCE_MAP_REGEXP = /\/\/[#@]\s*sourceMappingURL=([^'"\n]+)\s*$/gm;
 
-exports.install = function(resourcesPath, nodeRequire) {
+exports.install = function (resourcesPath, nodeRequire) {
   const snapshotSourceMapConsumer = {
     originalPositionFor({ line, column }) {
       const { relativePath, row } = snapshotResult.translateSnapshotRow(line);
@@ -136,9 +136,9 @@ exports.install = function(resourcesPath, nodeRequire) {
         column,
         line: row,
         source: path.join(resourcesPath, 'app', 'static', relativePath),
-        name: null
+        name: null,
       };
-    }
+    },
   };
 
   sourceMapSupport.install({
@@ -147,7 +147,7 @@ exports.install = function(resourcesPath, nodeRequire) {
     // Most of this logic is the same as the default implementation in the
     // source-map-support module, but we've overridden it to read the javascript
     // code from our cache directory.
-    retrieveSourceMap: function(filePath) {
+    retrieveSourceMap: function (filePath) {
       if (filePath === '<embedded>') {
         return { map: snapshotSourceMapConsumer };
       }
@@ -156,8 +156,9 @@ exports.install = function(resourcesPath, nodeRequire) {
         return null;
       }
 
+      let sourceCode;
       try {
-        var sourceCode = fs.readFileSync(filePath, 'utf8');
+        sourceCode = fs.readFileSync(filePath, 'utf8');
       } catch (error) {
         console.warn('Error reading source file', error.stack);
         return null;
@@ -166,9 +167,10 @@ exports.install = function(resourcesPath, nodeRequire) {
       let compiler = COMPILERS[path.extname(filePath)];
       if (!compiler) compiler = COMPILERS['.js'];
 
+      let fileData;
       try {
-        var fileData = readCachedJavaScript(
-          compiler.getCachePath(sourceCode, filePath)
+        fileData = readCachedJavaScript(
+          compiler.getCachePath(sourceCode, filePath),
         );
       } catch (error) {
         console.warn('Error reading compiled file', error.stack);
@@ -191,8 +193,9 @@ exports.install = function(resourcesPath, nodeRequire) {
       const sourceMappingURL = lastMatch[1];
       const rawData = sourceMappingURL.slice(sourceMappingURL.indexOf(',') + 1);
 
+      let sourceMap;
       try {
-        var sourceMap = JSON.parse(Buffer.from(rawData, 'base64'));
+        sourceMap = JSON.parse(Buffer.from(rawData, 'base64'));
       } catch (error) {
         console.warn('Error parsing source map', error.stack);
         return null;
@@ -200,13 +203,13 @@ exports.install = function(resourcesPath, nodeRequire) {
 
       return {
         map: sourceMap,
-        url: null
+        url: null,
       };
-    }
+    },
   });
 
   const prepareStackTraceWithSourceMapping = Error.prepareStackTrace;
-  var prepareStackTrace = prepareStackTraceWithSourceMapping;
+  let prepareStackTrace = prepareStackTraceWithSourceMapping;
 
   function prepareStackTraceWithRawStackAssignment(error, frames) {
     if (error.rawStack) {
@@ -221,36 +224,36 @@ exports.install = function(resourcesPath, nodeRequire) {
   Error.stackTraceLimit = 30;
 
   Object.defineProperty(Error, 'prepareStackTrace', {
-    get: function() {
+    get: function () {
       return prepareStackTraceWithRawStackAssignment;
     },
 
-    set: function(newValue) {
+    set: function (newValue) {
       prepareStackTrace = newValue;
-      process.nextTick(function() {
+      process.nextTick(function () {
         prepareStackTrace = prepareStackTraceWithSourceMapping;
       });
-    }
+    },
   });
 
   // eslint-disable-next-line no-extend-native
-  Error.prototype.getRawStack = function() {
+  Error.prototype.getRawStack = function () {
     // Access this.stack to ensure prepareStackTrace has been run on this error
     // because it assigns this.rawStack as a side-effect
     this.stack; // eslint-disable-line no-unused-expressions
     return this.rawStack;
   };
 
-  Object.keys(COMPILERS).forEach(function(extension) {
+  Object.keys(COMPILERS).forEach(function (extension) {
     const compiler = COMPILERS[extension];
 
     Object.defineProperty(nodeRequire.extensions, extension, {
       enumerable: true,
       writable: false,
-      value: function(module, filePath) {
+      value: function (module, filePath) {
         const code = compileFileAtPath(compiler, filePath, extension);
         return module._compile(code, filePath);
-      }
+      },
     });
   });
 };

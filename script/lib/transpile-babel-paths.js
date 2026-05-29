@@ -7,16 +7,18 @@ const path = require('path');
 
 const CONFIG = require('../config');
 
-module.exports = function() {
+module.exports = function () {
   console.log(`Transpiling Babel paths in ${CONFIG.intermediateAppPath}`);
-  for (let path of getPathsToTranspile()) {
+  for (const path of getPathsToTranspile()) {
     transpileBabelPath(path);
   }
 };
 
 function getPathsToTranspile() {
   let paths = [];
-  for (let packageName of Object.keys(CONFIG.appMetadata.packageDependencies)) {
+  for (const packageName of Object.keys(
+    CONFIG.appMetadata.packageDependencies,
+  )) {
     paths = paths.concat(
       glob.sync(
         path.join(
@@ -24,7 +26,7 @@ function getPathsToTranspile() {
           'node_modules',
           packageName,
           '**',
-          '*.js'
+          '*.js',
         ),
         {
           ignore: path.join(
@@ -33,11 +35,11 @@ function getPathsToTranspile() {
             packageName,
             'spec',
             '**',
-            '*.js'
+            '*.js',
           ),
-          nodir: true
-        }
-      )
+          nodir: true,
+        },
+      ),
     );
   }
   return paths;
@@ -46,6 +48,6 @@ function getPathsToTranspile() {
 function transpileBabelPath(path) {
   fs.writeFileSync(
     path,
-    CompileCache.addPathToCache(path, CONFIG.atomHomeDirPath)
+    CompileCache.addPathToCache(path, CONFIG.atomHomeDirPath),
   );
 }

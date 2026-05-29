@@ -75,13 +75,13 @@ module.exports = class URIHandlerRegistry {
   registerHostHandler(host, callback) {
     if (typeof callback !== 'function') {
       throw new Error(
-        'Cannot register a URI host handler with a non-function callback'
+        'Cannot register a URI host handler with a non-function callback',
       );
     }
 
     if (this.registrations.has(host)) {
       throw new Error(
-        `There is already a URI host handler for the host ${host}`
+        `There is already a URI host handler for the host ${host}`,
       );
     } else {
       this.registrations.set(host, callback);
@@ -97,12 +97,12 @@ module.exports = class URIHandlerRegistry {
     const { protocol, slashes, auth, port, host } = parsed;
     if (protocol !== 'atom:' || slashes !== true || auth || port) {
       throw new Error(
-        `URIHandlerRegistry#handleURI asked to handle an invalid URI: ${uri}`
+        `URIHandlerRegistry#handleURI asked to handle an invalid URI: ${uri}`,
       );
     }
 
     const registration = this.registrations.get(host);
-    const historyEntry = { id: ++this._id, uri: uri, handled: false, host };
+    const historyEntry = { id: ++this._id, uri, handled: false, host };
     try {
       if (registration) {
         historyEntry.handled = true;

@@ -21,7 +21,7 @@ const EDITOR_PARAMS_BY_SETTING_KEY = [
   ['editor.autoIndentOnPaste', 'autoIndentOnPaste'],
   ['editor.scrollPastEnd', 'scrollPastEnd'],
   ['editor.undoGroupingInterval', 'undoGroupingInterval'],
-  ['editor.scrollSensitivity', 'scrollSensitivity']
+  ['editor.scrollSensitivity', 'scrollSensitivity'],
 ];
 
 // Experimental: This global registry tracks registered `TextEditors`.
@@ -49,7 +49,7 @@ module.exports = class TextEditorRegistry {
 
   serialize() {
     return {
-      editorGrammarOverrides: Object.assign({}, this.editorGrammarOverrides)
+      editorGrammarOverrides: Object.assign({}, this.editorGrammarOverrides),
     };
   }
 
@@ -119,12 +119,12 @@ module.exports = class TextEditorRegistry {
   //
   // Returns the currently active text editor, or `null` if there is none.
   getActiveTextEditor() {
-    for (let ed of this.editors) {
+    for (const ed of this.editors) {
       // fast path, works as long as there's a shadow DOM inside the text editor
       if (ed.getElement() === document.activeElement) {
         return ed;
       } else {
-        let editorElement = ed.getElement();
+        const editorElement = ed.getElement();
         let current = document.activeElement;
         while (current) {
           if (current === editorElement) {
@@ -164,7 +164,7 @@ module.exports = class TextEditorRegistry {
     const languageChangeSubscription = editor.buffer.onDidChangeLanguageMode(
       (newLanguageMode, oldLanguageMode) => {
         this.updateAndMonitorEditorSettings(editor, oldLanguageMode);
-      }
+      },
     );
     this.subscriptions.add(languageChangeSubscription);
 
@@ -174,8 +174,8 @@ module.exports = class TextEditorRegistry {
         shouldEditorUseSoftTabs(
           editor,
           this.config.get('editor.tabType', configOptions),
-          this.config.get('editor.softTabs', configOptions)
-        )
+          this.config.get('editor.softTabs', configOptions),
+        ),
       );
     };
 
@@ -242,10 +242,10 @@ module.exports = class TextEditorRegistry {
 
     if (oldLanguageMode) {
       const newSettings = this.textEditorParamsForScope(
-        newLanguageMode.rootScopeDescriptor
+        newLanguageMode.rootScopeDescriptor,
       );
       const oldSettings = this.textEditorParamsForScope(
-        oldLanguageMode.rootScopeDescriptor
+        oldLanguageMode.rootScopeDescriptor,
       );
 
       const updatedSettings = {};
@@ -263,7 +263,7 @@ module.exports = class TextEditorRegistry {
       }
     } else {
       editor.update(
-        this.textEditorParamsForScope(newLanguageMode.rootScopeDescriptor)
+        this.textEditorParamsForScope(newLanguageMode.rootScopeDescriptor),
       );
     }
   }
@@ -281,22 +281,22 @@ module.exports = class TextEditorRegistry {
       for (const [settingKey, paramName] of EDITOR_PARAMS_BY_SETTING_KEY) {
         this.subscriptions.add(
           this.config.onDidChange(settingKey, configOptions, ({ newValue }) => {
-            this.editorsWithMaintainedConfig.forEach(editor => {
+            this.editorsWithMaintainedConfig.forEach((editor) => {
               if (editor.getRootScopeDescriptor().isEqual(scopeDescriptor)) {
                 editor.update({ [paramName]: newValue });
               }
             });
-          })
+          }),
         );
       }
 
       const updateTabTypes = () => {
         const tabType = this.config.get('editor.tabType', configOptions);
         const softTabs = this.config.get('editor.softTabs', configOptions);
-        this.editorsWithMaintainedConfig.forEach(editor => {
+        this.editorsWithMaintainedConfig.forEach((editor) => {
           if (editor.getRootScopeDescriptor().isEqual(scopeDescriptor)) {
             editor.setSoftTabs(
-              shouldEditorUseSoftTabs(editor, tabType, softTabs)
+              shouldEditorUseSoftTabs(editor, tabType, softTabs),
             );
           }
         });
@@ -306,13 +306,13 @@ module.exports = class TextEditorRegistry {
         this.config.onDidChange(
           'editor.tabType',
           configOptions,
-          updateTabTypes
+          updateTabTypes,
         ),
         this.config.onDidChange(
           'editor.softTabs',
           configOptions,
-          updateTabTypes
-        )
+          updateTabTypes,
+        ),
       );
     }
   }

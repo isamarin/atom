@@ -25,24 +25,17 @@ module.exports = function upload(connStr, directory, assets) {
   }
 
   function uploadAssets(assets) {
-    return assets.reduce(function(promise, asset) {
+    return assets.reduce(function (promise, asset) {
       return promise.then(() => uploadAsset(asset));
     }, Promise.resolve());
   }
 
-  function uploadAsset(assetPath) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        console.info(`Uploading ${assetPath}`);
-        const blockBlobClient = containerClient.getBlockBlobClient(
-          path.join(directory, path.basename(assetPath))
-        );
-        const result = await blockBlobClient.uploadFile(assetPath);
-        resolve(result);
-      } catch (ex) {
-        reject(ex.message);
-      }
-    });
+  async function uploadAsset(assetPath) {
+    console.info(`Uploading ${assetPath}`);
+    const blockBlobClient = containerClient.getBlockBlobClient(
+      path.join(directory, path.basename(assetPath)),
+    );
+    return blockBlobClient.uploadFile(assetPath);
   }
 
   return listExistingAssetsForDirectory()

@@ -21,10 +21,10 @@ const args = yargs(process.argv)
   .alias('r', 'resource-path').argv;
 
 function isAtomRepoPath(repoPath) {
-  let packageJsonPath = path.join(repoPath, 'package.json');
+  const packageJsonPath = path.join(repoPath, 'package.json');
   if (fs.statSyncNoException(packageJsonPath)) {
     try {
-      let packageJson = CSON.readFileSync(packageJsonPath);
+      const packageJson = CSON.readFileSync(packageJsonPath);
       return packageJson.name === 'atom';
     } catch (e) {
       return false;
@@ -45,7 +45,7 @@ if (args.resourcePath) {
   const defaultRepositoryPath = path.join(
     app.getPath('home'),
     'github',
-    'atom'
+    'atom',
   );
 
   if (process.env.ATOM_DEV_RESOURCE_PATH) {

@@ -37,7 +37,7 @@ module.exports = class TextEditorComponent {
 
   static didUpdateStyles() {
     if (this.attachedComponents) {
-      this.attachedComponents.forEach(component => {
+      this.attachedComponents.forEach((component) => {
         component.didUpdateStyles();
       });
     }
@@ -45,7 +45,7 @@ module.exports = class TextEditorComponent {
 
   static didUpdateScrollbarStyles() {
     if (this.attachedComponents) {
-      this.attachedComponents.forEach(component => {
+      this.attachedComponents.forEach((component) => {
         component.didUpdateScrollbarStyles();
       });
     }
@@ -57,7 +57,7 @@ module.exports = class TextEditorComponent {
     if (!props.model) {
       props.model = new TextEditor({
         mini: props.mini,
-        readOnly: props.readOnly
+        readOnly: props.readOnly,
       });
     }
     this.props.model.component = this;
@@ -91,7 +91,7 @@ module.exports = class TextEditorComponent {
     this.didMouseDownOnContent = this.didMouseDownOnContent.bind(this);
     this.debouncedResumeCursorBlinking = debounce(
       this.resumeCursorBlinking.bind(this),
-      this.props.cursorBlinkResumeDelay || CURSOR_BLINK_RESUME_DELAY
+      this.props.cursorBlinkResumeDelay || CURSOR_BLINK_RESUME_DELAY,
     );
     this.lineTopIndex = new LineTopIndex();
     this.lineNodesPool = new NodePool();
@@ -110,7 +110,7 @@ module.exports = class TextEditorComponent {
       clientContainerWidth: 0,
       verticalScrollbarWidth: 0,
       horizontalScrollbarHeight: 0,
-      longestLineWidth: 0
+      longestLineWidth: 0,
     };
     this.derivedDimensionsCache = {};
     this.visible = false;
@@ -127,7 +127,7 @@ module.exports = class TextEditorComponent {
     this.blockDecorationSentinel.style.height = '1px';
     this.heightsByBlockDecoration = new WeakMap();
     this.blockDecorationResizeObserver = new ResizeObserver(
-      this.didResizeBlockDecorations.bind(this)
+      this.didResizeBlockDecorations.bind(this),
     );
     this.lineComponentsByScreenLineId = new Map();
     this.overlayComponents = new Set();
@@ -156,7 +156,7 @@ module.exports = class TextEditorComponent {
       screenRows: [],
       keys: [],
       softWrappedFlags: [],
-      foldableFlags: []
+      foldableFlags: [],
     };
     this.decorationsToRender = {
       lineNumbers: new Map(),
@@ -166,11 +166,11 @@ module.exports = class TextEditorComponent {
       overlays: [],
       customGutter: new Map(),
       blocks: new Map(),
-      text: []
+      text: [],
     };
     this.decorationsToMeasure = {
       highlights: [],
-      cursors: new Map()
+      cursors: new Map(),
     };
     this.textDecorationsByMarker = new Map();
     this.textDecorationBoundaries = [];
@@ -326,7 +326,7 @@ module.exports = class TextEditorComponent {
       const sentinelElements = new Set();
 
       blockDecorationMeasurementArea.appendChild(document.createElement('div'));
-      this.blockDecorationsToMeasure.forEach(decoration => {
+      this.blockDecorationsToMeasure.forEach((decoration) => {
         const { item } = decoration.getProperties();
         const decorationElement = TextEditor.viewForItem(item);
         if (document.contains(decorationElement)) {
@@ -347,11 +347,11 @@ module.exports = class TextEditorComponent {
           this.didMeasureVisibleBlockDecoration = true;
         } else {
           blockDecorationMeasurementArea.appendChild(
-            this.blockDecorationSentinel.cloneNode()
+            this.blockDecorationSentinel.cloneNode(),
           );
           blockDecorationMeasurementArea.appendChild(decorationElement);
           blockDecorationMeasurementArea.appendChild(
-            this.blockDecorationSentinel.cloneNode()
+            this.blockDecorationSentinel.cloneNode(),
           );
         }
       });
@@ -362,7 +362,7 @@ module.exports = class TextEditorComponent {
           this.getScrollWidth() + 'px';
       }
 
-      this.blockDecorationsToMeasure.forEach(decoration => {
+      this.blockDecorationsToMeasure.forEach((decoration) => {
         const { item } = decoration.getProperties();
         const decorationElement = TextEditor.viewForItem(item);
         const { previousSibling, nextSibling } = decorationElement;
@@ -373,7 +373,7 @@ module.exports = class TextEditorComponent {
         this.lineTopIndex.resizeBlock(decoration, height);
       });
 
-      sentinelElements.forEach(sentinelElement => sentinelElement.remove());
+      sentinelElements.forEach((sentinelElement) => sentinelElement.remove());
       while (blockDecorationMeasurementArea.firstChild) {
         blockDecorationMeasurementArea.firstChild.remove();
       }
@@ -386,15 +386,15 @@ module.exports = class TextEditorComponent {
     this.derivedDimensionsCache = {};
     this.updateModelSoftWrapColumn();
     if (this.pendingAutoscroll) {
-      let { screenRange, options } = this.pendingAutoscroll;
+      const { screenRange, options } = this.pendingAutoscroll;
       this.autoscrollVertically(screenRange, options);
       this.requestHorizontalMeasurement(
         screenRange.start.row,
-        screenRange.start.column
+        screenRange.start.column,
       );
       this.requestHorizontalMeasurement(
         screenRange.end.row,
-        screenRange.end.column
+        screenRange.end.column,
       );
     }
     this.populateVisibleRowRange(this.getRenderedStartRow());
@@ -500,7 +500,7 @@ module.exports = class TextEditorComponent {
       }
     }
 
-    let attributes = {};
+    const attributes = {};
     if (model.isMini()) {
       attributes.mini = '';
     }
@@ -523,7 +523,7 @@ module.exports = class TextEditorComponent {
         attributes,
         dataset,
         tabIndex: -1,
-        on: { mousewheel: this.didMouseWheel }
+        on: { mousewheel: this.didMouseWheel },
       },
       $.div(
         {
@@ -534,13 +534,13 @@ module.exports = class TextEditorComponent {
             overflow: 'hidden',
             backgroundColor: 'inherit',
             height: clientContainerHeight,
-            width: clientContainerWidth
-          }
+            width: clientContainerWidth,
+          },
         },
         this.renderGutterContainer(),
-        this.renderScrollContainer()
+        this.renderScrollContainer(),
       ),
-      this.renderOverlayDecorations()
+      this.renderOverlayDecorations(),
     );
   }
 
@@ -566,7 +566,7 @@ module.exports = class TextEditorComponent {
         isLineNumberGutterVisible: this.props.model.isLineNumberGutterVisible(),
         showLineNumbers: this.showLineNumbers,
         lineNumbersToRender: this.lineNumbersToRender,
-        didMeasureVisibleBlockDecoration: this.didMeasureVisibleBlockDecoration
+        didMeasureVisibleBlockDecoration: this.didMeasureVisibleBlockDecoration,
       });
     }
   }
@@ -578,7 +578,7 @@ module.exports = class TextEditorComponent {
       overflow: 'hidden',
       top: 0,
       bottom: 0,
-      backgroundColor: 'inherit'
+      backgroundColor: 'inherit',
     };
 
     if (this.hasInitialMeasurements) {
@@ -591,25 +591,25 @@ module.exports = class TextEditorComponent {
         ref: 'scrollContainer',
         key: 'scrollContainer',
         className: 'scroll-view',
-        style
+        style,
       },
       this.renderContent(),
-      this.renderDummyScrollbars()
+      this.renderDummyScrollbars(),
     );
   }
 
   renderContent() {
-    let style = {
+    const style = {
       contain: 'strict',
       overflow: 'hidden',
-      backgroundColor: 'inherit'
+      backgroundColor: 'inherit',
     };
     if (this.hasInitialMeasurements) {
       style.width = ceilToPhysicalPixelBoundary(this.getScrollWidth()) + 'px';
       style.height = ceilToPhysicalPixelBoundary(this.getScrollHeight()) + 'px';
       style.willChange = 'transform';
       style.transform = `translate(${-roundToPhysicalPixelBoundary(
-        this.getScrollLeft()
+        this.getScrollLeft(),
       )}px, ${-roundToPhysicalPixelBoundary(this.getScrollTop())}px)`;
     }
 
@@ -617,11 +617,11 @@ module.exports = class TextEditorComponent {
       {
         ref: 'content',
         on: { mousedown: this.didMouseDownOnContent },
-        style
+        style,
       },
       this.renderLineTiles(),
       this.renderBlockDecorationMeasurementArea(),
-      this.renderCharacterMeasurementLine()
+      this.renderCharacterMeasurementLine(),
     );
   }
 
@@ -631,7 +631,7 @@ module.exports = class TextEditorComponent {
       highlightDecorations: this.decorationsToRender.highlights.slice(),
       width: this.getScrollWidth(),
       height: this.getScrollHeight(),
-      lineHeight: this.getLineHeight()
+      lineHeight: this.getLineHeight(),
     });
   }
 
@@ -639,7 +639,7 @@ module.exports = class TextEditorComponent {
     const style = {
       position: 'absolute',
       contain: 'strict',
-      overflow: 'hidden'
+      overflow: 'hidden',
     };
 
     const children = [];
@@ -673,21 +673,21 @@ module.exports = class TextEditorComponent {
             tileEndRow,
             screenLines: this.renderedScreenLines.slice(
               tileStartRow - startRow,
-              tileEndRow - startRow
+              tileEndRow - startRow,
             ),
             lineDecorations: this.decorationsToRender.lines.slice(
               tileStartRow - startRow,
-              tileEndRow - startRow
+              tileEndRow - startRow,
             ),
             textDecorations: this.decorationsToRender.text.slice(
               tileStartRow - startRow,
-              tileEndRow - startRow
+              tileEndRow - startRow,
             ),
             blockDecorations: this.decorationsToRender.blocks.get(tileStartRow),
             displayLayer: this.props.model.displayLayer,
             nodePool: this.lineNodesPool,
-            lineComponentsByScreenLineId
-          })
+            lineComponentsByScreenLineId,
+          }),
         );
       }
 
@@ -701,8 +701,8 @@ module.exports = class TextEditorComponent {
               screenRow,
               displayLayer: this.props.model.displayLayer,
               nodePool: this.lineNodesPool,
-              lineComponentsByScreenLineId
-            })
+              lineComponentsByScreenLineId,
+            }),
           );
         }
       });
@@ -716,7 +716,7 @@ module.exports = class TextEditorComponent {
 
     return $.div(
       { key: 'lineTiles', ref: 'lineTiles', className: 'lines', style },
-      children
+      children,
     );
   }
 
@@ -741,7 +741,7 @@ module.exports = class TextEditorComponent {
       decorationsToRender: this.decorationsToRender,
       cursorsBlinkedOff: this.cursorsBlinkedOff,
       hiddenInputPosition: this.hiddenInputPosition,
-      tabIndex: this.tabIndex
+      tabIndex: this.tabIndex,
     });
   }
 
@@ -762,12 +762,12 @@ module.exports = class TextEditorComponent {
         key: 'characterMeasurementLine',
         ref: 'characterMeasurementLine',
         className: 'line dummy',
-        style: { position: 'absolute', visibility: 'hidden' }
+        style: { position: 'absolute', visibility: 'hidden' },
       },
       $.span({ ref: 'normalWidthCharacterSpan' }, NORMAL_WIDTH_CHARACTER),
       $.span({ ref: 'doubleWidthCharacterSpan' }, DOUBLE_WIDTH_CHARACTER),
       $.span({ ref: 'halfWidthCharacterSpan' }, HALF_WIDTH_CHARACTER),
-      $.span({ ref: 'koreanCharacterSpan' }, KOREAN_CHARACTER)
+      $.span({ ref: 'koreanCharacterSpan' }, KOREAN_CHARACTER),
     );
   }
 
@@ -779,8 +779,8 @@ module.exports = class TextEditorComponent {
         contain: 'strict',
         position: 'absolute',
         visibility: 'hidden',
-        width: this.getScrollWidth() + 'px'
-      }
+        width: this.getScrollWidth() + 'px',
+      },
     });
   }
 
@@ -817,7 +817,7 @@ module.exports = class TextEditorComponent {
           scrollHeight,
           scrollTop,
           horizontalScrollbarHeight,
-          forceScrollbarVisible
+          forceScrollbarVisible,
         }),
         $(DummyScrollbarComponent, {
           ref: 'horizontalScrollbar',
@@ -828,7 +828,7 @@ module.exports = class TextEditorComponent {
           scrollWidth,
           scrollLeft,
           verticalScrollbarWidth,
-          forceScrollbarVisible
+          forceScrollbarVisible,
         }),
 
         // Force a "corner" to render where the two scrollbars meet at the lower right
@@ -841,9 +841,9 @@ module.exports = class TextEditorComponent {
             width: '20px',
             bottom: 0,
             right: 0,
-            overflow: 'scroll'
-          }
-        })
+            overflow: 'scroll',
+          },
+        }),
       ];
     } else {
       return null;
@@ -851,21 +851,21 @@ module.exports = class TextEditorComponent {
   }
 
   renderOverlayDecorations() {
-    return this.decorationsToRender.overlays.map(overlayProps =>
+    return this.decorationsToRender.overlays.map((overlayProps) =>
       $(
         OverlayComponent,
         Object.assign(
           {
             key: overlayProps.element,
             overlayComponents: this.overlayComponents,
-            didResize: overlayComponent => {
+            didResize: (overlayComponent) => {
               this.updateOverlayToRender(overlayProps);
               overlayComponent.update(overlayProps);
-            }
+            },
           },
-          overlayProps
-        )
-      )
+          overlayProps,
+        ),
+      ),
     );
   }
 
@@ -878,7 +878,7 @@ module.exports = class TextEditorComponent {
     const newClassList = ['editor'];
     if (this.focused) newClassList.push('is-focused');
     if (model.isMini()) newClassList.push('mini');
-    for (var i = 0; i < model.selections.length; i++) {
+    for (let i = 0; i < model.selections.length; i++) {
       if (!model.selections[i].isEmpty()) {
         newClassList.push('has-selection');
         break;
@@ -906,7 +906,7 @@ module.exports = class TextEditorComponent {
 
     this.renderedScreenLines = model.displayLayer.getScreenLines(
       this.getRenderedStartRow(),
-      this.getRenderedEndRow()
+      this.getRenderedEndRow(),
     );
   }
 
@@ -1013,7 +1013,7 @@ module.exports = class TextEditorComponent {
     const oldGuttersToRender = this.guttersToRender;
     const oldGuttersVisibility = this.guttersVisibility;
     this.guttersToRender = this.props.model.getGutters();
-    this.guttersVisibility = this.guttersToRender.map(g => g.visible);
+    this.guttersVisibility = this.guttersToRender.map((g) => g.visible);
 
     if (
       !oldGuttersToRender ||
@@ -1045,10 +1045,11 @@ module.exports = class TextEditorComponent {
     this.textDecorationsByMarker.clear();
     this.textDecorationBoundaries.length = 0;
 
-    const decorationsByMarker = this.props.model.decorationManager.decorationPropertiesByMarkerForScreenRowRange(
-      this.getRenderedStartRow(),
-      this.getRenderedEndRow()
-    );
+    const decorationsByMarker =
+      this.props.model.decorationManager.decorationPropertiesByMarkerForScreenRowRange(
+        this.getRenderedStartRow(),
+        this.getRenderedEndRow(),
+      );
 
     decorationsByMarker.forEach((decorations, marker) => {
       const screenRange = marker.getScreenRange();
@@ -1060,7 +1061,7 @@ module.exports = class TextEditorComponent {
           decoration,
           marker,
           screenRange,
-          reversed
+          reversed,
         );
       }
     });
@@ -1076,7 +1077,7 @@ module.exports = class TextEditorComponent {
           decoration,
           marker,
           screenRange,
-          reversed
+          reversed,
         );
       }
     } else {
@@ -1087,14 +1088,14 @@ module.exports = class TextEditorComponent {
             type,
             decoration,
             screenRange,
-            reversed
+            reversed,
           );
           break;
         case 'highlight':
           this.addHighlightDecorationToMeasure(
             decoration,
             screenRange,
-            marker.id
+            marker.id,
           );
           break;
         case 'cursor':
@@ -1102,7 +1103,7 @@ module.exports = class TextEditorComponent {
             decoration,
             marker,
             screenRange,
-            reversed
+            reversed,
           );
           break;
         case 'overlay':
@@ -1127,14 +1128,13 @@ module.exports = class TextEditorComponent {
       decorationsToRender = this.decorationsToRender.lines;
     } else {
       const gutterName = decoration.gutterName || 'line-number';
-      decorationsToRender = this.decorationsToRender.lineNumbers.get(
-        gutterName
-      );
+      decorationsToRender =
+        this.decorationsToRender.lineNumbers.get(gutterName);
       if (!decorationsToRender) {
         decorationsToRender = [];
         this.decorationsToRender.lineNumbers.set(
           gutterName,
-          decorationsToRender
+          decorationsToRender,
         );
       }
     }
@@ -1178,7 +1178,7 @@ module.exports = class TextEditorComponent {
     screenRange = constrainRangeToRows(
       screenRange,
       this.getRenderedStartRow(),
-      this.getRenderedEndRow()
+      this.getRenderedEndRow(),
     );
     if (screenRange.isEmpty()) return;
 
@@ -1186,7 +1186,7 @@ module.exports = class TextEditorComponent {
       class: className,
       flashRequested,
       flashClass,
-      flashDuration
+      flashDuration,
     } = decoration;
     decoration.flashRequested = false;
     this.decorationsToMeasure.highlights.push({
@@ -1195,15 +1195,15 @@ module.exports = class TextEditorComponent {
       className,
       flashRequested,
       flashClass,
-      flashDuration
+      flashDuration,
     });
     this.requestHorizontalMeasurement(
       screenRange.start.row,
-      screenRange.start.column
+      screenRange.start.column,
     );
     this.requestHorizontalMeasurement(
       screenRange.end.row,
-      screenRange.end.column
+      screenRange.end.column,
     );
   }
 
@@ -1257,25 +1257,25 @@ module.exports = class TextEditorComponent {
 
     this.requestHorizontalMeasurement(
       screenPosition.row,
-      screenPosition.column
+      screenPosition.column,
     );
     this.decorationsToRender.overlays.push({
       className,
       element,
       avoidOverflow,
-      screenPosition
+      screenPosition,
     });
   }
 
   addCustomGutterDecorationToRender(decoration, screenRange) {
     let decorations = this.decorationsToRender.customGutter.get(
-      decoration.gutterName
+      decoration.gutterName,
     );
     if (!decorations) {
       decorations = [];
       this.decorationsToRender.customGutter.set(
         decoration.gutterName,
-        decorations
+        decorations,
       );
     }
     const top = this.pixelPositionAfterBlocksForRow(screenRange.start.row);
@@ -1287,7 +1287,7 @@ module.exports = class TextEditorComponent {
         'decoration' + (decoration.class ? ' ' + decoration.class : ''),
       element: TextEditor.viewForItem(decoration.item),
       top,
-      height
+      height,
     });
   }
 
@@ -1297,18 +1297,16 @@ module.exports = class TextEditorComponent {
       return;
 
     const tileStartRow = this.tileStartRowForRow(row);
-    const screenLine = this.renderedScreenLines[
-      row - this.getRenderedStartRow()
-    ];
+    const screenLine =
+      this.renderedScreenLines[row - this.getRenderedStartRow()];
 
-    let decorationsByScreenLine = this.decorationsToRender.blocks.get(
-      tileStartRow
-    );
+    let decorationsByScreenLine =
+      this.decorationsToRender.blocks.get(tileStartRow);
     if (!decorationsByScreenLine) {
       decorationsByScreenLine = new Map();
       this.decorationsToRender.blocks.set(
         tileStartRow,
-        decorationsByScreenLine
+        decorationsByScreenLine,
       );
     }
 
@@ -1322,7 +1320,7 @@ module.exports = class TextEditorComponent {
     // Order block decorations by increasing values of their "order" property. Break ties with "id", which mirrors
     // their creation sequence.
     decorations.sort((a, b) =>
-      a.order !== b.order ? a.order - b.order : a.id - b.id
+      a.order !== b.order ? a.order - b.order : a.id - b.id,
     );
   }
 
@@ -1335,11 +1333,11 @@ module.exports = class TextEditorComponent {
       this.textDecorationsByMarker.set(marker, decorationsForMarker);
       this.textDecorationBoundaries.push({
         position: screenRange.start,
-        starting: [marker]
+        starting: [marker],
       });
       this.textDecorationBoundaries.push({
         position: screenRange.end,
-        ending: [marker]
+        ending: [marker],
       });
     }
     decorationsForMarker.push(decoration);
@@ -1348,7 +1346,7 @@ module.exports = class TextEditorComponent {
   populateTextDecorationsToRender() {
     // Sort all boundaries in ascending order of position
     this.textDecorationBoundaries.sort((a, b) =>
-      a.position.compare(b.position)
+      a.position.compare(b.position),
     );
 
     // Combine adjacent boundaries with the same position
@@ -1401,7 +1399,7 @@ module.exports = class TextEditorComponent {
         for (let j = boundary.ending.length - 1; j >= 0; j--) {
           containingMarkers.splice(
             containingMarkers.lastIndexOf(boundary.ending[j]),
-            1
+            1,
           );
         }
       }
@@ -1439,7 +1437,7 @@ module.exports = class TextEditorComponent {
           boundary.position.row,
           boundary.position.column,
           className,
-          style
+          style,
         );
       }
       const nextBoundary = this.textDecorationBoundaries[i + 1];
@@ -1462,9 +1460,8 @@ module.exports = class TextEditorComponent {
 
   addTextDecorationStart(row, column, className, style) {
     const renderedStartRow = this.getRenderedStartRow();
-    let decorationStarts = this.decorationsToRender.text[
-      row - renderedStartRow
-    ];
+    let decorationStarts =
+      this.decorationsToRender.text[row - renderedStartRow];
     if (!decorationStarts) {
       decorationStarts = [];
       this.decorationsToRender.text[row - renderedStartRow] = decorationStarts;
@@ -1486,13 +1483,13 @@ module.exports = class TextEditorComponent {
       highlight.startPixelTop = this.pixelPositionAfterBlocksForRow(start.row);
       highlight.startPixelLeft = this.pixelLeftForRowAndColumn(
         start.row,
-        start.column
+        start.column,
       );
       highlight.endPixelTop =
         this.pixelPositionAfterBlocksForRow(end.row) + this.getLineHeight();
       highlight.endPixelLeft = this.pixelLeftForRowAndColumn(
         end.row,
-        end.column
+        end.column,
       );
       this.decorationsToRender.highlights.push(highlight);
     }
@@ -1501,7 +1498,7 @@ module.exports = class TextEditorComponent {
   updateCursorsToRender() {
     this.decorationsToRender.cursors.length = 0;
 
-    this.decorationsToMeasure.cursors.forEach(cursor => {
+    this.decorationsToMeasure.cursors.forEach((cursor) => {
       const { screenPosition, className, style } = cursor;
       const { row, column } = screenPosition;
 
@@ -1519,7 +1516,7 @@ module.exports = class TextEditorComponent {
         pixelLeft,
         pixelWidth,
         className,
-        style
+        style,
       };
       this.decorationsToRender.cursors.push(cursorPosition);
       if (cursor.isLastCursor) this.hiddenInputPosition = cursorPosition;
@@ -1580,7 +1577,7 @@ module.exports = class TextEditorComponent {
   didAttach() {
     if (!this.attached) {
       this.attached = true;
-      this.intersectionObserver = new IntersectionObserver(entries => {
+      this.intersectionObserver = new IntersectionObserver((entries) => {
         const { intersectionRect } = entries[entries.length - 1];
         if (intersectionRect.width > 0 || intersectionRect.height > 0) {
           this.didShow();
@@ -1595,14 +1592,14 @@ module.exports = class TextEditorComponent {
 
       if (this.refs.gutterContainer) {
         this.gutterContainerResizeObserver = new ResizeObserver(
-          this.didResizeGutterContainer.bind(this)
+          this.didResizeGutterContainer.bind(this),
         );
         this.gutterContainerResizeObserver.observe(
-          this.refs.gutterContainer.element
+          this.refs.gutterContainer.element,
         );
       }
 
-      this.overlayComponents.forEach(component => component.didAttach());
+      this.overlayComponents.forEach((component) => component.didAttach());
 
       if (this.isVisible()) {
         this.didShow();
@@ -1627,7 +1624,7 @@ module.exports = class TextEditorComponent {
       this.resizeObserver.disconnect();
       if (this.gutterContainerResizeObserver)
         this.gutterContainerResizeObserver.disconnect();
-      this.overlayComponents.forEach(component => component.didDetach());
+      this.overlayComponents.forEach((component) => component.didDetach());
 
       this.didHide();
       this.attached = false;
@@ -1710,7 +1707,7 @@ module.exports = class TextEditorComponent {
     }
 
     if (this.getPlatform() !== 'darwin' && event.shiftKey) {
-      let temp = wheelDeltaX;
+      const temp = wheelDeltaX;
       wheelDeltaX = wheelDeltaY;
       wheelDeltaY = temp;
     }
@@ -1755,7 +1752,7 @@ module.exports = class TextEditorComponent {
       this.scheduleUpdate();
       process.nextTick(() => {
         this.gutterContainerResizeObserver.observe(
-          this.refs.gutterContainer.element
+          this.refs.gutterContainer.element,
         );
       });
     }
@@ -1766,12 +1763,12 @@ module.exports = class TextEditorComponent {
     let scrollLeftChanged = false;
     if (!this.scrollTopPending) {
       scrollTopChanged = this.setScrollTop(
-        this.refs.verticalScrollbar.element.scrollTop
+        this.refs.verticalScrollbar.element.scrollTop,
       );
     }
     if (!this.scrollLeftPending) {
       scrollLeftChanged = this.setScrollLeft(
-        this.refs.horizontalScrollbar.element.scrollLeft
+        this.refs.horizontalScrollbar.element.scrollLeft,
       );
     }
     if (scrollTopChanged || scrollLeftChanged) this.updateSync();
@@ -1976,9 +1973,8 @@ module.exports = class TextEditorComponent {
     if (platform === 'darwin' && ctrlKey) return;
 
     if (target && target.matches('.fold-marker')) {
-      const bufferPosition = model.bufferPositionForScreenPosition(
-        screenPosition
-      );
+      const bufferPosition =
+        model.bufferPositionForScreenPosition(screenPosition);
       model.destroyFoldsContainingBufferPositions([bufferPosition], false);
       return;
     }
@@ -1990,14 +1986,13 @@ module.exports = class TextEditorComponent {
     switch (detail) {
       case 1:
         if (addOrRemoveSelection) {
-          const existingSelection = model.getSelectionAtScreenPosition(
-            screenPosition
-          );
+          const existingSelection =
+            model.getSelectionAtScreenPosition(screenPosition);
           if (existingSelection) {
             if (model.hasMultipleCursors()) existingSelection.destroy();
           } else {
             model.addCursorAtScreenPosition(screenPosition, {
-              autoscroll: false
+              autoscroll: false,
             });
           }
         } else {
@@ -2005,7 +2000,7 @@ module.exports = class TextEditorComponent {
             model.selectToScreenPosition(screenPosition, { autoscroll: false });
           } else {
             model.setCursorScreenPosition(screenPosition, {
-              autoscroll: false
+              autoscroll: false,
             });
           }
         }
@@ -2013,26 +2008,26 @@ module.exports = class TextEditorComponent {
       case 2:
         if (addOrRemoveSelection)
           model.addCursorAtScreenPosition(screenPosition, {
-            autoscroll: false
+            autoscroll: false,
           });
         model.getLastSelection().selectWord({ autoscroll: false });
         break;
       case 3:
         if (addOrRemoveSelection)
           model.addCursorAtScreenPosition(screenPosition, {
-            autoscroll: false
+            autoscroll: false,
           });
         model.getLastSelection().selectLine(null, { autoscroll: false });
         break;
     }
 
     this.handleMouseDragUntilMouseUp({
-      didDrag: event => {
+      didDrag: (event) => {
         this.autoscrollOnMouseDrag(event);
         const screenPosition = this.screenPositionForMouseEvent(event);
         model.selectToScreenPosition(screenPosition, {
           suppressSelectionMerge: true,
-          autoscroll: false
+          autoscroll: false,
         });
         this.updateSync();
       },
@@ -2040,7 +2035,7 @@ module.exports = class TextEditorComponent {
         model.finalizeSelections();
         model.mergeIntersectingSelections();
         this.updateSync();
-      }
+      },
     });
   }
 
@@ -2054,7 +2049,7 @@ module.exports = class TextEditorComponent {
     const clickedScreenRow = this.screenPositionForMouseEvent(event).row;
     const startBufferRow = model.bufferPositionForScreenPosition([
       clickedScreenRow,
-      0
+      0,
     ]).row;
 
     if (
@@ -2070,11 +2065,11 @@ module.exports = class TextEditorComponent {
       metaKey || (ctrlKey && this.getPlatform() !== 'darwin');
     const endBufferRow = model.bufferPositionForScreenPosition([
       clickedScreenRow,
-      Infinity
+      Infinity,
     ]).row;
     const clickedLineBufferRange = Range(
       Point(startBufferRow, 0),
-      Point(endBufferRow + 1, 0)
+      Point(endBufferRow + 1, 0),
     );
 
     let initialBufferRange;
@@ -2087,48 +2082,47 @@ module.exports = class TextEditorComponent {
           reversed: clickedScreenRow < lastSelection.getScreenRange().start.row,
           autoscroll: false,
           preserveFolds: true,
-          suppressSelectionMerge: true
-        }
+          suppressSelectionMerge: true,
+        },
       );
     } else {
       initialBufferRange = clickedLineBufferRange;
       if (addOrRemoveSelection) {
         model.addSelectionForBufferRange(clickedLineBufferRange, {
           autoscroll: false,
-          preserveFolds: true
+          preserveFolds: true,
         });
       } else {
         model.setSelectedBufferRange(clickedLineBufferRange, {
           autoscroll: false,
-          preserveFolds: true
+          preserveFolds: true,
         });
       }
     }
 
-    const initialScreenRange = model.screenRangeForBufferRange(
-      initialBufferRange
-    );
+    const initialScreenRange =
+      model.screenRangeForBufferRange(initialBufferRange);
     this.handleMouseDragUntilMouseUp({
-      didDrag: event => {
+      didDrag: (event) => {
         this.autoscrollOnMouseDrag(event, true);
         const dragRow = this.screenPositionForMouseEvent(event).row;
         const draggedLineScreenRange = Range(
           Point(dragRow, 0),
-          Point(dragRow + 1, 0)
+          Point(dragRow + 1, 0),
         );
         model
           .getLastSelection()
           .setScreenRange(draggedLineScreenRange.union(initialScreenRange), {
             reversed: dragRow < initialScreenRange.start.row,
             autoscroll: false,
-            preserveFolds: true
+            preserveFolds: true,
           });
         this.updateSync();
       },
       didStopDragging: () => {
         model.mergeIntersectingSelections();
         this.updateSync();
-      }
+      },
     });
   }
 
@@ -2169,12 +2163,8 @@ module.exports = class TextEditorComponent {
   }
 
   autoscrollOnMouseDrag({ clientX, clientY }, verticalOnly = false) {
-    let {
-      top,
-      bottom,
-      left,
-      right
-    } = this.refs.scrollContainer.getBoundingClientRect(); // Using var to avoid deopt on += assignments below
+    let { top, bottom, left, right } =
+      this.refs.scrollContainer.getBoundingClientRect(); // Using var to avoid deopt on += assignments below
     top += MOUSE_DRAG_AUTOSCROLL_MARGIN;
     bottom -= MOUSE_DRAG_AUTOSCROLL_MARGIN;
     left += MOUSE_DRAG_AUTOSCROLL_MARGIN;
@@ -2214,24 +2204,25 @@ module.exports = class TextEditorComponent {
 
   screenPositionForMouseEvent(event) {
     return this.screenPositionForPixelPosition(
-      this.pixelPositionForMouseEvent(event)
+      this.pixelPositionForMouseEvent(event),
     );
   }
 
   pixelPositionForMouseEvent({ clientX, clientY }) {
-    const scrollContainerRect = this.refs.scrollContainer.getBoundingClientRect();
+    const scrollContainerRect =
+      this.refs.scrollContainer.getBoundingClientRect();
     clientX = Math.min(
       scrollContainerRect.right,
-      Math.max(scrollContainerRect.left, clientX)
+      Math.max(scrollContainerRect.left, clientX),
     );
     clientY = Math.min(
       scrollContainerRect.bottom,
-      Math.max(scrollContainerRect.top, clientY)
+      Math.max(scrollContainerRect.top, clientY),
     );
     const linesRect = this.refs.lineTiles.getBoundingClientRect();
     return {
       top: clientY - linesRect.top,
-      left: clientX - linesRect.left
+      left: clientX - linesRect.left,
     };
   }
 
@@ -2262,10 +2253,13 @@ module.exports = class TextEditorComponent {
 
   startCursorBlinking() {
     if (!this.cursorsBlinking) {
-      this.cursorBlinkIntervalHandle = window.setInterval(() => {
-        this.cursorsBlinkedOff = !this.cursorsBlinkedOff;
-        this.scheduleUpdate(true);
-      }, (this.props.cursorBlinkPeriod || CURSOR_BLINK_PERIOD) / 2);
+      this.cursorBlinkIntervalHandle = window.setInterval(
+        () => {
+          this.cursorsBlinkedOff = !this.cursorsBlinkedOff;
+          this.scheduleUpdate(true);
+        },
+        (this.props.cursorBlinkPeriod || CURSOR_BLINK_PERIOD) / 2,
+      );
       this.cursorsBlinking = true;
       this.scheduleUpdate(true);
     }
@@ -2287,7 +2281,7 @@ module.exports = class TextEditorComponent {
     if (this.pendingScrollLeftColumn > 0) {
       changedScrollLeft = this.setScrollLeftColumn(
         this.pendingScrollLeftColumn,
-        false
+        false,
       );
       this.pendingScrollLeftColumn = null;
     }
@@ -2299,7 +2293,7 @@ module.exports = class TextEditorComponent {
 
   autoscrollVertically(screenRange, options) {
     const screenRangeTop = this.pixelPositionAfterBlocksForRow(
-      screenRange.start.row
+      screenRange.start.row,
     );
     const screenRangeBottom =
       this.pixelPositionAfterBlocksForRow(screenRange.end.row) +
@@ -2341,23 +2335,23 @@ module.exports = class TextEditorComponent {
     const horizontalScrollMargin = this.getHorizontalAutoscrollMargin();
 
     const gutterContainerWidth = this.getGutterContainerWidth();
-    let left =
+    const left =
       this.pixelLeftForRowAndColumn(
         screenRange.start.row,
-        screenRange.start.column
+        screenRange.start.column,
       ) + gutterContainerWidth;
-    let right =
+    const right =
       this.pixelLeftForRowAndColumn(
         screenRange.end.row,
-        screenRange.end.column
+        screenRange.end.column,
       ) + gutterContainerWidth;
     const desiredScrollLeft = Math.max(
       0,
-      left - horizontalScrollMargin - gutterContainerWidth
+      left - horizontalScrollMargin - gutterContainerWidth,
     );
     const desiredScrollRight = Math.min(
       this.getScrollWidth(),
-      right + horizontalScrollMargin
+      right + horizontalScrollMargin,
     );
 
     if (!options || options.reversed !== false) {
@@ -2379,11 +2373,11 @@ module.exports = class TextEditorComponent {
 
   getVerticalAutoscrollMargin() {
     const maxMarginInLines = Math.floor(
-      (this.getScrollContainerClientHeight() / this.getLineHeight() - 1) / 2
+      (this.getScrollContainerClientHeight() / this.getLineHeight() - 1) / 2,
     );
     const marginInLines = Math.min(
       this.props.model.verticalScrollMargin,
-      maxMarginInLines
+      maxMarginInLines,
     );
     return marginInLines * this.getLineHeight();
   }
@@ -2392,11 +2386,11 @@ module.exports = class TextEditorComponent {
     const maxMarginInBaseCharacters = Math.floor(
       (this.getScrollContainerClientWidth() / this.getBaseCharacterWidth() -
         1) /
-        2
+        2,
     );
     const marginInBaseCharacters = Math.min(
       this.props.model.horizontalScrollMargin,
-      maxMarginInBaseCharacters
+      maxMarginInBaseCharacters,
     );
     return marginInBaseCharacters * this.getBaseCharacterWidth();
   }
@@ -2405,7 +2399,8 @@ module.exports = class TextEditorComponent {
   // potential changes in the editor's width into the model before proceeding.
   updateModelSoftWrapColumn() {
     const { model } = this.props;
-    const newEditorWidthInChars = this.getScrollContainerClientWidthInBaseCharacters();
+    const newEditorWidthInChars =
+      this.getScrollContainerClientWidthInBaseCharacters();
     if (newEditorWidthInChars !== model.getEditorWidthInChars()) {
       this.suppressUpdates = true;
 
@@ -2423,7 +2418,7 @@ module.exports = class TextEditorComponent {
       // rendered start row accurately. 😥
       this.populateVisibleRowRange(renderedStartRow);
       this.props.model.setEditorWidthInChars(
-        this.getScrollContainerClientWidthInBaseCharacters()
+        this.getScrollContainerClientWidthInBaseCharacters(),
       );
       this.derivedDimensionsCache = {};
 
@@ -2445,19 +2440,23 @@ module.exports = class TextEditorComponent {
   measureCharacterDimensions() {
     this.measurements.lineHeight = Math.max(
       1,
-      this.refs.characterMeasurementLine.getBoundingClientRect().height
+      this.refs.characterMeasurementLine.getBoundingClientRect().height,
     );
-    this.measurements.baseCharacterWidth = this.refs.normalWidthCharacterSpan.getBoundingClientRect().width;
-    this.measurements.doubleWidthCharacterWidth = this.refs.doubleWidthCharacterSpan.getBoundingClientRect().width;
-    this.measurements.halfWidthCharacterWidth = this.refs.halfWidthCharacterSpan.getBoundingClientRect().width;
-    this.measurements.koreanCharacterWidth = this.refs.koreanCharacterSpan.getBoundingClientRect().width;
+    this.measurements.baseCharacterWidth =
+      this.refs.normalWidthCharacterSpan.getBoundingClientRect().width;
+    this.measurements.doubleWidthCharacterWidth =
+      this.refs.doubleWidthCharacterSpan.getBoundingClientRect().width;
+    this.measurements.halfWidthCharacterWidth =
+      this.refs.halfWidthCharacterSpan.getBoundingClientRect().width;
+    this.measurements.koreanCharacterWidth =
+      this.refs.koreanCharacterSpan.getBoundingClientRect().width;
 
     this.props.model.setLineHeightInPixels(this.measurements.lineHeight);
     this.props.model.setDefaultCharWidth(
       this.measurements.baseCharacterWidth,
       this.measurements.doubleWidthCharacterWidth,
       this.measurements.halfWidthCharacterWidth,
-      this.measurements.koreanCharacterWidth
+      this.measurements.koreanCharacterWidth,
     );
     this.lineTopIndex.setDefaultLineHeight(this.measurements.lineHeight);
   }
@@ -2466,8 +2465,8 @@ module.exports = class TextEditorComponent {
     let dimensionsChanged = false;
 
     if (this.refs.gutterContainer) {
-      const gutterContainerWidth = this.refs.gutterContainer.element
-        .offsetWidth;
+      const gutterContainerWidth =
+        this.refs.gutterContainer.element.offsetWidth;
       if (gutterContainerWidth !== this.measurements.gutterContainerWidth) {
         dimensionsChanged = true;
         this.measurements.gutterContainerWidth = gutterContainerWidth;
@@ -2480,8 +2479,8 @@ module.exports = class TextEditorComponent {
       this.refs.gutterContainer &&
       this.refs.gutterContainer.refs.lineNumberGutter
     ) {
-      const lineNumberGutterWidth = this.refs.gutterContainer.refs
-        .lineNumberGutter.element.offsetWidth;
+      const lineNumberGutterWidth =
+        this.refs.gutterContainer.refs.lineNumberGutter.element.offsetWidth;
       if (lineNumberGutterWidth !== this.measurements.lineNumberGutterWidth) {
         dimensionsChanged = true;
         this.measurements.lineNumberGutterWidth = lineNumberGutterWidth;
@@ -2518,15 +2517,17 @@ module.exports = class TextEditorComponent {
       this.measurements.verticalScrollbarWidth = 0;
       this.measurements.horizontalScrollbarHeight = 0;
     } else {
-      this.measurements.verticalScrollbarWidth = this.refs.verticalScrollbar.getRealScrollbarWidth();
-      this.measurements.horizontalScrollbarHeight = this.refs.horizontalScrollbar.getRealScrollbarHeight();
+      this.measurements.verticalScrollbarWidth =
+        this.refs.verticalScrollbar.getRealScrollbarWidth();
+      this.measurements.horizontalScrollbarHeight =
+        this.refs.horizontalScrollbar.getRealScrollbarHeight();
     }
   }
 
   measureLongestLineWidth() {
     if (this.longestLineToMeasure) {
       const lineComponent = this.lineComponentsByScreenLineId.get(
-        this.longestLineToMeasure.id
+        this.longestLineToMeasure.id,
       );
       this.measurements.longestLineWidth =
         lineComponent.element.firstChild.offsetWidth;
@@ -2560,26 +2561,28 @@ module.exports = class TextEditorComponent {
 
       const screenLine = this.renderedScreenLineForRow(row);
       const lineComponent = this.lineComponentsByScreenLineId.get(
-        screenLine.id
+        screenLine.id,
       );
 
       if (!lineComponent) {
         const error = new Error(
-          'Requested measurement of a line component that is not currently rendered'
+          'Requested measurement of a line component that is not currently rendered',
         );
         error.metadata = {
           row,
           columnsToMeasure,
-          renderedScreenLineIds: this.renderedScreenLines.map(line => line.id),
+          renderedScreenLineIds: this.renderedScreenLines.map(
+            (line) => line.id,
+          ),
           extraRenderedScreenLineIds: Array.from(
-            this.extraRenderedScreenLines.keys()
+            this.extraRenderedScreenLines.keys(),
           ),
           lineComponentScreenLineIds: Array.from(
-            this.lineComponentsByScreenLineId.keys()
+            this.lineComponentsByScreenLineId.keys(),
           ),
           renderedStartRow: this.getRenderedStartRow(),
           renderedEndRow: this.getRenderedEndRow(),
-          requestedScreenLineId: screenLine.id
+          requestedScreenLineId: screenLine.id,
         };
         throw error;
       }
@@ -2587,13 +2590,13 @@ module.exports = class TextEditorComponent {
       const lineNode = lineComponent.element;
       const textNodes = lineComponent.textNodes;
       let positionsForLine = this.horizontalPixelPositionsByScreenLineId.get(
-        screenLine.id
+        screenLine.id,
       );
       if (positionsForLine == null) {
         positionsForLine = new Map();
         this.horizontalPixelPositionsByScreenLineId.set(
           screenLine.id,
-          positionsForLine
+          positionsForLine,
         );
       }
 
@@ -2601,7 +2604,7 @@ module.exports = class TextEditorComponent {
         lineNode,
         textNodes,
         columnsToMeasure,
-        positionsForLine
+        positionsForLine,
       );
     });
     this.horizontalPositionsToMeasure.clear();
@@ -2611,7 +2614,7 @@ module.exports = class TextEditorComponent {
     lineNode,
     textNodes,
     columnsToMeasure,
-    positions
+    positions,
   ) {
     let lineNodeClientLeft = -1;
     let textNodeStartColumn = 0;
@@ -2644,7 +2647,7 @@ module.exports = class TextEditorComponent {
             clientPixelPosition = clientRectForRange(
               textNode,
               0,
-              nextColumnToMeasure - textNodeStartColumn
+              nextColumnToMeasure - textNodeStartColumn,
             ).right;
           }
 
@@ -2654,7 +2657,7 @@ module.exports = class TextEditorComponent {
 
           positions.set(
             nextColumnToMeasure,
-            Math.round(clientPixelPosition - lineNodeClientLeft)
+            Math.round(clientPixelPosition - lineNodeClientLeft),
           );
           continue columnLoop; // eslint-disable-line no-labels
         } else {
@@ -2668,7 +2671,7 @@ module.exports = class TextEditorComponent {
         lastTextNodeRight = clientRectForRange(
           lastTextNode,
           0,
-          lastTextNode.textContent.length
+          lastTextNode.textContent.length,
         ).right;
       }
 
@@ -2678,7 +2681,7 @@ module.exports = class TextEditorComponent {
 
       positions.set(
         nextColumnToMeasure,
-        Math.round(lastTextNodeRight - lineNodeClientLeft)
+        Math.round(lastTextNodeRight - lineNodeClientLeft),
       );
     }
   }
@@ -2713,9 +2716,8 @@ module.exports = class TextEditorComponent {
     if (column === 0) return 0;
     const screenLine = this.renderedScreenLineForRow(row);
     if (screenLine) {
-      const horizontalPositionsByColumn = this.horizontalPixelPositionsByScreenLineId.get(
-        screenLine.id
-      );
+      const horizontalPositionsByColumn =
+        this.horizontalPixelPositionsByScreenLineId.get(screenLine.id);
       if (horizontalPositionsByColumn) {
         return horizontalPositionsByColumn.get(column);
       }
@@ -2727,7 +2729,7 @@ module.exports = class TextEditorComponent {
 
     const row = Math.min(
       this.rowForPixelPosition(top),
-      model.getApproximateScreenLineCount() - 1
+      model.getApproximateScreenLineCount() - 1,
     );
 
     let screenLine = this.renderedScreenLineForRow(row);
@@ -2772,7 +2774,7 @@ module.exports = class TextEditorComponent {
         const charIndex = low + ((high - low) >> 1);
         const nextCharIndex = isPairedCharacter(
           containingTextNode.textContent,
-          charIndex
+          charIndex,
         )
           ? charIndex + 2
           : charIndex + 1;
@@ -2780,7 +2782,7 @@ module.exports = class TextEditorComponent {
         const rangeRect = clientRectForRange(
           containingTextNode,
           charIndex,
-          nextCharIndex
+          nextCharIndex,
         );
         if (targetClientLeft < rangeRect.left) {
           high = charIndex - 1;
@@ -2789,7 +2791,7 @@ module.exports = class TextEditorComponent {
           low = nextCharIndex;
           characterIndex = Math.min(
             containingTextNode.textContent.length,
-            nextCharIndex
+            nextCharIndex,
           );
         } else {
           if (targetClientLeft <= (rangeRect.left + rangeRect.right) / 2) {
@@ -2822,7 +2824,7 @@ module.exports = class TextEditorComponent {
       this.spliceLineTopIndex(
         newRange.start.row,
         oldRange.end.row - oldRange.start.row,
-        newRange.end.row - newRange.start.row
+        newRange.end.row - newRange.start.row,
       );
     }
 
@@ -2849,7 +2851,7 @@ module.exports = class TextEditorComponent {
           // will slow down selections.
           electron.ipcRenderer.send(
             'write-text-to-selection-clipboard',
-            selectedText
+            selectedText,
           );
         }
       });
@@ -2899,11 +2901,11 @@ module.exports = class TextEditorComponent {
           } else if (isValid && !textChanged) {
             this.lineTopIndex.moveBlock(
               decoration,
-              marker.getHeadScreenPosition().row
+              marker.getHeadScreenPosition().row,
             );
             this.scheduleUpdate();
           }
-        }
+        },
       );
 
       const didDestroyDisposable = decoration.onDidDestroy(() => {
@@ -2948,9 +2950,9 @@ module.exports = class TextEditorComponent {
     const invalidatedBlockDecorations = this.lineTopIndex.splice(
       startRow,
       oldExtent,
-      newExtent
+      newExtent,
     );
-    invalidatedBlockDecorations.forEach(decoration => {
+    invalidatedBlockDecorations.forEach((decoration) => {
       const newPosition = decoration.getMarker().getHeadScreenPosition();
       this.lineTopIndex.moveBlock(decoration, newPosition.row);
     });
@@ -3035,7 +3037,7 @@ module.exports = class TextEditorComponent {
         this.getContentHeight() +
         Math.max(
           3 * this.getLineHeight(),
-          this.getScrollContainerClientHeight() - 3 * this.getLineHeight()
+          this.getScrollContainerClientHeight() - 3 * this.getLineHeight(),
         )
       );
     } else if (this.props.model.getAutoHeight()) {
@@ -3043,7 +3045,7 @@ module.exports = class TextEditorComponent {
     } else {
       return Math.max(
         this.getContentHeight(),
-        this.getScrollContainerClientHeight()
+        this.getScrollContainerClientHeight(),
       );
     }
   }
@@ -3058,14 +3060,14 @@ module.exports = class TextEditorComponent {
     } else {
       return Math.max(
         this.getContentWidth(),
-        this.getScrollContainerClientWidth()
+        this.getScrollContainerClientWidth(),
       );
     }
   }
 
   getContentHeight() {
     return this.pixelPositionAfterBlocksForRow(
-      this.props.model.getApproximateScreenLineCount()
+      this.props.model.getApproximateScreenLineCount(),
     );
   }
 
@@ -3075,7 +3077,7 @@ module.exports = class TextEditorComponent {
 
   getScrollContainerClientWidthInBaseCharacters() {
     return Math.floor(
-      this.getScrollContainerClientWidth() / this.getBaseCharacterWidth()
+      this.getScrollContainerClientWidth() / this.getBaseCharacterWidth(),
     );
   }
 
@@ -3106,7 +3108,7 @@ module.exports = class TextEditorComponent {
   getRenderedStartRow() {
     if (this.derivedDimensionsCache.renderedStartRow == null) {
       this.derivedDimensionsCache.renderedStartRow = this.tileStartRowForRow(
-        this.getFirstVisibleRow()
+        this.getFirstVisibleRow(),
       );
     }
 
@@ -3118,7 +3120,7 @@ module.exports = class TextEditorComponent {
       this.derivedDimensionsCache.renderedEndRow = Math.min(
         this.props.model.getApproximateScreenLineCount(),
         this.getRenderedStartRow() +
-          this.getVisibleTileCount() * this.getRowsPerTile()
+          this.getVisibleTileCount() * this.getRowsPerTile(),
       );
     }
 
@@ -3129,7 +3131,7 @@ module.exports = class TextEditorComponent {
     if (this.derivedDimensionsCache.renderedRowCount == null) {
       this.derivedDimensionsCache.renderedRowCount = Math.max(
         0,
-        this.getRenderedEndRow() - this.getRenderedStartRow()
+        this.getRenderedEndRow() - this.getRenderedStartRow(),
       );
     }
 
@@ -3139,7 +3141,7 @@ module.exports = class TextEditorComponent {
   getRenderedTileCount() {
     if (this.derivedDimensionsCache.renderedTileCount == null) {
       this.derivedDimensionsCache.renderedTileCount = Math.ceil(
-        this.getRenderedRowCount() / this.getRowsPerTile()
+        this.getRenderedRowCount() / this.getRowsPerTile(),
       );
     }
 
@@ -3149,7 +3151,7 @@ module.exports = class TextEditorComponent {
   getFirstVisibleRow() {
     if (this.derivedDimensionsCache.firstVisibleRow == null) {
       this.derivedDimensionsCache.firstVisibleRow = this.rowForPixelPosition(
-        this.getScrollTop()
+        this.getScrollTop(),
       );
     }
 
@@ -3160,7 +3162,7 @@ module.exports = class TextEditorComponent {
     if (this.derivedDimensionsCache.lastVisibleRow == null) {
       this.derivedDimensionsCache.lastVisibleRow = Math.min(
         this.props.model.getApproximateScreenLineCount() - 1,
-        this.rowForPixelPosition(this.getScrollBottom())
+        this.rowForPixelPosition(this.getScrollBottom()),
       );
     }
 
@@ -3197,7 +3199,7 @@ module.exports = class TextEditorComponent {
     if (Number.isNaN(scrollTop) || scrollTop == null) return false;
 
     scrollTop = roundToPhysicalPixelBoundary(
-      Math.max(0, Math.min(this.getMaxScrollTop(), scrollTop))
+      Math.max(0, Math.min(this.getMaxScrollTop(), scrollTop)),
     );
     if (scrollTop !== this.scrollTop) {
       this.derivedDimensionsCache = {};
@@ -3214,8 +3216,8 @@ module.exports = class TextEditorComponent {
     return Math.round(
       Math.max(
         0,
-        this.getScrollHeight() - this.getScrollContainerClientHeight()
-      )
+        this.getScrollHeight() - this.getScrollContainerClientHeight(),
+      ),
     );
   }
 
@@ -3225,7 +3227,7 @@ module.exports = class TextEditorComponent {
 
   setScrollBottom(scrollBottom) {
     return this.setScrollTop(
-      scrollBottom - this.getScrollContainerClientHeight()
+      scrollBottom - this.getScrollContainerClientHeight(),
     );
   }
 
@@ -3237,7 +3239,7 @@ module.exports = class TextEditorComponent {
     if (Number.isNaN(scrollLeft) || scrollLeft == null) return false;
 
     scrollLeft = roundToPhysicalPixelBoundary(
-      Math.max(0, Math.min(this.getMaxScrollLeft(), scrollLeft))
+      Math.max(0, Math.min(this.getMaxScrollLeft(), scrollLeft)),
     );
     if (scrollLeft !== this.scrollLeft) {
       this.scrollLeftPending = true;
@@ -3251,7 +3253,7 @@ module.exports = class TextEditorComponent {
 
   getMaxScrollLeft() {
     return Math.round(
-      Math.max(0, this.getScrollWidth() - this.getScrollContainerClientWidth())
+      Math.max(0, this.getScrollWidth() - this.getScrollContainerClientWidth()),
     );
   }
 
@@ -3261,14 +3263,14 @@ module.exports = class TextEditorComponent {
 
   setScrollRight(scrollRight) {
     return this.setScrollLeft(
-      scrollRight - this.getScrollContainerClientWidth()
+      scrollRight - this.getScrollContainerClientWidth(),
     );
   }
 
   setScrollTopRow(scrollTopRow, scheduleUpdate = true) {
     if (this.hasInitialMeasurements) {
       const didScroll = this.setScrollTop(
-        this.pixelPositionBeforeBlocksForRow(scrollTopRow)
+        this.pixelPositionBeforeBlocksForRow(scrollTopRow),
       );
       if (didScroll && scheduleUpdate) {
         this.scheduleUpdate();
@@ -3291,7 +3293,7 @@ module.exports = class TextEditorComponent {
   setScrollLeftColumn(scrollLeftColumn, scheduleUpdate = true) {
     if (this.hasInitialMeasurements && this.getLongestLineWidth() != null) {
       const didScroll = this.setScrollLeft(
-        scrollLeftColumn * this.getBaseCharacterWidth()
+        scrollLeftColumn * this.getBaseCharacterWidth(),
       );
       if (didScroll && scheduleUpdate) {
         this.scheduleUpdate();
@@ -3320,7 +3322,7 @@ module.exports = class TextEditorComponent {
       renderedStartRow + this.getVisibleTileCount() * this.getRowsPerTile();
     this.props.model.displayLayer.populateSpatialIndexIfNeeded(
       Infinity,
-      renderedEndRow
+      renderedEndRow,
     );
 
     // If the approximate screen line count changes, previously-cached derived
@@ -3361,13 +3363,13 @@ module.exports = class TextEditorComponent {
     }
 
     this.renderedTileStartRows.sort(
-      (a, b) => this.idsByTileStartRow.get(a) - this.idsByTileStartRow.get(b)
+      (a, b) => this.idsByTileStartRow.get(a) - this.idsByTileStartRow.get(b),
     );
   }
 
   getNextUpdatePromise() {
     if (!this.nextUpdatePromise) {
-      this.nextUpdatePromise = new Promise(resolve => {
+      this.nextUpdatePromise = new Promise((resolve) => {
         this.resolveNextUpdatePromise = () => {
           this.nextUpdatePromise = null;
           this.resolveNextUpdatePromise = null;
@@ -3436,20 +3438,20 @@ class DummyScrollbarComponent {
       horizontalScrollbarHeight,
       canScroll,
       forceScrollbarVisible,
-      didScroll
+      didScroll,
     } = this.props;
 
     const outerStyle = {
       position: 'absolute',
       contain: 'content',
       zIndex: 1,
-      willChange: 'transform'
+      willChange: 'transform',
     };
     if (!canScroll) outerStyle.visibility = 'hidden';
 
     const innerStyle = {};
     if (orientation === 'horizontal') {
-      let right = verticalScrollbarWidth || 0;
+      const right = verticalScrollbarWidth || 0;
       outerStyle.bottom = 0;
       outerStyle.left = 0;
       outerStyle.right = right + 'px';
@@ -3460,7 +3462,7 @@ class DummyScrollbarComponent {
       innerStyle.height = '15px';
       innerStyle.width = (scrollWidth || 0) + 'px';
     } else {
-      let bottom = horizontalScrollbarHeight || 0;
+      const bottom = horizontalScrollbarHeight || 0;
       outerStyle.right = 0;
       outerStyle.top = 0;
       outerStyle.bottom = bottom + 'px';
@@ -3478,15 +3480,15 @@ class DummyScrollbarComponent {
         style: outerStyle,
         on: {
           scroll: didScroll,
-          mousedown: this.didMouseDown
-        }
+          mousedown: this.didMouseDown,
+        },
       },
-      $.div({ style: innerStyle })
+      $.div({ style: innerStyle }),
     );
   }
 
   didMouseDown(event) {
-    let { bottom, right } = this.element.getBoundingClientRect();
+    const { bottom, right } = this.element.getBoundingClientRect();
     const clickedOnScrollbar =
       this.props.orientation === 'horizontal'
         ? event.clientY >= bottom - this.getRealScrollbarHeight()
@@ -3529,17 +3531,17 @@ class GutterContainerComponent {
       scrollTop,
       scrollHeight,
       guttersToRender,
-      decorationsToRender
+      decorationsToRender,
     } = this.props;
 
     const innerStyle = {
       willChange: 'transform',
-      display: 'flex'
+      display: 'flex',
     };
 
     if (hasInitialMeasurements) {
       innerStyle.transform = `translateY(${-roundToPhysicalPixelBoundary(
-        scrollTop
+        scrollTop,
       )}px)`;
     }
 
@@ -3551,12 +3553,12 @@ class GutterContainerComponent {
         style: {
           position: 'relative',
           zIndex: 1,
-          backgroundColor: 'inherit'
-        }
+          backgroundColor: 'inherit',
+        },
       },
       $.div(
         { style: innerStyle },
-        guttersToRender.map(gutter => {
+        guttersToRender.map((gutter) => {
           if (gutter.type === 'line-number') {
             return this.renderLineNumberGutter(gutter);
           } else {
@@ -3566,11 +3568,11 @@ class GutterContainerComponent {
               name: gutter.name,
               visible: gutter.isVisible(),
               height: scrollHeight,
-              decorations: decorationsToRender.customGutter.get(gutter.name)
+              decorations: decorationsToRender.customGutter.get(gutter.name),
             });
           }
-        })
-      )
+        }),
+      ),
     );
   }
 
@@ -3587,7 +3589,7 @@ class GutterContainerComponent {
       didMeasureVisibleBlockDecoration,
       scrollHeight,
       lineNumberGutterWidth,
-      lineHeight
+      lineHeight,
     } = this.props;
 
     if (!gutter.isVisible()) {
@@ -3605,7 +3607,7 @@ class GutterContainerComponent {
         bufferRows,
         screenRows,
         softWrappedFlags,
-        foldableFlags
+        foldableFlags,
       } = lineNumbersToRender;
       return $(LineNumberGutterComponent, {
         ref,
@@ -3615,23 +3617,23 @@ class GutterContainerComponent {
         labelFn: gutter.labelFn,
         onMouseDown: gutter.onMouseDown,
         onMouseMove: gutter.onMouseMove,
-        rootComponent: rootComponent,
+        rootComponent,
         startRow: renderedStartRow,
         endRow: renderedEndRow,
-        rowsPerTile: rowsPerTile,
-        maxDigits: maxDigits,
-        keys: keys,
-        bufferRows: bufferRows,
-        screenRows: screenRows,
-        softWrappedFlags: softWrappedFlags,
-        foldableFlags: foldableFlags,
+        rowsPerTile,
+        maxDigits,
+        keys,
+        bufferRows,
+        screenRows,
+        softWrappedFlags,
+        foldableFlags,
         decorations: decorationsToRender.lineNumbers.get(gutter.name) || [],
         blockDecorations: decorationsToRender.blocks,
-        didMeasureVisibleBlockDecoration: didMeasureVisibleBlockDecoration,
+        didMeasureVisibleBlockDecoration,
         height: scrollHeight,
         width,
-        lineHeight: lineHeight,
-        showLineNumbers
+        lineHeight,
+        showLineNumbers,
       });
     } else {
       return $(LineNumberGutterComponent, {
@@ -3642,7 +3644,7 @@ class GutterContainerComponent {
         onMouseDown: gutter.onMouseDown,
         onMouseMove: gutter.onMouseMove,
         maxDigits: lineNumbersToRender.maxDigits,
-        showLineNumbers
+        showLineNumbers,
       });
     }
   }
@@ -3681,7 +3683,7 @@ class LineNumberGutterComponent {
       softWrappedFlags,
       foldableFlags,
       decorations,
-      className
+      className,
     } = this.props;
 
     let children = null;
@@ -3720,7 +3722,7 @@ class LineNumberGutterComponent {
                 screenRow,
                 foldable,
                 softWrapped,
-                maxDigits
+                maxDigits,
               });
             }
           }
@@ -3734,7 +3736,7 @@ class LineNumberGutterComponent {
           let marginTop = rootComponent.heightForBlockDecorationsBeforeRow(row);
           if (indexInTile > 0)
             marginTop += rootComponent.heightForBlockDecorationsAfterRow(
-              row - 1
+              row - 1,
             );
 
           tileChildren[row - tileStartRow] = $(LineNumberComponent, {
@@ -3745,16 +3747,14 @@ class LineNumberGutterComponent {
             screenRow,
             number,
             marginTop,
-            nodePool: this.nodePool
+            nodePool: this.nodePool,
           });
         }
 
-        const tileTop = rootComponent.pixelPositionBeforeBlocksForRow(
-          tileStartRow
-        );
-        const tileBottom = rootComponent.pixelPositionBeforeBlocksForRow(
-          tileEndRow
-        );
+        const tileTop =
+          rootComponent.pixelPositionBeforeBlocksForRow(tileStartRow);
+        const tileBottom =
+          rootComponent.pixelPositionBeforeBlocksForRow(tileEndRow);
         const tileHeight = tileBottom - tileTop;
         const tileWidth = width != null && width > 0 ? width + 'px' : '';
 
@@ -3767,10 +3767,10 @@ class LineNumberGutterComponent {
               top: 0,
               height: tileHeight + 'px',
               width: tileWidth,
-              transform: `translateY(${tileTop}px)`
-            }
+              transform: `translateY(${tileTop}px)`,
+            },
           },
-          ...tileChildren
+          ...tileChildren,
         );
       }
     }
@@ -3786,23 +3786,23 @@ class LineNumberGutterComponent {
         attributes: { 'gutter-name': this.props.name },
         style: {
           position: 'relative',
-          height: ceilToPhysicalPixelBoundary(height) + 'px'
+          height: ceilToPhysicalPixelBoundary(height) + 'px',
         },
         on: {
           mousedown: this.didMouseDown,
-          mousemove: this.didMouseMove
-        }
+          mousemove: this.didMouseMove,
+        },
       },
       $.div(
         {
           key: 'placeholder',
           className: 'line-number dummy',
-          style: { visibility: 'hidden' }
+          style: { visibility: 'hidden' },
         },
         showLineNumbers ? '0'.repeat(maxDigits) : null,
-        $.div({ className: 'icon-right' })
+        $.div({ className: 'icon-right' }),
       ),
-      children
+      children,
     );
   }
 
@@ -3832,12 +3832,10 @@ class LineNumberGutterComponent {
       oldTileStartRow < oldProps.endRow ||
       newTileStartRow < newProps.endRow
     ) {
-      let oldTileBlockDecorations = oldProps.blockDecorations.get(
-        oldTileStartRow
-      );
-      let newTileBlockDecorations = newProps.blockDecorations.get(
-        newTileStartRow
-      );
+      const oldTileBlockDecorations =
+        oldProps.blockDecorations.get(oldTileStartRow);
+      const newTileBlockDecorations =
+        newProps.blockDecorations.get(newTileStartRow);
 
       if (oldTileBlockDecorations && newTileBlockDecorations) {
         if (oldTileBlockDecorations.size !== newTileBlockDecorations.size)
@@ -3883,7 +3881,7 @@ class LineNumberGutterComponent {
       this.props.onMouseDown({
         bufferRow: parseInt(bufferRow, 10),
         screenRow: parseInt(screenRow, 10),
-        domEvent: event
+        domEvent: event,
       });
     }
   }
@@ -3894,7 +3892,7 @@ class LineNumberGutterComponent {
       this.props.onMouseMove({
         bufferRow: parseInt(bufferRow, 10),
         screenRow: parseInt(screenRow, 10),
-        domEvent: event
+        domEvent: event,
       });
     }
   }
@@ -3909,7 +3907,7 @@ class LineNumberComponent {
       bufferRow,
       screenRow,
       number,
-      nodePool
+      nodePool,
     } = props;
     this.props = props;
     const style = {};
@@ -3935,7 +3933,7 @@ class LineNumberComponent {
       marginTop,
       bufferRow,
       screenRow,
-      number
+      number,
     } = props;
 
     if (this.props.bufferRow !== bufferRow)
@@ -3968,7 +3966,7 @@ class LineNumberComponent {
       if (number != null) {
         this.element.insertBefore(
           nodePool.getTextNode(number),
-          this.element.firstChild
+          this.element.firstChild,
         );
       }
     }
@@ -4005,16 +4003,16 @@ class CustomGutterComponent {
         className,
         attributes: { 'gutter-name': this.props.name },
         style: {
-          display: this.props.visible ? '' : 'none'
-        }
+          display: this.props.visible ? '' : 'none',
+        },
       },
       $.div(
         {
           className: 'custom-decorations',
-          style: { height: this.props.height + 'px' }
+          style: { height: this.props.height + 'px' },
         },
-        this.renderDecorations()
-      )
+        this.renderDecorations(),
+      ),
     );
   }
 
@@ -4026,7 +4024,7 @@ class CustomGutterComponent {
         className,
         element,
         top,
-        height
+        height,
       });
     });
   }
@@ -4092,12 +4090,8 @@ class CursorsAndInputComponent {
   }
 
   render() {
-    const {
-      lineHeight,
-      decorationsToRender,
-      scrollHeight,
-      scrollWidth
-    } = this.props;
+    const { lineHeight, decorationsToRender, scrollHeight, scrollWidth } =
+      this.props;
 
     const className = this.getCursorsClassName();
     const cursorHeight = lineHeight + 'px';
@@ -4109,7 +4103,7 @@ class CursorsAndInputComponent {
         pixelTop,
         pixelWidth,
         className: extraCursorClassName,
-        style: extraCursorStyle
+        style: extraCursorStyle,
       } = decorationsToRender.cursors[i];
       let cursorClassName = 'cursor';
       if (extraCursorClassName) cursorClassName += ' ' + extraCursorClassName;
@@ -4117,15 +4111,15 @@ class CursorsAndInputComponent {
       const cursorStyle = {
         height: cursorHeight,
         width: Math.min(pixelWidth, scrollWidth - pixelLeft) + 'px',
-        transform: `translate(${pixelLeft}px, ${pixelTop}px)`
+        transform: `translate(${pixelLeft}px, ${pixelTop}px)`,
       };
       if (extraCursorStyle) Object.assign(cursorStyle, extraCursorStyle);
 
       children.push(
         $.div({
           className: cursorClassName,
-          style: cursorStyle
-        })
+          style: cursorStyle,
+        }),
       );
     }
 
@@ -4141,10 +4135,10 @@ class CursorsAndInputComponent {
           width: scrollWidth + 'px',
           height: scrollHeight + 'px',
           pointerEvents: 'none',
-          userSelect: 'none'
-        }
+          userSelect: 'none',
+        },
       },
-      children
+      children,
     );
   }
 
@@ -4166,7 +4160,7 @@ class CursorsAndInputComponent {
       didCompositionStart,
       didCompositionUpdate,
       didCompositionEnd,
-      tabIndex
+      tabIndex,
     } = this.props;
 
     let top, left;
@@ -4192,9 +4186,9 @@ class CursorsAndInputComponent {
         keypress: didKeypress,
         compositionstart: didCompositionStart,
         compositionupdate: didCompositionUpdate,
-        compositionend: didCompositionEnd
+        compositionend: didCompositionEnd,
       },
-      tabIndex: tabIndex,
+      tabIndex,
       style: {
         position: 'absolute',
         width: '1px',
@@ -4203,8 +4197,8 @@ class CursorsAndInputComponent {
         left: left + 'px',
         opacity: 0,
         padding: 0,
-        border: 0
-      }
+        border: 0,
+      },
     });
   }
 }
@@ -4248,9 +4242,9 @@ class LinesTileComponent {
           position: 'absolute',
           height: height + 'px',
           width: width + 'px',
-          transform: `translateY(${top}px)`
-        }
-      }
+          transform: `translateY(${top}px)`,
+        },
+      },
       // Lines and block decorations will be manually inserted here for efficiency
     );
   }
@@ -4263,7 +4257,7 @@ class LinesTileComponent {
       textDecorations,
       nodePool,
       displayLayer,
-      lineComponentsByScreenLineId
+      lineComponentsByScreenLineId,
     } = this.props;
 
     this.lineComponents = [];
@@ -4275,7 +4269,7 @@ class LinesTileComponent {
         textDecorations: textDecorations[i],
         displayLayer,
         nodePool,
-        lineComponentsByScreenLineId
+        lineComponentsByScreenLineId,
       });
       this.element.appendChild(component.element);
       this.lineComponents.push(component);
@@ -4290,7 +4284,7 @@ class LinesTileComponent {
       textDecorations,
       nodePool,
       displayLayer,
-      lineComponentsByScreenLineId
+      lineComponentsByScreenLineId,
     } = newProps;
 
     const oldScreenLines = oldProps.screenLines;
@@ -4308,15 +4302,16 @@ class LinesTileComponent {
       const oldScreenLine = oldScreenLines[oldScreenLineIndex];
       const newScreenLine = newScreenLines[newScreenLineIndex];
 
+      let newScreenLineComponent;
       if (oldScreenLineIndex >= oldScreenLinesEndIndex) {
-        var newScreenLineComponent = new LineComponent({
+        newScreenLineComponent = new LineComponent({
           screenLine: newScreenLine,
           screenRow: tileStartRow + newScreenLineIndex,
           lineDecoration: lineDecorations[newScreenLineIndex],
           textDecorations: textDecorations[newScreenLineIndex],
           displayLayer,
           nodePool,
-          lineComponentsByScreenLineId
+          lineComponentsByScreenLineId,
         });
         this.element.appendChild(newScreenLineComponent.element);
         this.lineComponents.push(newScreenLineComponent);
@@ -4333,38 +4328,35 @@ class LinesTileComponent {
         lineComponent.update({
           screenRow: tileStartRow + newScreenLineIndex,
           lineDecoration: lineDecorations[newScreenLineIndex],
-          textDecorations: textDecorations[newScreenLineIndex]
+          textDecorations: textDecorations[newScreenLineIndex],
         });
 
         oldScreenLineIndex++;
         newScreenLineIndex++;
         lineComponentIndex++;
       } else {
-        const oldScreenLineIndexInNewScreenLines = newScreenLines.indexOf(
-          oldScreenLine
-        );
-        const newScreenLineIndexInOldScreenLines = oldScreenLines.indexOf(
-          newScreenLine
-        );
+        const oldScreenLineIndexInNewScreenLines =
+          newScreenLines.indexOf(oldScreenLine);
+        const newScreenLineIndexInOldScreenLines =
+          oldScreenLines.indexOf(newScreenLine);
         if (
           newScreenLineIndex < oldScreenLineIndexInNewScreenLines &&
           oldScreenLineIndexInNewScreenLines < newScreenLinesEndIndex
         ) {
           const newScreenLineComponents = [];
           while (newScreenLineIndex < oldScreenLineIndexInNewScreenLines) {
-            // eslint-disable-next-line no-redeclare
-            var newScreenLineComponent = new LineComponent({
+            newScreenLineComponent = new LineComponent({
               screenLine: newScreenLines[newScreenLineIndex],
               screenRow: tileStartRow + newScreenLineIndex,
               lineDecoration: lineDecorations[newScreenLineIndex],
               textDecorations: textDecorations[newScreenLineIndex],
               displayLayer,
               nodePool,
-              lineComponentsByScreenLineId
+              lineComponentsByScreenLineId,
             });
             this.element.insertBefore(
               newScreenLineComponent.element,
-              this.getFirstElementForScreenLine(oldProps, oldScreenLine)
+              this.getFirstElementForScreenLine(oldProps, oldScreenLine),
             );
             newScreenLineComponents.push(newScreenLineComponent);
 
@@ -4374,7 +4366,7 @@ class LinesTileComponent {
           this.lineComponents.splice(
             lineComponentIndex,
             0,
-            ...newScreenLineComponents
+            ...newScreenLineComponents,
           );
           lineComponentIndex =
             lineComponentIndex + newScreenLineComponents.length;
@@ -4389,22 +4381,20 @@ class LinesTileComponent {
             oldScreenLineIndex++;
           }
         } else {
-          const oldScreenLineComponent = this.lineComponents[
-            lineComponentIndex
-          ];
-          // eslint-disable-next-line no-redeclare
-          var newScreenLineComponent = new LineComponent({
+          const oldScreenLineComponent =
+            this.lineComponents[lineComponentIndex];
+          newScreenLineComponent = new LineComponent({
             screenLine: newScreenLines[newScreenLineIndex],
             screenRow: tileStartRow + newScreenLineIndex,
             lineDecoration: lineDecorations[newScreenLineIndex],
             textDecorations: textDecorations[newScreenLineIndex],
             displayLayer,
             nodePool,
-            lineComponentsByScreenLineId
+            lineComponentsByScreenLineId,
           });
           this.element.insertBefore(
             newScreenLineComponent.element,
-            oldScreenLineComponent.element
+            oldScreenLineComponent.element,
           );
           oldScreenLineComponent.destroy();
           this.lineComponents[lineComponentIndex] = newScreenLineComponent;
@@ -4427,7 +4417,7 @@ class LinesTileComponent {
         const decoration = blockDecorations[i];
         if (decoration.position !== 'after') {
           blockDecorationElementsBeforeOldScreenLine.push(
-            TextEditor.viewForItem(decoration.item)
+            TextEditor.viewForItem(decoration.item),
           );
         }
       }
@@ -4441,7 +4431,7 @@ class LinesTileComponent {
           blockDecorationElementsBeforeOldScreenLine[i];
         if (
           !blockDecorationElementsBeforeOldScreenLine.includes(
-            blockDecorationElement.previousSibling
+            blockDecorationElement.previousSibling,
           )
         ) {
           return blockDecorationElement;
@@ -4550,7 +4540,7 @@ class LinesTileComponent {
       if (
         !textDecorationsEqual(
           oldProps.textDecorations[i],
-          newProps.textDecorations[i]
+          newProps.textDecorations[i],
         )
       )
         return true;
@@ -4567,7 +4557,7 @@ class LineComponent {
       screenRow,
       screenLine,
       lineComponentsByScreenLineId,
-      offScreen
+      offScreen,
     } = props;
     this.props = props;
     this.element = nodePool.getElement('DIV', this.buildClassName(), null);
@@ -4598,7 +4588,7 @@ class LineComponent {
     if (
       !textDecorationsEqual(
         this.props.textDecorations,
-        newProps.textDecorations
+        newProps.textDecorations,
       )
     ) {
       this.props.textDecorations = newProps.textDecorations;
@@ -4650,7 +4640,7 @@ class LineComponent {
           const newScopeNode = nodePool.getElement(
             'SPAN',
             displayLayer.classNameForTag(tag),
-            null
+            null,
           );
           openScopeNode.appendChild(newScopeNode);
           openScopeNode = newScopeNode;
@@ -4662,7 +4652,7 @@ class LineComponent {
               openScopeNode,
               text,
               activeClassName,
-              activeStyle
+              activeStyle,
             );
             column = nextDecoration.column;
             activeClassName = nextDecoration.className;
@@ -4676,7 +4666,7 @@ class LineComponent {
               openScopeNode,
               text,
               activeClassName,
-              activeStyle
+              activeStyle,
             );
             column = nextTokenColumn;
           }
@@ -4707,7 +4697,7 @@ class LineComponent {
       const decorationNode = nodePool.getElement(
         'SPAN',
         activeClassName,
-        activeStyle
+        activeStyle,
       );
       openScopeNode.appendChild(decorationNode);
       openScopeNode = decorationNode;
@@ -4740,7 +4730,7 @@ class HighlightsComponent {
   }
 
   destroy() {
-    this.highlightComponentsByKey.forEach(highlightComponent => {
+    this.highlightComponentsByKey.forEach((highlightComponent) => {
       highlightComponent.destroy();
     });
     this.highlightComponentsByKey.clear();
@@ -4760,11 +4750,11 @@ class HighlightsComponent {
           const highlightDecoration = highlightDecorations[i];
           const highlightProps = Object.assign(
             { lineHeight },
-            highlightDecorations[i]
+            highlightDecorations[i],
           );
 
           let highlightComponent = this.highlightComponentsByKey.get(
-            highlightDecoration.key
+            highlightDecoration.key,
           );
           if (highlightComponent) {
             highlightComponent.update(highlightProps);
@@ -4773,7 +4763,7 @@ class HighlightsComponent {
             this.element.appendChild(highlightComponent.element);
             this.highlightComponentsByKey.set(
               highlightDecoration.key,
-              highlightComponent
+              highlightComponent,
             );
           }
 
@@ -4842,7 +4832,7 @@ class HighlightComponent {
 
   destroy() {
     if (this.timeoutsByClassName) {
-      this.timeoutsByClassName.forEach(timeout => {
+      this.timeoutsByClassName.forEach((timeout) => {
         window.clearTimeout(timeout);
       });
       this.timeoutsByClassName.clear();
@@ -4875,7 +4865,7 @@ class HighlightComponent {
         flashClass,
         window.setTimeout(() => {
           this.element.classList.remove(flashClass);
-        }, flashDuration)
+        }, flashDuration),
       );
     }
   }
@@ -4888,7 +4878,7 @@ class HighlightComponent {
       startPixelTop,
       startPixelLeft,
       endPixelTop,
-      endPixelLeft
+      endPixelLeft,
     } = this.props;
     const regionClassName = 'region ' + className;
 
@@ -4902,8 +4892,8 @@ class HighlightComponent {
           top: startPixelTop + 'px',
           left: startPixelLeft + 'px',
           width: endPixelLeft - startPixelLeft + 'px',
-          height: lineHeight + 'px'
-        }
+          height: lineHeight + 'px',
+        },
       });
     } else {
       children = [];
@@ -4916,9 +4906,9 @@ class HighlightComponent {
             top: startPixelTop + 'px',
             left: startPixelLeft + 'px',
             right: 0,
-            height: lineHeight + 'px'
-          }
-        })
+            height: lineHeight + 'px',
+          },
+        }),
       );
 
       if (screenRange.end.row - screenRange.start.row > 1) {
@@ -4931,9 +4921,9 @@ class HighlightComponent {
               top: startPixelTop + lineHeight + 'px',
               left: 0,
               right: 0,
-              height: endPixelTop - startPixelTop - lineHeight * 2 + 'px'
-            }
-          })
+              height: endPixelTop - startPixelTop - lineHeight * 2 + 'px',
+            },
+          }),
         );
       }
 
@@ -4947,9 +4937,9 @@ class HighlightComponent {
               top: endPixelTop - lineHeight + 'px',
               left: 0,
               width: endPixelLeft + 'px',
-              height: lineHeight + 'px'
-            }
-          })
+              height: lineHeight + 'px',
+            },
+          }),
         );
       }
     }
@@ -4975,7 +4965,7 @@ class OverlayComponent {
     // "loop limit exceeded" error. We disconnect the observer before
     // potentially mutating the DOM, and then reconnect it on the next tick.
     // Note: ResizeObserver calls its callback when .observe is called
-    this.resizeObserver = new ResizeObserver(entries => {
+    this.resizeObserver = new ResizeObserver((entries) => {
       const { contentRect } = entries[0];
 
       if (
@@ -5003,7 +4993,7 @@ class OverlayComponent {
 
   getNextUpdatePromise() {
     if (!this.nextUpdatePromise) {
-      this.nextUpdatePromise = new Promise(resolve => {
+      this.nextUpdatePromise = new Promise((resolve) => {
         this.resolveNextUpdatePromise = () => {
           this.nextUpdatePromise = null;
           this.resolveNextUpdatePromise = null;
@@ -5114,7 +5104,7 @@ function debounce(fn, wait) {
     }
   }
 
-  return function() {
+  return function () {
     timestamp = Date.now();
     if (!timeout) timeout = setTimeout(later, wait);
   };

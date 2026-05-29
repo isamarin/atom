@@ -105,7 +105,7 @@ module.exports = class Package {
     this.activationDisposables = new CompositeDisposable();
     this.activateKeymaps();
     this.activateMenus();
-    for (let settings of this.settings) {
+    for (const settings of this.settings) {
       settings.activate(this.config);
     }
     this.settingsActivated = true;
@@ -135,7 +135,8 @@ module.exports = class Package {
         this.activateCoreStartupServices();
         this.registerURIHandler();
         this.registerTranspilerConfig();
-        this.configSchemaRegisteredOnLoad = this.registerConfigSchemaFromMetadata();
+        this.configSchemaRegisteredOnLoad =
+          this.registerConfigSchemaFromMetadata();
         this.settingsPromise = this.loadSettings();
         if (this.shouldRequireMainModuleOnLoad() && this.mainModule == null) {
           this.requireMainModule();
@@ -184,14 +185,14 @@ module.exports = class Package {
         if (!this.mainModule) this.requireMainModule();
         if (typeof this.mainModule.initialize === 'function') {
           this.mainModule.initialize(
-            this.packageManager.getPackageState(this.name) || {}
+            this.packageManager.getPackageState(this.name) || {},
           );
         }
         this.mainInitialized = true;
       } catch (error) {
         this.handleError(
           `Failed to initialize the ${this.name} package`,
-          error
+          error,
         );
       }
     });
@@ -213,7 +214,7 @@ module.exports = class Package {
           } catch (error) {
             return this.handleError(
               `Failed to activate the ${this.name} package`,
-              error
+              error,
             );
           }
         });
@@ -223,14 +224,15 @@ module.exports = class Package {
     return Promise.all([
       this.grammarsPromise,
       this.settingsPromise,
-      this.activationPromise
+      this.activationPromise,
     ]);
   }
 
   activateNow() {
     try {
       if (!this.mainModule) this.requireMainModule();
-      this.configSchemaRegisteredOnActivate = this.registerConfigSchemaFromMainModule();
+      this.configSchemaRegisteredOnActivate =
+        this.registerConfigSchemaFromMainModule();
       this.registerViewProviders();
       this.activateStylesheets();
       if (this.mainModule && !this.mainActivated) {
@@ -240,7 +242,7 @@ module.exports = class Package {
         }
         if (typeof this.mainModule.activate === 'function') {
           this.mainModule.activate(
-            this.packageManager.getPackageState(this.name) || {}
+            this.packageManager.getPackageState(this.name) || {},
           );
         }
         this.mainActivated = true;
@@ -265,7 +267,7 @@ module.exports = class Package {
     if (configSchema) {
       this.config.setSchema(this.name, {
         type: 'object',
-        properties: configSchema
+        properties: configSchema,
       });
       return true;
     } else {
@@ -278,7 +280,7 @@ module.exports = class Package {
       if (typeof this.mainModule.config === 'object') {
         this.config.setSchema(this.name, {
           type: 'object',
-          properties: this.mainModule.config
+          properties: this.mainModule.config,
         });
         return true;
       }
@@ -299,7 +301,7 @@ module.exports = class Package {
     this.stylesheetDisposables = new CompositeDisposable();
 
     const priority = this.getStyleSheetPriority();
-    for (let [sourcePath, source] of this.stylesheets) {
+    for (const [sourcePath, source] of this.stylesheets) {
       const match = path.basename(sourcePath).match(/[^.]*\.([^.]*)\./);
 
       let context;
@@ -314,8 +316,8 @@ module.exports = class Package {
           sourcePath,
           priority,
           context,
-          skipDeprecatedSelectorsTransformation: this.bundledPackage
-        })
+          skipDeprecatedSelectorsTransformation: this.bundledPackage,
+        }),
       );
     }
 
@@ -327,7 +329,7 @@ module.exports = class Package {
       this.activationDisposables = new CompositeDisposable();
 
     const packagesWithKeymapsDisabled = this.config.get(
-      'core.packagesWithKeymapsDisabled'
+      'core.packagesWithKeymapsDisabled',
     );
     if (
       packagesWithKeymapsDisabled &&
@@ -343,14 +345,14 @@ module.exports = class Package {
     }
 
     if (!this.grammarsActivated) {
-      for (let grammar of this.grammars) {
+      for (const grammar of this.grammars) {
         grammar.activate();
       }
       this.grammarsActivated = true;
     }
 
     if (!this.settingsActivated) {
-      for (let settings of this.settings) {
+      for (const settings of this.settings) {
         settings.activate(this.config);
       }
       this.settingsActivated = true;
@@ -363,9 +365,9 @@ module.exports = class Package {
     this.keymapDisposables = new CompositeDisposable();
 
     const validateSelectors = !this.preloadedPackage;
-    for (let [keymapPath, map] of this.keymaps) {
+    for (const [keymapPath, map] of this.keymaps) {
       this.keymapDisposables.add(
-        this.keymapManager.add(keymapPath, map, 0, validateSelectors)
+        this.keymapManager.add(keymapPath, map, 0, validateSelectors),
       );
     }
     this.menuManager.update();
@@ -383,7 +385,7 @@ module.exports = class Package {
   }
 
   hasKeymaps() {
-    for (let [, map] of this.keymaps) {
+    for (const [, map] of this.keymaps) {
       if (map.length > 0) return true;
     }
     return false;
@@ -396,7 +398,7 @@ module.exports = class Package {
         try {
           const itemsBySelector = map['context-menu'];
           this.activationDisposables.add(
-            this.contextMenuManager.add(itemsBySelector, validateSelectors)
+            this.contextMenuManager.add(itemsBySelector, validateSelectors),
           );
         } catch (error) {
           if (error.code === 'EBADSELECTOR') {
@@ -418,7 +420,7 @@ module.exports = class Package {
 
   activateServices() {
     let methodName, version, versions;
-    for (var name in this.metadata.providedServices) {
+    for (const name in this.metadata.providedServices) {
       ({ versions } = this.metadata.providedServices[name]);
       const servicesByVersion = {};
       for (version in versions) {
@@ -428,11 +430,11 @@ module.exports = class Package {
         }
       }
       this.activationDisposables.add(
-        this.packageManager.serviceHub.provide(name, servicesByVersion)
+        this.packageManager.serviceHub.provide(name, servicesByVersion),
       );
     }
 
-    for (name in this.metadata.consumedServices) {
+    for (const name in this.metadata.consumedServices) {
       ({ versions } = this.metadata.consumedServices[name]);
       for (version in versions) {
         methodName = versions[version];
@@ -441,8 +443,8 @@ module.exports = class Package {
             this.packageManager.serviceHub.consume(
               name,
               version,
-              this.mainModule[methodName].bind(this.mainModule)
-            )
+              this.mainModule[methodName].bind(this.mainModule),
+            ),
           );
         }
       }
@@ -453,10 +455,10 @@ module.exports = class Package {
     const handlerConfig = this.getURIHandler();
     const methodName = handlerConfig && handlerConfig.method;
     if (methodName) {
-      this.uriHandlerSubscription = this.packageManager.registerURIHandlerForPackage(
-        this.name,
-        (...args) => this.handleURI(methodName, args)
-      );
+      this.uriHandlerSubscription =
+        this.packageManager.registerURIHandlerForPackage(this.name, (...args) =>
+          this.handleURI(methodName, args),
+        );
     }
   }
 
@@ -478,7 +480,7 @@ module.exports = class Package {
         this.path,
         this.name,
         this.metadata,
-        this.metadata.atomTranspilers
+        this.metadata.atomTranspilers,
       );
     }
   }
@@ -494,14 +496,14 @@ module.exports = class Package {
       this.keymaps = [];
       for (const keymapPath in this.packageManager.packagesCache[this.name]
         .keymaps) {
-        const keymapObject = this.packageManager.packagesCache[this.name]
-          .keymaps[keymapPath];
+        const keymapObject =
+          this.packageManager.packagesCache[this.name].keymaps[keymapPath];
         this.keymaps.push([`core:${keymapPath}`, keymapObject]);
       }
     } else {
-      this.keymaps = this.getKeymapPaths().map(keymapPath => [
+      this.keymaps = this.getKeymapPaths().map((keymapPath) => [
         keymapPath,
-        CSON.readFileSync(keymapPath, { allowDuplicateKeys: false }) || {}
+        CSON.readFileSync(keymapPath, { allowDuplicateKeys: false }) || {},
       ]);
     }
   }
@@ -511,15 +513,14 @@ module.exports = class Package {
       this.menus = [];
       for (const menuPath in this.packageManager.packagesCache[this.name]
         .menus) {
-        const menuObject = this.packageManager.packagesCache[this.name].menus[
-          menuPath
-        ];
+        const menuObject =
+          this.packageManager.packagesCache[this.name].menus[menuPath];
         this.menus.push([`core:${menuPath}`, menuObject]);
       }
     } else {
-      this.menus = this.getMenuPaths().map(menuPath => [
+      this.menus = this.getMenuPaths().map((menuPath) => [
         menuPath,
-        CSON.readFileSync(menuPath) || {}
+        CSON.readFileSync(menuPath) || {},
       ]);
     }
   }
@@ -527,8 +528,8 @@ module.exports = class Package {
   getKeymapPaths() {
     const keymapsDirPath = path.join(this.path, 'keymaps');
     if (this.metadata.keymaps) {
-      return this.metadata.keymaps.map(name =>
-        fs.resolve(keymapsDirPath, name, ['json', 'cson', ''])
+      return this.metadata.keymaps.map((name) =>
+        fs.resolve(keymapsDirPath, name, ['json', 'cson', '']),
       );
     } else {
       return fs.listSync(keymapsDirPath, ['cson', 'json']);
@@ -538,8 +539,8 @@ module.exports = class Package {
   getMenuPaths() {
     const menusDirPath = path.join(this.path, 'menus');
     if (this.metadata.menus) {
-      return this.metadata.menus.map(name =>
-        fs.resolve(menusDirPath, name, ['json', 'cson', ''])
+      return this.metadata.menus.map((name) =>
+        fs.resolve(menusDirPath, name, ['json', 'cson', '']),
       );
     } else {
       return fs.listSync(menusDirPath, ['cson', 'json']);
@@ -547,15 +548,15 @@ module.exports = class Package {
   }
 
   loadStylesheets() {
-    this.stylesheets = this.getStylesheetPaths().map(stylesheetPath => [
+    this.stylesheets = this.getStylesheetPaths().map((stylesheetPath) => [
       stylesheetPath,
-      this.themeManager.loadStylesheet(stylesheetPath, true)
+      this.themeManager.loadStylesheet(stylesheetPath, true),
     ]);
   }
 
   registerDeserializerMethods() {
     if (this.metadata.deserializers) {
-      Object.keys(this.metadata.deserializers).forEach(deserializerName => {
+      Object.keys(this.metadata.deserializers).forEach((deserializerName) => {
         const methodName = this.metadata.deserializers[deserializerName];
         this.deserializerManager.add({
           name: deserializerName,
@@ -577,7 +578,7 @@ module.exports = class Package {
             }
             this.deserialized = true;
             return this.mainModule[methodName](state, atomEnvironment);
-          }
+          },
         });
       });
     }
@@ -590,7 +591,7 @@ module.exports = class Package {
     if (directoryProviderService) {
       this.requireMainModule();
       const servicesByVersion = {};
-      for (let version in directoryProviderService.versions) {
+      for (const version in directoryProviderService.versions) {
         const methodName = directoryProviderService.versions[version];
         if (typeof this.mainModule[methodName] === 'function') {
           servicesByVersion[version] = this.mainModule[methodName]();
@@ -598,7 +599,7 @@ module.exports = class Package {
       }
       this.packageManager.serviceHub.provide(
         'atom.directory-provider',
-        servicesByVersion
+        servicesByVersion,
       );
     }
   }
@@ -606,8 +607,8 @@ module.exports = class Package {
   registerViewProviders() {
     if (this.metadata.viewProviders && !this.registeredViewProviders) {
       this.requireMainModule();
-      this.metadata.viewProviders.forEach(methodName => {
-        this.viewRegistry.addViewProvider(model => {
+      this.metadata.viewProviders.forEach((methodName) => {
+        this.viewRegistry.addViewProvider((model) => {
           this.initializeIfNeeded();
           return this.mainModule[methodName](model);
         });
@@ -627,8 +628,8 @@ module.exports = class Package {
       this.packageManager.packagesCache[this.name].styleSheetPaths
     ) {
       const { styleSheetPaths } = this.packageManager.packagesCache[this.name];
-      return styleSheetPaths.map(styleSheetPath =>
-        path.join(this.path, styleSheetPath)
+      return styleSheetPaths.map((styleSheetPath) =>
+        path.join(this.path, styleSheetPath),
       );
     } else {
       let indexStylesheet;
@@ -636,8 +637,8 @@ module.exports = class Package {
       if (this.metadata.mainStyleSheet) {
         return [fs.resolve(this.path, this.metadata.mainStyleSheet)];
       } else if (this.metadata.styleSheets) {
-        return this.metadata.styleSheets.map(name =>
-          fs.resolve(stylesheetDirPath, name, ['css', 'less', ''])
+        return this.metadata.styleSheets.map((name) =>
+          fs.resolve(stylesheetDirPath, name, ['css', 'less', '']),
         );
       } else if (
         (indexStylesheet = fs.resolve(this.path, 'index', ['css', 'less']))
@@ -658,7 +659,7 @@ module.exports = class Package {
     } else {
       grammarPaths = fs.listSync(path.join(this.path, 'grammars'), [
         'json',
-        'cson'
+        'cson',
       ]);
     }
 
@@ -669,7 +670,7 @@ module.exports = class Package {
       ) {
         grammarPath = path.resolve(
           this.packageManager.resourcePath,
-          grammarPath
+          grammarPath,
         );
       }
 
@@ -682,7 +683,7 @@ module.exports = class Package {
       } catch (error) {
         console.warn(
           `Failed to load grammar: ${grammarPath}`,
-          error.stack || error
+          error.stack || error,
         );
       }
     }
@@ -698,7 +699,7 @@ module.exports = class Package {
       if (this.preloadedPackage) {
         grammarPath = path.resolve(
           this.packageManager.resourcePath,
-          grammarPath
+          grammarPath,
         );
       }
 
@@ -708,7 +709,7 @@ module.exports = class Package {
           const stack = `${error.stack}\n  at ${grammarPath}:1:1`;
           this.notificationManager.addFatalError(
             `Failed to load a ${this.name} package grammar`,
-            { stack, detail, packageName: this.name, dismissable: true }
+            { stack, detail, packageName: this.name, dismissable: true },
           );
         } else {
           grammar.packageName = this.name;
@@ -720,7 +721,7 @@ module.exports = class Package {
       });
     };
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       if (
         this.preloadedPackage &&
         this.packageManager.packagesCache[this.name]
@@ -729,7 +730,7 @@ module.exports = class Package {
         return asyncEach(grammarPaths, loadGrammar, () => resolve());
       } else {
         const grammarsDirPath = path.join(this.path, 'grammars');
-        fs.exists(grammarsDirPath, grammarsDirExists => {
+        fs.exists(grammarsDirPath, (grammarsDirExists) => {
           if (!grammarsDirExists) return resolve();
           fs.list(grammarsDirPath, ['json', 'cson'], (error, grammarPaths) => {
             if (error || !grammarPaths) return resolve();
@@ -750,7 +751,7 @@ module.exports = class Package {
           const stack = `${error.stack}\n  at ${settingsPath}:1:1`;
           this.notificationManager.addFatalError(
             `Failed to load the ${this.name} package settings`,
-            { stack, detail, packageName: this.name, dismissable: true }
+            { stack, detail, packageName: this.name, dismissable: true },
           );
         } else {
           this.settings.push(settingsFile);
@@ -761,21 +762,21 @@ module.exports = class Package {
     };
 
     if (this.preloadedPackage && this.packageManager.packagesCache[this.name]) {
-      for (let settingsPath in this.packageManager.packagesCache[this.name]
+      for (const settingsPath in this.packageManager.packagesCache[this.name]
         .settings) {
-        const properties = this.packageManager.packagesCache[this.name]
-          .settings[settingsPath];
+        const properties =
+          this.packageManager.packagesCache[this.name].settings[settingsPath];
         const settingsFile = new SettingsFile(
           `core:${settingsPath}`,
-          properties || {}
+          properties || {},
         );
         this.settings.push(settingsFile);
         if (this.settingsActivated) settingsFile.activate(this.config);
       }
     } else {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         const settingsDirPath = path.join(this.path, 'settings');
-        fs.exists(settingsDirPath, settingsDirExists => {
+        fs.exists(settingsDirPath, (settingsDirExists) => {
           if (!settingsDirExists) return resolve();
           fs.list(settingsDirPath, ['json', 'cson'], (error, settingsPaths) => {
             if (error || !settingsPaths) return resolve();
@@ -794,7 +795,7 @@ module.exports = class Package {
         } catch (error) {
           console.error(
             `Error serializing package '${this.name}'`,
-            error.stack
+            error.stack,
           );
         }
       }
@@ -846,10 +847,10 @@ module.exports = class Package {
   }
 
   deactivateResources() {
-    for (let grammar of this.grammars) {
+    for (const grammar of this.grammars) {
       grammar.deactivate();
     }
-    for (let settings of this.settings) {
+    for (const settings of this.settings) {
       settings.deactivate(this.config);
     }
 
@@ -869,7 +870,7 @@ module.exports = class Package {
     } catch (error) {
       this.handleError(
         `Failed to reload the ${this.name} package stylesheets`,
-        error
+        error,
       );
     }
 
@@ -883,7 +884,7 @@ module.exports = class Package {
     if (this.bundledPackage && this.packageManager.packagesCache[this.name]) {
       if (this.packageManager.packagesCache[this.name].main) {
         this.mainModule = requireModule(
-          this.packageManager.packagesCache[this.name].main
+          this.packageManager.packagesCache[this.name].main,
         );
         return this.mainModule;
       }
@@ -891,7 +892,7 @@ module.exports = class Package {
       return this.mainModule;
     } else if (!this.isCompatible()) {
       const nativeModuleNames = this.incompatibleModules
-        .map(m => m.name)
+        .map((m) => m.name)
         .join(', ');
       console.warn(dedent`
         Failed to require the main module of '${
@@ -904,8 +905,10 @@ module.exports = class Package {
       if (fs.isFileSync(mainModulePath)) {
         this.mainModuleRequired = true;
 
-        const previousViewProviderCount = this.viewRegistry.getViewProviderCount();
-        const previousDeserializerCount = this.deserializerManager.getDeserializerCount();
+        const previousViewProviderCount =
+          this.viewRegistry.getViewProviderCount();
+        const previousDeserializerCount =
+          this.deserializerManager.getDeserializerCount();
         this.mainModule = requireModule(mainModulePath);
         if (
           this.viewRegistry.getViewProviderCount() ===
@@ -915,11 +918,11 @@ module.exports = class Package {
         ) {
           localStorage.setItem(
             this.getCanDeferMainModuleRequireStorageKey(),
-            'true'
+            'true',
           );
         } else {
           localStorage.removeItem(
-            this.getCanDeferMainModuleRequireStorageKey()
+            this.getCanDeferMainModuleRequireStorageKey(),
           );
         }
         return this.mainModule;
@@ -936,7 +939,7 @@ module.exports = class Package {
         this.mainModulePath = path.resolve(
           this.packageManager.resourcePath,
           'static',
-          this.packageManager.packagesCache[this.name].main
+          this.packageManager.packagesCache[this.name].main,
         );
       } else {
         this.mainModulePath = null;
@@ -947,7 +950,7 @@ module.exports = class Package {
         : path.join(this.path, 'index');
       this.mainModulePath = fs.resolveExtension(mainModulePath, [
         '',
-        ...CompileCache.supportedExtensions
+        ...CompileCache.supportedExtensions,
       ]);
     }
     return this.mainModulePath;
@@ -975,7 +978,7 @@ module.exports = class Package {
 
   hasActivationCommands() {
     const object = this.getActivationCommands();
-    for (let selector in object) {
+    for (const selector in object) {
       const commands = object[selector];
       if (commands.length > 0) return true;
     }
@@ -996,15 +999,15 @@ module.exports = class Package {
   subscribeToActivationCommands() {
     this.activationCommandSubscriptions = new CompositeDisposable();
     const object = this.getActivationCommands();
-    for (let selector in object) {
+    for (const selector in object) {
       const commands = object[selector];
-      for (let command of commands) {
+      for (const command of commands) {
         ((selector, command) => {
           // Add dummy command so it appears in menu.
           // The real command will be registered on package activation
           try {
             this.activationCommandSubscriptions.add(
-              this.commandRegistry.add(selector, command, function() {})
+              this.commandRegistry.add(selector, command, function () {}),
             );
           } catch (error) {
             if (error.code === 'EBADSELECTOR') {
@@ -1016,7 +1019,7 @@ module.exports = class Package {
           }
 
           this.activationCommandSubscriptions.add(
-            this.commandRegistry.onWillDispatch(event => {
+            this.commandRegistry.onWillDispatch((event) => {
               if (event.type !== command) return;
               let currentTarget = event.target;
               while (currentTarget) {
@@ -1027,7 +1030,7 @@ module.exports = class Package {
                 }
                 currentTarget = currentTarget.parentElement;
               }
-            })
+            }),
           );
         })(selector, command);
       }
@@ -1040,7 +1043,7 @@ module.exports = class Package {
     this.activationCommands = {};
 
     if (this.metadata.activationCommands) {
-      for (let selector in this.metadata.activationCommands) {
+      for (const selector in this.metadata.activationCommands) {
         const commands = this.metadata.activationCommands[selector];
         if (!this.activationCommands[selector])
           this.activationCommands[selector] = [];
@@ -1057,12 +1060,12 @@ module.exports = class Package {
 
   subscribeToActivationHooks() {
     this.activationHookSubscriptions = new CompositeDisposable();
-    for (let hook of this.getActivationHooks()) {
+    for (const hook of this.getActivationHooks()) {
       if (typeof hook === 'string' && hook.trim().length > 0) {
         this.activationHookSubscriptions.add(
           this.packageManager.onDidTriggerActivationHook(hook, () =>
-            this.activateNow()
-          )
+            this.activateNow(),
+          ),
         );
       }
     }
@@ -1074,7 +1077,7 @@ module.exports = class Package {
     if (this.metadata.activationHooks) {
       if (Array.isArray(this.metadata.activationHooks)) {
         this.activationHooks = Array.from(
-          new Set(this.metadata.activationHooks)
+          new Set(this.metadata.activationHooks),
         );
       } else if (typeof this.metadata.activationHooks === 'string') {
         this.activationHooks = [this.metadata.activationHooks];
@@ -1090,15 +1093,15 @@ module.exports = class Package {
 
   subscribeToWorkspaceOpeners() {
     this.workspaceOpenerSubscriptions = new CompositeDisposable();
-    for (let opener of this.getWorkspaceOpeners()) {
+    for (const opener of this.getWorkspaceOpeners()) {
       this.workspaceOpenerSubscriptions.add(
-        atom.workspace.addOpener(filePath => {
+        atom.workspace.addOpener((filePath) => {
           if (filePath === opener) {
             this.activateNow();
             this.workspaceOpenerSubscriptions.dispose();
             return atom.workspace.createItemForURI(opener);
           }
-        })
+        }),
       );
     }
   }
@@ -1109,7 +1112,7 @@ module.exports = class Package {
     if (this.metadata.workspaceOpeners) {
       if (Array.isArray(this.metadata.workspaceOpeners)) {
         this.workspaceOpeners = Array.from(
-          new Set(this.metadata.workspaceOpeners)
+          new Set(this.metadata.workspaceOpeners),
         );
       } else if (typeof this.metadata.workspaceOpeners === 'string') {
         this.workspaceOpeners = [this.metadata.workspaceOpeners];
@@ -1141,7 +1144,7 @@ module.exports = class Package {
     try {
       const modulePathNodeFiles = fs.listSync(
         path.join(modulePath, 'build', 'Release'),
-        ['.node']
+        ['.node'],
       );
       return modulePathNodeFiles;
     } catch (error) {
@@ -1163,13 +1166,13 @@ module.exports = class Package {
         (this.metadata._atomModuleCache.extensions &&
           this.metadata._atomModuleCache.extensions['.node']) ||
         [];
-      for (let relativeNativeModuleBindingPath of relativeNativeModuleBindingPaths) {
+      for (const relativeNativeModuleBindingPath of relativeNativeModuleBindingPaths) {
         const nodeFilePath = path.join(
           this.path,
           relativeNativeModuleBindingPath,
           '..',
           '..',
-          '..'
+          '..',
         );
         nodeFilePaths.push(nodeFilePath);
       }
@@ -1177,9 +1180,9 @@ module.exports = class Package {
       return nativeModulePaths;
     }
 
-    const traversePath = nodeModulesPath => {
+    const traversePath = (nodeModulesPath) => {
       try {
-        for (let modulePath of fs.listSync(nodeModulesPath)) {
+        for (const modulePath of fs.listSync(nodeModulesPath)) {
           const modulePathNodeFiles = this.getModulePathNodeFiles(modulePath);
           if (modulePathNodeFiles) {
             nativeModulePaths.set(modulePath, modulePathNodeFiles);
@@ -1233,25 +1236,25 @@ module.exports = class Package {
   // `stdout`, and `stderr` properties based on the results of running
   // `apm rebuild` on the package.
   rebuild() {
-    return new Promise(resolve =>
-      this.runRebuildProcess(result => {
+    return new Promise((resolve) =>
+      this.runRebuildProcess((result) => {
         if (result.code === 0) {
           global.localStorage.removeItem(
-            this.getBuildFailureOutputStorageKey()
+            this.getBuildFailureOutputStorageKey(),
           );
         } else {
           this.compatible = false;
           global.localStorage.setItem(
             this.getBuildFailureOutputStorageKey(),
-            result.stderr
+            result.stderr,
           );
         }
         global.localStorage.setItem(
           this.getIncompatibleNativeModulesStorageKey(),
-          '[]'
+          '[]',
         );
         resolve(result);
-      })
+      }),
     );
   }
 
@@ -1277,7 +1280,7 @@ module.exports = class Package {
       },
       exit(code) {
         done({ code, stdout, stderr });
-      }
+      },
     });
   }
 
@@ -1309,7 +1312,7 @@ module.exports = class Package {
     if (!this.packageManager.devMode) {
       try {
         const arrayAsString = global.localStorage.getItem(
-          this.getIncompatibleNativeModulesStorageKey()
+          this.getIncompatibleNativeModulesStorageKey(),
         );
         if (arrayAsString) return JSON.parse(arrayAsString);
       } catch (error1) {}
@@ -1332,14 +1335,14 @@ module.exports = class Package {
           path: nativeModulePath,
           name: path.basename(nativeModulePath),
           version,
-          error: error.message
+          error: error.message,
         });
       }
     }
 
     global.localStorage.setItem(
       this.getIncompatibleNativeModulesStorageKey(),
-      JSON.stringify(incompatibleNativeModules)
+      JSON.stringify(incompatibleNativeModules),
     );
 
     return incompatibleNativeModules;
@@ -1350,8 +1353,9 @@ module.exports = class Package {
 
     let detail, location, stack;
     if (error.filename && error.location && error instanceof SyntaxError) {
-      location = `${error.filename}:${error.location.first_line + 1}:${error
-        .location.first_column + 1}`;
+      location = `${error.filename}:${error.location.first_line + 1}:${
+        error.location.first_column + 1
+      }`;
       detail = `${error.message} in ${location}`;
       stack = 'SyntaxError: ' + error.message + '\n' + 'at ' + location;
     } else if (
@@ -1372,7 +1376,7 @@ module.exports = class Package {
       stack,
       detail,
       packageName: this.name,
-      dismissable: true
+      dismissable: true,
     });
   }
 };
@@ -1394,16 +1398,16 @@ class SettingsFile {
   }
 
   activate(config) {
-    for (let selector in this.properties) {
+    for (const selector in this.properties) {
       config.set(null, this.properties[selector], {
         scopeSelector: selector,
-        source: this.path
+        source: this.path,
       });
     }
   }
 
   deactivate(config) {
-    for (let selector in this.properties) {
+    for (const selector in this.properties) {
       config.unset(null, { scopeSelector: selector, source: this.path });
     }
   }

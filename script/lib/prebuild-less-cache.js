@@ -11,10 +11,10 @@ const LESS_CACHE_VERSION = require('less-cache/package.json').version;
 const FALLBACK_VARIABLE_IMPORTS =
   '@import "variables/ui-variables";\n@import "variables/syntax-variables";\n';
 
-module.exports = function() {
+module.exports = function () {
   const cacheDirPath = path.join(
     CONFIG.intermediateAppPath,
-    'less-compile-cache'
+    'less-compile-cache',
   );
   console.log(`Generating pre-built less cache in ${cacheDirPath}`);
 
@@ -22,13 +22,15 @@ module.exports = function() {
   const uiThemes = [];
   const syntaxThemes = [];
   const nonThemePackages = [];
-  for (let packageName in CONFIG.appMetadata.packageDependencies) {
-    const packageMetadata = require(path.join(
-      CONFIG.intermediateAppPath,
-      'node_modules',
-      packageName,
-      'package.json'
-    ));
+  for (const packageName in CONFIG.appMetadata.packageDependencies) {
+    const packageMetadata = require(
+      path.join(
+        CONFIG.intermediateAppPath,
+        'node_modules',
+        packageName,
+        'package.json',
+      ),
+    );
     if (packageMetadata.theme === 'ui') {
       uiThemes.push(packageName);
     } else if (packageMetadata.theme === 'syntax') {
@@ -42,18 +44,19 @@ module.exports = function() {
   function saveIntoSnapshotAuxiliaryData(absoluteFilePath, content) {
     const relativeFilePath = path.relative(
       CONFIG.intermediateAppPath,
-      absoluteFilePath
+      absoluteFilePath,
     );
     if (
-      !CONFIG.snapshotAuxiliaryData.lessSourcesByRelativeFilePath.hasOwnProperty(
-        relativeFilePath
+      !Object.prototype.hasOwnProperty.call(
+        CONFIG.snapshotAuxiliaryData.lessSourcesByRelativeFilePath,
+        relativeFilePath,
       )
     ) {
       CONFIG.snapshotAuxiliaryData.lessSourcesByRelativeFilePath[
         relativeFilePath
       ] = {
-        content: content,
-        digest: LessCache.digestForContent(content)
+        content,
+        digest: LessCache.digestForContent(content),
       };
     }
   }
@@ -61,8 +64,8 @@ module.exports = function() {
   CONFIG.snapshotAuxiliaryData.importedFilePathsByRelativeImportPath = {};
   // Warm cache for every combination of the default UI and syntax themes,
   // because themes assign variables which may be used in any style sheet.
-  for (let uiTheme of uiThemes) {
-    for (let syntaxTheme of syntaxThemes) {
+  for (const uiTheme of uiThemes) {
+    for (const syntaxTheme of syntaxThemes) {
       // Build a LessCache instance with import paths based on the current theme combination
       const lessCache = new LessCache({
         cacheDir: cacheDirPath,
@@ -70,7 +73,7 @@ module.exports = function() {
           CONFIG.atomHomeDirPath,
           'compile-cache',
           'prebuild-less',
-          LESS_CACHE_VERSION
+          LESS_CACHE_VERSION,
         ),
         syncCaches: true,
         resourcePath: CONFIG.intermediateAppPath,
@@ -79,62 +82,63 @@ module.exports = function() {
             CONFIG.intermediateAppPath,
             'node_modules',
             syntaxTheme,
-            'styles'
+            'styles',
           ),
           path.join(
             CONFIG.intermediateAppPath,
             'node_modules',
             uiTheme,
-            'styles'
+            'styles',
           ),
           path.join(CONFIG.intermediateAppPath, 'static', 'variables'),
-          path.join(CONFIG.intermediateAppPath, 'static')
-        ]
+          path.join(CONFIG.intermediateAppPath, 'static'),
+        ],
       });
 
       // Store file paths located at the import paths so that we can avoid scanning them at runtime.
       for (const absoluteImportPath of lessCache.getImportPaths()) {
         const relativeImportPath = path.relative(
           CONFIG.intermediateAppPath,
-          absoluteImportPath
+          absoluteImportPath,
         );
         if (
-          !CONFIG.snapshotAuxiliaryData.importedFilePathsByRelativeImportPath.hasOwnProperty(
-            relativeImportPath
+          !Object.prototype.hasOwnProperty.call(
+            CONFIG.snapshotAuxiliaryData.importedFilePathsByRelativeImportPath,
+            relativeImportPath,
           )
         ) {
           CONFIG.snapshotAuxiliaryData.importedFilePathsByRelativeImportPath[
             relativeImportPath
           ] = [];
           for (const importedFile of klawSync(absoluteImportPath, {
-            nodir: true
+            nodir: true,
           })) {
             CONFIG.snapshotAuxiliaryData.importedFilePathsByRelativeImportPath[
               relativeImportPath
             ].push(
-              path.relative(CONFIG.intermediateAppPath, importedFile.path)
+              path.relative(CONFIG.intermediateAppPath, importedFile.path),
             );
           }
         }
       }
 
       // Cache all styles in static; don't append variable imports
-      for (let lessFilePath of glob.sync(
-        path.join(CONFIG.intermediateAppPath, 'static', '**', '*.less')
+      for (const lessFilePath of glob.sync(
+        path.join(CONFIG.intermediateAppPath, 'static', '**', '*.less'),
       )) {
         cacheCompiledCSS(lessCache, lessFilePath, false);
       }
 
       // Cache styles for all bundled non-theme packages
-      for (let nonThemePackage of nonThemePackages) {
-        for (let lessFilePath of glob.sync(
+      for (const nonThemePackage of nonThemePackages) {
+        for (const lessFilePath of glob.sync(
           path.join(
             CONFIG.intermediateAppPath,
             'node_modules',
             nonThemePackage,
             '**',
-            '*.less'
-          )
+            '*.less',
+          ),
         )) {
           cacheCompiledCSS(lessCache, lessFilePath, true);
         }
@@ -145,22 +149,22 @@ module.exports = function() {
         CONFIG.intermediateAppPath,
         'node_modules',
         uiTheme,
-        'index.less'
+        'index.less',
       );
       cacheCompiledCSS(lessCache, uiThemeMainPath, true);
-      for (let lessFilePath of glob.sync(
+      for (const lessFilePath of glob.sync(
         path.join(
           CONFIG.intermediateAppPath,
           'node_modules',
           uiTheme,
           '**',
-          '*.less'
-        )
+          '*.less',
+        ),
       )) {
         if (lessFilePath !== uiThemeMainPath) {
           saveIntoSnapshotAuxiliaryData(
             lessFilePath,
-            fs.readFileSync(lessFilePath, 'utf8')
+            fs.readFileSync(lessFilePath, 'utf8'),
           );
         }
       }
@@ -170,40 +174,40 @@ module.exports = function() {
         CONFIG.intermediateAppPath,
         'node_modules',
         syntaxTheme,
-        'index.less'
+        'index.less',
       );
       cacheCompiledCSS(lessCache, syntaxThemeMainPath, true);
-      for (let lessFilePath of glob.sync(
+      for (const lessFilePath of glob.sync(
         path.join(
           CONFIG.intermediateAppPath,
           'node_modules',
           syntaxTheme,
           '**',
-          '*.less'
-        )
+          '*.less',
+        ),
       )) {
         if (lessFilePath !== syntaxThemeMainPath) {
           saveIntoSnapshotAuxiliaryData(
             lessFilePath,
-            fs.readFileSync(lessFilePath, 'utf8')
+            fs.readFileSync(lessFilePath, 'utf8'),
           );
         }
       }
     }
   }
 
-  for (let lessFilePath of glob.sync(
+  for (const lessFilePath of glob.sync(
     path.join(
       CONFIG.intermediateAppPath,
       'node_modules',
       'atom-ui',
       '**',
-      '*.less'
-    )
+      '*.less',
+    ),
   )) {
     saveIntoSnapshotAuxiliaryData(
       lessFilePath,
-      fs.readFileSync(lessFilePath, 'utf8')
+      fs.readFileSync(lessFilePath, 'utf8'),
     );
   }
 

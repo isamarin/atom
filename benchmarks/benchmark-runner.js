@@ -11,7 +11,7 @@ module.exports = async ({ test, benchmarkPaths }) => {
   for (const benchmarkPath of benchmarkPaths) {
     if (fs.isDirectorySync(benchmarkPath)) {
       paths = paths.concat(
-        glob.sync(path.join(benchmarkPath, '**', '*.bench.js'))
+        glob.sync(path.join(benchmarkPath, '**', '*.bench.js')),
       );
     } else {
       paths.push(benchmarkPath);
@@ -44,16 +44,16 @@ module.exports = async ({ test, benchmarkPaths }) => {
         new Chart(canvas, {
           type: 'line',
           data: {
-            datasets: [{ label: key, fill: false, data: data.points }]
+            datasets: [{ label: key, fill: false, data: data.points }],
           },
           options: {
             showLines: false,
-            scales: { xAxes: [{ type: 'linear', position: 'bottom' }] }
-          }
+            scales: { xAxes: [{ type: 'linear', position: 'bottom' }] },
+          },
         });
 
         const textualOutput =
-          `${key}:\n\n` + data.points.map(p => `${p.x}\t${p.y}`).join('\n');
+          `${key}:\n\n` + data.points.map((p) => `${p.x}\t${p.y}`).join('\n');
         console.log(textualOutput);
       } else {
         const title = document.createElement('h2');

@@ -18,19 +18,19 @@ const argv = yargs
   .help('help')
   .describe(
     'assets-path',
-    'Path to the folder where all release assets are stored'
+    'Path to the folder where all release assets are stored',
   )
   .describe(
     'azure-blob-path',
-    'Indicates the Azure Blob Path path in which the assets should be uploaded'
+    'Indicates the Azure Blob Path path in which the assets should be uploaded',
   )
   .describe(
     'create-github-release',
-    'Creates a GitHub release for this build, draft if release branch or public if Nightly'
+    'Creates a GitHub release for this build, draft if release branch or public if Nightly',
   )
   .describe(
     'linux-repo-name',
-    'If specified, uploads Linux packages to the given repo name on packagecloud'
+    'If specified, uploads Linux packages to the given repo name on packagecloud',
   )
   .wrap(yargs.terminalWidth()).argv;
 
@@ -48,14 +48,14 @@ if (!assets || assets.length === 0) {
 }
 
 async function uploadArtifacts() {
-  let releaseForVersion = await releaseNotes.getRelease(
+  const releaseForVersion = await releaseNotes.getRelease(
     releaseVersion,
-    process.env.GITHUB_TOKEN
+    process.env.GITHUB_TOKEN,
   );
 
   if (releaseForVersion.exists && !releaseForVersion.isDraft) {
     console.log(
-      `Published release already exists for ${releaseVersion}, skipping upload.`
+      `Published release already exists for ${releaseVersion}, skipping upload.`,
     );
     return;
   }
@@ -63,13 +63,13 @@ async function uploadArtifacts() {
   console.log(
     `Uploading ${
       assets.length
-    } release assets for ${releaseVersion} to Azure Blob Storage under '${azureBlobPath}'`
+    } release assets for ${releaseVersion} to Azure Blob Storage under '${azureBlobPath}'`,
   );
 
   await uploadToAzure(
     process.env.ATOM_RELEASES_AZURE_CONN_STRING,
     azureBlobPath,
-    assets
+    assets,
   );
 
   if (argv.linuxRepoName) {
@@ -77,11 +77,11 @@ async function uploadArtifacts() {
       argv.linuxRepoName,
       process.env.PACKAGE_CLOUD_API_KEY,
       releaseVersion,
-      assets
+      assets,
     );
   } else {
     console.log(
-      '\nNo Linux package repo name specified, skipping Linux package upload.'
+      '\nNo Linux package repo name specified, skipping Linux package upload.',
     );
   }
 
@@ -89,16 +89,16 @@ async function uploadArtifacts() {
   if (oldReleaseNotes) {
     const oldReleaseNotesPath = path.resolve(
       os.tmpdir(),
-      'OLD_RELEASE_NOTES.md'
+      'OLD_RELEASE_NOTES.md',
     );
     console.log(
-      `Saving existing ${releaseVersion} release notes to ${oldReleaseNotesPath}`
+      `Saving existing ${releaseVersion} release notes to ${oldReleaseNotesPath}`,
     );
     fs.writeFileSync(oldReleaseNotesPath, oldReleaseNotes, 'utf8');
 
     // This line instructs VSTS to upload the file as an artifact
     console.log(
-      `##vso[artifact.upload containerfolder=OldReleaseNotes;artifactname=OldReleaseNotes;]${oldReleaseNotesPath}`
+      `##vso[artifact.upload containerfolder=OldReleaseNotes;artifactname=OldReleaseNotes;]${oldReleaseNotesPath}`,
     );
   }
 
@@ -109,22 +109,20 @@ async function uploadArtifacts() {
       newReleaseNotes = await releaseNotes.generateForNightly(
         releaseVersion,
         process.env.GITHUB_TOKEN,
-        oldReleaseNotes
+        oldReleaseNotes,
       );
     } else {
       newReleaseNotes = await releaseNotes.generateForVersion(
         releaseVersion,
         process.env.GITHUB_TOKEN,
-        oldReleaseNotes
+        oldReleaseNotes,
       );
     }
 
     console.log(`New release notes:\n\n${newReleaseNotes}`);
 
     const releaseSha = !isNightlyRelease
-      ? spawnSync('git', ['rev-parse', 'HEAD'])
-          .stdout.toString()
-          .trimEnd()
+      ? spawnSync('git', ['rev-parse', 'HEAD']).stdout.toString().trimEnd()
       : 'master'; // Nightly tags are created in atom/atom-nightly-releases so the SHA is irrelevant
 
     console.log(`Creating GitHub release v${releaseVersion}`);
@@ -141,7 +139,7 @@ async function uploadArtifacts() {
       editRelease: true,
       reuseRelease: true,
       skipIfPublished: true,
-      assets
+      assets,
     });
 
     console.log('Release published successfully: ', release.html_url);
@@ -164,7 +162,7 @@ async function publishReleaseAsync(options) {
 
 // Wrap the call the async function and catch errors from its promise because
 // Node.js doesn't yet allow use of await at the script scope
-uploadArtifacts().catch(err => {
+uploadArtifacts().catch((err) => {
   console.error('An error occurred while uploading the release:\n\n', err);
   process.exit(1);
 });

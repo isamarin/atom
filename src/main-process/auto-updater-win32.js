@@ -15,29 +15,26 @@ class AutoUpdater extends EventEmitter {
   }
 
   downloadUpdate(callback) {
-    SquirrelUpdate.spawn(['--download', this.updateUrl], function(
-      error,
-      stdout
-    ) {
-      let update;
-      if (error != null) return callback(error);
+    SquirrelUpdate.spawn(
+      ['--download', this.updateUrl],
+      function (error, stdout) {
+        let update;
+        if (error != null) return callback(error);
 
-      try {
-        // Last line of output is the JSON details about the releases
-        const json = stdout
-          .trim()
-          .split('\n')
-          .pop();
-        const data = JSON.parse(json);
-        const releasesToApply = data && data.releasesToApply;
-        if (releasesToApply.pop) update = releasesToApply.pop();
-      } catch (error) {
-        error.stdout = stdout;
-        return callback(error);
-      }
+        try {
+          // Last line of output is the JSON details about the releases
+          const json = stdout.trim().split('\n').pop();
+          const data = JSON.parse(json);
+          const releasesToApply = data && data.releasesToApply;
+          if (releasesToApply.pop) update = releasesToApply.pop();
+        } catch (error) {
+          error.stdout = stdout;
+          return callback(error);
+        }
 
-      callback(null, update);
-    });
+        callback(null, update);
+      },
+    );
   }
 
   installUpdate(callback) {
@@ -71,7 +68,7 @@ class AutoUpdater extends EventEmitter {
 
       this.emit('update-available');
 
-      this.installUpdate(error => {
+      this.installUpdate((error) => {
         if (error != null) {
           this.emit('update-not-available');
           return;
@@ -84,7 +81,7 @@ class AutoUpdater extends EventEmitter {
           update.version,
           new Date(),
           'https://atom.io',
-          () => this.quitAndInstall()
+          () => this.quitAndInstall(),
         );
       });
     });

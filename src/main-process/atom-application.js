@@ -16,7 +16,7 @@ const {
   dialog,
   ipcMain,
   shell,
-  screen
+  screen,
 } = require('electron');
 const { CompositeDisposable, Disposable } = require('event-kit');
 const crypto = require('crypto');
@@ -50,14 +50,14 @@ const getDefaultPath = () => {
   }
 };
 
-const getSocketSecretPath = atomVersion => {
+const getSocketSecretPath = (atomVersion) => {
   const { username } = os.userInfo();
   const atomHome = path.resolve(process.env.ATOM_HOME);
 
   return path.join(atomHome, `.atom-socket-secret-${username}-${atomVersion}`);
 };
 
-const getSocketPath = socketSecret => {
+const getSocketPath = (socketSecret) => {
   if (!socketSecret) {
     return null;
   }
@@ -76,7 +76,7 @@ const getSocketPath = socketSecret => {
   }
 };
 
-const getExistingSocketSecret = atomVersion => {
+const getExistingSocketSecret = (atomVersion) => {
   const socketSecretPath = getSocketSecretPath(atomVersion);
 
   if (!fs.existsSync(socketSecretPath)) {
@@ -89,12 +89,12 @@ const getExistingSocketSecret = atomVersion => {
 const getRandomBytes = promisify(crypto.randomBytes);
 const writeFile = promisify(fs.writeFile);
 
-const createSocketSecret = async atomVersion => {
+const createSocketSecret = async (atomVersion) => {
   const socketSecret = (await getRandomBytes(16)).toString('hex');
 
   await writeFile(getSocketSecretPath(atomVersion), socketSecret, {
     encoding: 'utf8',
-    mode: 0o600
+    mode: 0o600,
   });
 
   return socketSecret;
@@ -113,7 +113,7 @@ const encryptOptions = (options, secret) => {
   return JSON.stringify({
     authTag,
     content,
-    initVector: initVector.toString('hex')
+    initVector: initVector.toString('hex'),
   });
 };
 
@@ -123,7 +123,7 @@ const decryptOptions = (optionsMessage, secret) => {
   const decipher = crypto.createDecipheriv(
     'aes-256-gcm',
     secret,
-    Buffer.from(initVector, 'hex')
+    Buffer.from(initVector, 'hex'),
   );
   decipher.setAuthTag(Buffer.from(authTag, 'hex'));
 
@@ -174,7 +174,7 @@ module.exports = class AtomApplication extends EventEmitter {
       return createApplication(options);
     }
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const client = net.connect({ path: socketPath }, () => {
         client.write(encryptOptions(options, socketSecret), () => {
           client.end();
@@ -213,32 +213,32 @@ module.exports = class AtomApplication extends EventEmitter {
     this.initializeAtomHome(process.env.ATOM_HOME);
 
     const configFilePath = fs.existsSync(
-      path.join(process.env.ATOM_HOME, 'config.json')
+      path.join(process.env.ATOM_HOME, 'config.json'),
     )
       ? path.join(process.env.ATOM_HOME, 'config.json')
       : path.join(process.env.ATOM_HOME, 'config.cson');
 
     this.configFile = ConfigFile.at(configFilePath);
     this.config = new Config({
-      saveCallback: settings => {
+      saveCallback: (settings) => {
         if (!this.quitting) {
           return this.configFile.update(settings);
         }
-      }
+      },
     });
     this.config.setSchema(null, {
       type: 'object',
-      properties: _.clone(ConfigSchema)
+      properties: _.clone(ConfigSchema),
     });
 
     this.fileRecoveryService = new FileRecoveryService(
-      path.join(process.env.ATOM_HOME, 'recovery')
+      path.join(process.env.ATOM_HOME, 'recovery'),
     );
     this.storageFolder = new StorageFolder(process.env.ATOM_HOME);
     this.autoUpdateManager = new AutoUpdateManager(
       this.version,
       options.test || options.benchmark || options.benchmarkTest,
-      this.config
+      this.config,
     );
 
     this.disposable = new CompositeDisposable();
@@ -258,11 +258,11 @@ module.exports = class AtomApplication extends EventEmitter {
 
     this.applicationMenu = new ApplicationMenu(
       this.version,
-      this.autoUpdateManager
+      this.autoUpdateManager,
     );
     this.atomProtocolHandler = new AtomProtocolHandler(
       this.resourcePath,
-      this.safeMode
+      this.safeMode,
     );
 
     let socketServerPromise;
@@ -284,7 +284,7 @@ module.exports = class AtomApplication extends EventEmitter {
   }
 
   async destroy() {
-    const windowsClosePromises = this.getAllWindows().map(window => {
+    const windowsClosePromises = this.getAllWindows().map((window) => {
       window.close();
       return window.closedPromise;
     });
@@ -294,11 +294,11 @@ module.exports = class AtomApplication extends EventEmitter {
 
   async launch(options) {
     if (!this.configFilePromise) {
-      this.configFilePromise = this.configFile.watch().then(disposable => {
+      this.configFilePromise = this.configFile.watch().then((disposable) => {
         this.disposable.add(disposable);
         this.config.onDidChange('core.titleBar', () => this.promptForRestart());
         this.config.onDidChange('core.colorProfile', () =>
-          this.promptForRestart()
+          this.promptForRestart(),
         );
       });
       await this.configFilePromise;
@@ -326,7 +326,7 @@ module.exports = class AtomApplication extends EventEmitter {
     if (shouldReopenPreviousWindows) {
       optionsForWindowsToOpen = [
         ...(await this.loadPreviousWindowOptions()),
-        ...optionsForWindowsToOpen
+        ...optionsForWindowsToOpen,
       ];
     }
 
@@ -361,7 +361,7 @@ module.exports = class AtomApplication extends EventEmitter {
       clearWindowState,
       addToLastWindow,
       preserveFocus,
-      env
+      env,
     } = options;
 
     if (!preserveFocus) {
@@ -377,7 +377,7 @@ module.exports = class AtomApplication extends EventEmitter {
         pathsToOpen,
         logFile,
         timeout,
-        env
+        env,
       });
     } else if (benchmark || benchmarkTest) {
       return this.runBenchmarks({
@@ -387,7 +387,7 @@ module.exports = class AtomApplication extends EventEmitter {
         executedFrom,
         pathsToOpen,
         timeout,
-        env
+        env,
       });
     } else if (
       (pathsToOpen && pathsToOpen.length > 0) ||
@@ -404,13 +404,13 @@ module.exports = class AtomApplication extends EventEmitter {
         profileStartup,
         clearWindowState,
         addToLastWindow,
-        env
+        env,
       });
     } else if (urlsToOpen && urlsToOpen.length > 0) {
       return Promise.all(
-        urlsToOpen.map(urlToOpen =>
-          this.openUrl({ urlToOpen, devMode, safeMode, env })
-        )
+        urlsToOpen.map((urlToOpen) =>
+          this.openUrl({ urlToOpen, devMode, safeMode, env }),
+        ),
       );
     } else {
       // Always open an editor window if this is the first instance of Atom.
@@ -423,7 +423,7 @@ module.exports = class AtomApplication extends EventEmitter {
         profileStartup,
         clearWindowState,
         addToLastWindow,
-        env
+        env,
       });
     }
   }
@@ -489,9 +489,9 @@ module.exports = class AtomApplication extends EventEmitter {
 
     await this.deleteSocketFile();
 
-    const server = net.createServer(connection => {
+    const server = net.createServer((connection) => {
       let data = '';
-      connection.on('data', chunk => {
+      connection.on('data', (chunk) => {
         data += chunk;
       });
       connection.on('end', () => {
@@ -505,10 +505,10 @@ module.exports = class AtomApplication extends EventEmitter {
       });
     });
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       server.listen(this.socketPath, resolve);
-      server.on('error', error =>
-        console.error('Application server failed', error)
+      server.on('error', (error) =>
+        console.error('Application server failed', error),
       );
     });
   }
@@ -561,22 +561,22 @@ module.exports = class AtomApplication extends EventEmitter {
       return {
         devMode: targetWindow ? targetWindow.devMode : false,
         safeMode: targetWindow ? targetWindow.safeMode : false,
-        window: sameWindow && targetWindow ? targetWindow : null
+        window: sameWindow && targetWindow ? targetWindow : null,
       };
     };
 
     this.on('application:quit', () => app.quit());
     this.on('application:new-window', () =>
-      this.openPath(createOpenSettings({}))
+      this.openPath(createOpenSettings({})),
     );
     this.on('application:new-file', () =>
-      (this.focusedWindow() || this).openPath()
+      (this.focusedWindow() || this).openPath(),
     );
     this.on('application:open-dev', () =>
-      this.promptForPathToOpen('all', { devMode: true })
+      this.promptForPathToOpen('all', { devMode: true }),
     );
     this.on('application:open-safe', () =>
-      this.promptForPathToOpen('all', { safeMode: true })
+      this.promptForPathToOpen('all', { safeMode: true }),
     );
     this.on('application:inspect', ({ x, y, atomWindow }) => {
       if (!atomWindow) atomWindow = this.focusedWindow();
@@ -584,24 +584,24 @@ module.exports = class AtomApplication extends EventEmitter {
     });
 
     this.on('application:open-documentation', () =>
-      shell.openExternal('http://flight-manual.atom.io')
+      shell.openExternal('http://flight-manual.atom.io'),
     );
     this.on('application:open-discussions', () =>
-      shell.openExternal('https://github.com/atom/atom/discussions')
+      shell.openExternal('https://github.com/atom/atom/discussions'),
     );
     this.on('application:open-faq', () =>
-      shell.openExternal('https://atom.io/faq')
+      shell.openExternal('https://atom.io/faq'),
     );
     this.on('application:open-terms-of-use', () =>
-      shell.openExternal('https://atom.io/terms')
+      shell.openExternal('https://atom.io/terms'),
     );
     this.on('application:report-issue', () =>
       shell.openExternal(
-        'https://github.com/atom/atom/blob/master/CONTRIBUTING.md#reporting-bugs'
-      )
+        'https://github.com/atom/atom/blob/master/CONTRIBUTING.md#reporting-bugs',
+      ),
     );
     this.on('application:search-issues', () =>
-      shell.openExternal('https://github.com/search?q=+is%3Aissue+user%3Aatom')
+      shell.openExternal('https://github.com/search?q=+is%3Aissue+user%3Aatom'),
     );
 
     this.on('application:install-update', () => {
@@ -611,7 +611,7 @@ module.exports = class AtomApplication extends EventEmitter {
     });
 
     this.on('application:check-for-update', () =>
-      this.autoUpdateManager.check()
+      this.autoUpdateManager.check(),
     );
 
     if (process.platform === 'darwin') {
@@ -629,48 +629,48 @@ module.exports = class AtomApplication extends EventEmitter {
         this.promptForPathToOpen(
           'all',
           createOpenSettings({ sameWindow: true }),
-          getDefaultPath()
+          getDefaultPath(),
         );
       });
       this.on('application:open-file', () => {
         this.promptForPathToOpen(
           'file',
           createOpenSettings({ sameWindow: true }),
-          getDefaultPath()
+          getDefaultPath(),
         );
       });
       this.on('application:open-folder', () => {
         this.promptForPathToOpen(
           'folder',
           createOpenSettings({ sameWindow: true }),
-          getDefaultPath()
+          getDefaultPath(),
         );
       });
 
       this.on('application:bring-all-windows-to-front', () =>
-        Menu.sendActionToFirstResponder('arrangeInFront:')
+        Menu.sendActionToFirstResponder('arrangeInFront:'),
       );
       this.on('application:hide', () =>
-        Menu.sendActionToFirstResponder('hide:')
+        Menu.sendActionToFirstResponder('hide:'),
       );
       this.on('application:hide-other-applications', () =>
-        Menu.sendActionToFirstResponder('hideOtherApplications:')
+        Menu.sendActionToFirstResponder('hideOtherApplications:'),
       );
       this.on('application:minimize', () =>
-        Menu.sendActionToFirstResponder('performMiniaturize:')
+        Menu.sendActionToFirstResponder('performMiniaturize:'),
       );
       this.on('application:unhide-all-applications', () =>
-        Menu.sendActionToFirstResponder('unhideAllApplications:')
+        Menu.sendActionToFirstResponder('unhideAllApplications:'),
       );
       this.on('application:zoom', () =>
-        Menu.sendActionToFirstResponder('zoom:')
+        Menu.sendActionToFirstResponder('zoom:'),
       );
     } else {
       this.on('application:minimize', () => {
         const window = this.focusedWindow();
         if (window) window.minimize();
       });
-      this.on('application:zoom', function() {
+      this.on('application:zoom', function () {
         const window = this.focusedWindow();
         if (window) window.maximize();
       });
@@ -681,30 +681,30 @@ module.exports = class AtomApplication extends EventEmitter {
     this.openPathOnEvent('application:open-your-config', 'atom://.atom/config');
     this.openPathOnEvent(
       'application:open-your-init-script',
-      'atom://.atom/init-script'
+      'atom://.atom/init-script',
     );
     this.openPathOnEvent('application:open-your-keymap', 'atom://.atom/keymap');
     this.openPathOnEvent(
       'application:open-your-snippets',
-      'atom://.atom/snippets'
+      'atom://.atom/snippets',
     );
     this.openPathOnEvent(
       'application:open-your-stylesheet',
-      'atom://.atom/stylesheet'
+      'atom://.atom/stylesheet',
     );
     this.openPathOnEvent(
       'application:open-license',
-      path.join(process.resourcesPath, 'LICENSE.md')
+      path.join(process.resourcesPath, 'LICENSE.md'),
     );
 
-    this.configFile.onDidChange(settings => {
-      for (let window of this.getAllWindows()) {
+    this.configFile.onDidChange((settings) => {
+      for (const window of this.getAllWindows()) {
         window.didChangeUserSettings(settings);
       }
       this.config.resetUserSettings(settings);
     });
 
-    this.configFile.onDidError(message => {
+    this.configFile.onDidError((message) => {
       const window = this.focusedWindow() || this.getLastFocusedWindow();
       if (window) {
         window.didFailToReadUserSettings(message);
@@ -714,9 +714,9 @@ module.exports = class AtomApplication extends EventEmitter {
     });
 
     this.disposable.add(
-      ipcHelpers.on(app, 'before-quit', async event => {
+      ipcHelpers.on(app, 'before-quit', async (event) => {
         let resolveBeforeQuitPromise;
-        this.lastBeforeQuitPromise = new Promise(resolve => {
+        this.lastBeforeQuitPromise = new Promise((resolve) => {
           resolveBeforeQuitPromise = resolve;
         });
 
@@ -724,14 +724,14 @@ module.exports = class AtomApplication extends EventEmitter {
           this.quitting = true;
           event.preventDefault();
           const windowUnloadPromises = this.getAllWindows().map(
-            async window => {
+            async (window) => {
               const unloaded = await window.prepareToUnload();
               if (unloaded) {
                 window.close();
                 await window.closedPromise;
               }
               return unloaded;
-            }
+            },
           );
           const windowUnloadedResults = await Promise.all(windowUnloadPromises);
           if (windowUnloadedResults.every(Boolean)) {
@@ -742,7 +742,7 @@ module.exports = class AtomApplication extends EventEmitter {
         }
 
         resolveBeforeQuitPromise();
-      })
+      }),
     );
 
     this.disposable.add(
@@ -751,9 +751,9 @@ module.exports = class AtomApplication extends EventEmitter {
 
         return Promise.all([
           this.deleteSocketFile(),
-          this.deleteSocketSecretFile()
+          this.deleteSocketSecretFile(),
         ]);
-      })
+      }),
     );
 
     // See: https://www.electronjs.org/docs/api/app#event-window-all-closed
@@ -766,7 +766,7 @@ module.exports = class AtomApplication extends EventEmitter {
         if (process.platform !== 'darwin') {
           app.quit();
         }
-      })
+      }),
     );
 
     // Triggered by the 'open-file' event from Electron:
@@ -776,7 +776,7 @@ module.exports = class AtomApplication extends EventEmitter {
       ipcHelpers.on(app, 'open-file', (event, pathToOpen) => {
         event.preventDefault();
         this.openPath({ pathToOpen });
-      })
+      }),
     );
 
     this.disposable.add(
@@ -785,9 +785,9 @@ module.exports = class AtomApplication extends EventEmitter {
         this.openUrl({
           urlToOpen,
           devMode: this.devMode,
-          safeMode: this.safeMode
+          safeMode: this.safeMode,
         });
-      })
+      }),
     );
 
     this.disposable.add(
@@ -795,13 +795,13 @@ module.exports = class AtomApplication extends EventEmitter {
         if (hasVisibleWindows) return;
         if (event) event.preventDefault();
         this.emit('application:new-window');
-      })
+      }),
     );
 
     this.disposable.add(
       ipcHelpers.on(ipcMain, 'restart-application', () => {
         this.restart();
-      })
+      }),
     );
 
     this.disposable.add(
@@ -809,17 +809,17 @@ module.exports = class AtomApplication extends EventEmitter {
         const proxy = await event.sender.session.resolveProxy(url);
         if (!event.sender.isDestroyed())
           event.sender.send('did-resolve-proxy', requestId, proxy);
-      })
+      }),
     );
 
     this.disposable.add(
-      ipcHelpers.on(ipcMain, 'did-change-history-manager', event => {
-        for (let atomWindow of this.getAllWindows()) {
+      ipcHelpers.on(ipcMain, 'did-change-history-manager', (event) => {
+        for (const atomWindow of this.getAllWindows()) {
           const { webContents } = atomWindow.browserWindow;
           if (webContents !== event.sender)
             webContents.send('did-change-history-manager');
         }
-      })
+      }),
     );
 
     // A request from the associated render process to open a set of paths using the standard window location logic.
@@ -843,7 +843,7 @@ module.exports = class AtomApplication extends EventEmitter {
         } else {
           this.promptForPathToOpen('all', {});
         }
-      })
+      }),
     );
 
     // Prompt for a file, folder, or either, then open the chosen paths. Files will be opened in the originating
@@ -853,27 +853,27 @@ module.exports = class AtomApplication extends EventEmitter {
         this.promptForPathToOpen(
           'all',
           createOpenSettings({ event, sameWindow: true }),
-          defaultPath
+          defaultPath,
         );
-      })
+      }),
     );
     this.disposable.add(
       ipcHelpers.on(ipcMain, 'open-chosen-file', (event, defaultPath) => {
         this.promptForPathToOpen(
           'file',
           createOpenSettings({ event, sameWindow: true }),
-          defaultPath
+          defaultPath,
         );
-      })
+      }),
     );
     this.disposable.add(
       ipcHelpers.on(ipcMain, 'open-chosen-folder', (event, defaultPath) => {
         this.promptForPathToOpen(
           'folder',
           createOpenSettings({ event }),
-          defaultPath
+          defaultPath,
         );
-      })
+      }),
     );
 
     this.disposable.add(
@@ -884,8 +884,8 @@ module.exports = class AtomApplication extends EventEmitter {
           const window = BrowserWindow.fromWebContents(event.sender);
           if (this.applicationMenu)
             this.applicationMenu.update(window, template, menu);
-        }
-      )
+        },
+      ),
     );
 
     this.disposable.add(
@@ -898,13 +898,13 @@ module.exports = class AtomApplication extends EventEmitter {
               {
                 resourcePath: this.devResourcePath,
                 pathsToOpen: [packageSpecPath],
-                headless: false
+                headless: false,
               },
-              options
-            )
+              options,
+            ),
           );
-        }
-      )
+        },
+      ),
     );
 
     this.disposable.add(
@@ -913,22 +913,22 @@ module.exports = class AtomApplication extends EventEmitter {
           resourcePath: this.devResourcePath,
           pathsToOpen: [benchmarksPath],
           headless: false,
-          test: false
+          test: false,
         });
-      })
+      }),
     );
 
     this.disposable.add(
       ipcHelpers.on(ipcMain, 'command', (event, command) => {
         this.emit(command);
-      })
+      }),
     );
 
     this.disposable.add(
       ipcHelpers.on(ipcMain, 'window-command', (event, command, ...args) => {
         const window = BrowserWindow.fromWebContents(event.sender);
         return window && window.emit(command, ...args);
-      })
+      }),
     );
 
     this.disposable.add(
@@ -937,28 +937,28 @@ module.exports = class AtomApplication extends EventEmitter {
         (browserWindow, method, ...args) => {
           const window = this.atomWindowForBrowserWindow(browserWindow);
           if (window) window[method](...args);
-        }
-      )
+        },
+      ),
     );
 
     this.disposable.add(
       ipcHelpers.on(ipcMain, 'pick-folder', (event, responseChannel) => {
-        this.promptForPath('folder', paths =>
-          event.sender.send(responseChannel, paths)
+        this.promptForPath('folder', (paths) =>
+          event.sender.send(responseChannel, paths),
         );
-      })
+      }),
     );
 
     this.disposable.add(
       ipcHelpers.respondTo('set-window-size', (window, width, height) => {
         window.setSize(width, height);
-      })
+      }),
     );
 
     this.disposable.add(
       ipcHelpers.respondTo('set-window-position', (window, x, y) => {
         window.setPosition(x, y);
-      })
+      }),
     );
 
     this.disposable.add(
@@ -967,62 +967,62 @@ module.exports = class AtomApplication extends EventEmitter {
         (window, settings, filePath) => {
           if (!this.quitting) {
             return ConfigFile.at(filePath || this.configFilePath).update(
-              JSON.parse(settings)
+              JSON.parse(settings),
             );
           }
-        }
-      )
+        },
+      ),
     );
 
     this.disposable.add(
-      ipcHelpers.respondTo('center-window', window => window.center())
+      ipcHelpers.respondTo('center-window', (window) => window.center()),
     );
     this.disposable.add(
-      ipcHelpers.respondTo('focus-window', window => window.focus())
+      ipcHelpers.respondTo('focus-window', (window) => window.focus()),
     );
     this.disposable.add(
-      ipcHelpers.respondTo('show-window', window => window.show())
+      ipcHelpers.respondTo('show-window', (window) => window.show()),
     );
     this.disposable.add(
-      ipcHelpers.respondTo('hide-window', window => window.hide())
+      ipcHelpers.respondTo('hide-window', (window) => window.hide()),
     );
     this.disposable.add(
       ipcHelpers.respondTo(
         'get-temporary-window-state',
-        window => window.temporaryState
-      )
+        (window) => window.temporaryState,
+      ),
     );
 
     this.disposable.add(
       ipcHelpers.respondTo('set-temporary-window-state', (win, state) => {
         win.temporaryState = state;
-      })
+      }),
     );
 
     this.disposable.add(
       ipcHelpers.on(
         ipcMain,
         'write-text-to-selection-clipboard',
-        (event, text) => clipboard.writeText(text, 'selection')
-      )
+        (event, text) => clipboard.writeText(text, 'selection'),
+      ),
     );
 
     this.disposable.add(
       ipcHelpers.on(ipcMain, 'write-to-stdout', (event, output) =>
-        process.stdout.write(output)
-      )
+        process.stdout.write(output),
+      ),
     );
 
     this.disposable.add(
       ipcHelpers.on(ipcMain, 'write-to-stderr', (event, output) =>
-        process.stderr.write(output)
-      )
+        process.stderr.write(output),
+      ),
     );
 
     this.disposable.add(
       ipcHelpers.on(ipcMain, 'add-recent-document', (event, filename) =>
-        app.addRecentDocument(filename)
-      )
+        app.addRecentDocument(filename),
+      ),
     );
 
     this.disposable.add(
@@ -1031,32 +1031,32 @@ module.exports = class AtomApplication extends EventEmitter {
         'execute-javascript-in-dev-tools',
         (event, code) =>
           event.sender.devToolsWebContents &&
-          event.sender.devToolsWebContents.executeJavaScript(code)
-      )
+          event.sender.devToolsWebContents.executeJavaScript(code),
+      ),
     );
 
     this.disposable.add(
-      ipcHelpers.on(ipcMain, 'get-auto-update-manager-state', event => {
+      ipcHelpers.on(ipcMain, 'get-auto-update-manager-state', (event) => {
         event.returnValue = this.autoUpdateManager.getState();
-      })
+      }),
     );
 
     this.disposable.add(
-      ipcHelpers.on(ipcMain, 'get-auto-update-manager-error', event => {
+      ipcHelpers.on(ipcMain, 'get-auto-update-manager-error', (event) => {
         event.returnValue = this.autoUpdateManager.getErrorMessage();
-      })
+      }),
     );
 
     this.disposable.add(
       ipcHelpers.respondTo('will-save-path', (window, path) =>
-        this.fileRecoveryService.willSavePath(window, path)
-      )
+        this.fileRecoveryService.willSavePath(window, path),
+      ),
     );
 
     this.disposable.add(
       ipcHelpers.respondTo('did-save-path', (window, path) =>
-        this.fileRecoveryService.didSavePath(window, path)
-      )
+        this.fileRecoveryService.didSavePath(window, path),
+      ),
     );
 
     this.disposable.add(this.disableZoomOnDisplayChange());
@@ -1068,9 +1068,9 @@ module.exports = class AtomApplication extends EventEmitter {
         Menu.buildFromTemplate([
           {
             label: 'New Window',
-            click: () => this.emit('application:new-window')
-          }
-        ])
+            click: () => this.emit('application:new-window'),
+          },
+        ]),
       );
     }
   }
@@ -1165,37 +1165,37 @@ module.exports = class AtomApplication extends EventEmitter {
   // Returns the {AtomWindow} for the given locations.
   windowForLocations(locationsToOpen, devMode, safeMode) {
     return this.getLastFocusedWindow(
-      window =>
+      (window) =>
         !window.isSpec &&
         window.devMode === devMode &&
         window.safeMode === safeMode &&
-        window.containsLocations(locationsToOpen)
+        window.containsLocations(locationsToOpen),
     );
   }
 
   // Returns the {AtomWindow} for the given ipcMain event.
   atomWindowForEvent({ sender }) {
     return this.atomWindowForBrowserWindow(
-      BrowserWindow.fromWebContents(sender)
+      BrowserWindow.fromWebContents(sender),
     );
   }
 
   atomWindowForBrowserWindow(browserWindow) {
     return this.getAllWindows().find(
-      atomWindow => atomWindow.browserWindow === browserWindow
+      (atomWindow) => atomWindow.browserWindow === browserWindow,
     );
   }
 
   // Public: Returns the currently focused {AtomWindow} or undefined if none.
   focusedWindow() {
-    return this.getAllWindows().find(window => window.isFocused());
+    return this.getAllWindows().find((window) => window.isFocused());
   }
 
   // Get the platform-specific window offset for new windows.
   getWindowOffsetForCurrentPlatform() {
     const offsetByPlatform = {
       darwin: 22,
-      win32: 26
+      win32: 26,
     };
     return offsetByPlatform[process.platform] || 0;
   }
@@ -1235,7 +1235,7 @@ module.exports = class AtomApplication extends EventEmitter {
     window,
     clearWindowState,
     addToLastWindow,
-    env
+    env,
   } = {}) {
     return this.openPaths({
       pathsToOpen: [pathToOpen],
@@ -1247,7 +1247,7 @@ module.exports = class AtomApplication extends EventEmitter {
       window,
       clearWindowState,
       addToLastWindow,
-      env
+      env,
     });
   }
 
@@ -1276,7 +1276,7 @@ module.exports = class AtomApplication extends EventEmitter {
     window,
     clearWindowState,
     addToLastWindow,
-    env
+    env,
   } = {}) {
     if (!env) env = process.env;
     if (!pathsToOpen) pathsToOpen = [];
@@ -1287,11 +1287,11 @@ module.exports = class AtomApplication extends EventEmitter {
     clearWindowState = Boolean(clearWindowState);
 
     const locationsToOpen = await Promise.all(
-      pathsToOpen.map(pathToOpen =>
+      pathsToOpen.map((pathToOpen) =>
         this.parsePathToOpen(pathToOpen, executedFrom, {
-          hasWaitSession: pidToKillWhenClosed != null
-        })
-      )
+          hasWaitSession: pidToKillWhenClosed != null,
+        }),
+      ),
     );
 
     for (const folderToOpen of foldersToOpen) {
@@ -1301,7 +1301,7 @@ module.exports = class AtomApplication extends EventEmitter {
         initialColumn: null,
         exists: true,
         isDirectory: true,
-        hasWaitSession: pidToKillWhenClosed != null
+        hasWaitSession: pidToKillWhenClosed != null,
       });
     }
 
@@ -1310,7 +1310,7 @@ module.exports = class AtomApplication extends EventEmitter {
     }
 
     const hasNonEmptyPath = locationsToOpen.some(
-      location => location.pathToOpen
+      (location) => location.pathToOpen,
     );
     const createNewWindow = newWindow || !hasNonEmptyPath;
 
@@ -1326,14 +1326,14 @@ module.exports = class AtomApplication extends EventEmitter {
         existingWindow = this.windowForLocations(
           locationsToOpen,
           devMode,
-          safeMode
+          safeMode,
         );
       }
 
       // No window specified, no existing window found, and addition to the last window requested. Find the last
       // focused window that matches the requested dev and safe modes.
       if (!existingWindow && addToLastWindow) {
-        existingWindow = this.getLastFocusedWindow(win => {
+        existingWindow = this.getLastFocusedWindow((win) => {
           return (
             !win.isSpec && win.devMode === devMode && win.safeMode === safeMode
           );
@@ -1343,17 +1343,17 @@ module.exports = class AtomApplication extends EventEmitter {
       // Fall back to the last focused window that has no project roots.
       if (!existingWindow) {
         existingWindow = this.getLastFocusedWindow(
-          win => !win.isSpec && !win.hasProjectPaths()
+          (win) => !win.isSpec && !win.hasProjectPaths(),
         );
       }
 
       // One last case: if *no* paths are directories, add to the last focused window.
       if (!existingWindow) {
         const noDirectories = locationsToOpen.every(
-          location => !location.isDirectory
+          (location) => !location.isDirectory,
         );
         if (noDirectories) {
-          existingWindow = this.getLastFocusedWindow(win => {
+          existingWindow = this.getLastFocusedWindow((win) => {
             return (
               !win.isSpec &&
               win.devMode === devMode &&
@@ -1383,17 +1383,16 @@ module.exports = class AtomApplication extends EventEmitter {
             path.join(
               this.devResourcePath,
               'src',
-              'initialize-application-window'
-            )
+              'initialize-application-window',
+            ),
           );
           resourcePath = this.devResourcePath;
         } catch (error) {}
       }
 
       if (!windowInitializationScript) {
-        windowInitializationScript = require.resolve(
-          '../initialize-application-window'
-        );
+        windowInitializationScript =
+          require.resolve('../initialize-application-window');
       }
       if (!resourcePath) resourcePath = this.resourcePath;
       if (!windowDimensions)
@@ -1409,7 +1408,7 @@ module.exports = class AtomApplication extends EventEmitter {
         windowDimensions,
         profileStartup,
         clearWindowState,
-        env
+        env,
       });
       this.addWindow(openedWindow);
       openedWindow.focus();
@@ -1422,20 +1421,22 @@ module.exports = class AtomApplication extends EventEmitter {
       this.waitSessionsByWindow.get(openedWindow).push({
         pid: pidToKillWhenClosed,
         remainingPaths: new Set(
-          locationsToOpen.map(location => location.pathToOpen).filter(Boolean)
-        )
+          locationsToOpen
+            .map((location) => location.pathToOpen)
+            .filter(Boolean),
+        ),
       });
     }
 
     openedWindow.browserWindow.once('closed', () =>
-      this.killProcessesForWindow(openedWindow)
+      this.killProcessesForWindow(openedWindow),
     );
     return openedWindow;
   }
 
   // Kill all processes associated with opened windows.
   killAllProcesses() {
-    for (let window of this.waitSessionsByWindow.keys()) {
+    for (const window of this.waitSessionsByWindow.keys()) {
       this.killProcessesForWindow(window);
     }
   }
@@ -1472,7 +1473,7 @@ module.exports = class AtomApplication extends EventEmitter {
         console.log(
           `Killing process ${pid} failed: ${
             error.code != null ? error.code : error.message
-          }`
+          }`,
         );
       }
     }
@@ -1482,15 +1483,15 @@ module.exports = class AtomApplication extends EventEmitter {
     if (this.quitting) return;
 
     const windows = this.getAllWindows();
-    const hasASpecWindow = windows.some(window => window.isSpec);
+    const hasASpecWindow = windows.some((window) => window.isSpec);
 
     if (windows.length === 1 && hasASpecWindow) return;
 
     const state = {
       version: APPLICATION_STATE_VERSION,
       windows: windows
-        .filter(window => !window.isSpec)
-        .map(window => ({ projectRoots: window.projectRoots }))
+        .filter((window) => !window.isSpec)
+        .map((window) => ({ projectRoots: window.projectRoots })),
     };
     state.windows.reverse();
 
@@ -1509,27 +1510,27 @@ module.exports = class AtomApplication extends EventEmitter {
     if (state.version === APPLICATION_STATE_VERSION) {
       // Atom >=1.36.1
       // Schema: {version: '1', windows: [{projectRoots: ['<root-dir>', ...]}, ...]}
-      return state.windows.map(each => ({
+      return state.windows.map((each) => ({
         foldersToOpen: each.projectRoots,
         devMode: this.devMode,
         safeMode: this.safeMode,
-        newWindow: true
+        newWindow: true,
       }));
     } else if (state.version === undefined) {
       // Atom <= 1.36.0
       // Schema: [{initialPaths: ['<root-dir>', ...]}, ...]
       return Promise.all(
-        state.map(async windowState => {
+        state.map(async (windowState) => {
           // Classify each window's initialPaths as directories or non-directories
           const classifiedPaths = await Promise.all(
             windowState.initialPaths.map(
-              initialPath =>
-                new Promise(resolve => {
-                  fs.isDirectory(initialPath, isDir =>
-                    resolve({ initialPath, isDir })
+              (initialPath) =>
+                new Promise((resolve) => {
+                  fs.isDirectory(initialPath, (isDir) =>
+                    resolve({ initialPath, isDir }),
                   );
-                })
-            )
+                }),
+            ),
           );
 
           // Only accept initialPaths that are existing directories
@@ -1539,9 +1540,9 @@ module.exports = class AtomApplication extends EventEmitter {
               .map(({ initialPath }) => initialPath),
             devMode: this.devMode,
             safeMode: this.safeMode,
-            newWindow: true
+            newWindow: true,
           };
-        })
+        }),
       );
     } else {
       // Unrecognized version (from a newer Atom?)
@@ -1571,7 +1572,7 @@ module.exports = class AtomApplication extends EventEmitter {
         urlToOpen,
         devMode,
         safeMode,
-        env
+        env,
       );
     } else {
       return this.openPackageUriHandler(
@@ -1579,7 +1580,7 @@ module.exports = class AtomApplication extends EventEmitter {
         parsedUrl,
         devMode,
         safeMode,
-        env
+        env,
       );
     }
   }
@@ -1589,15 +1590,15 @@ module.exports = class AtomApplication extends EventEmitter {
 
     if (parsedUrl.host === 'core') {
       const predicate = require('../core-uri-handlers').windowPredicate(
-        parsedUrl
+        parsedUrl,
       );
       bestWindow = this.getLastFocusedWindow(
-        win => !win.isSpecWindow() && predicate(win)
+        (win) => !win.isSpecWindow() && predicate(win),
       );
     }
 
     if (!bestWindow)
-      bestWindow = this.getLastFocusedWindow(win => !win.isSpecWindow());
+      bestWindow = this.getLastFocusedWindow((win) => !win.isSpecWindow());
 
     if (bestWindow) {
       bestWindow.sendURIMessage(url);
@@ -1612,17 +1613,16 @@ module.exports = class AtomApplication extends EventEmitter {
             path.join(
               this.devResourcePath,
               'src',
-              'initialize-application-window'
-            )
+              'initialize-application-window',
+            ),
           );
           resourcePath = this.devResourcePath;
         } catch (error) {}
       }
 
       if (!windowInitializationScript) {
-        windowInitializationScript = require.resolve(
-          '../initialize-application-window'
-        );
+        windowInitializationScript =
+          require.resolve('../initialize-application-window');
       }
 
       const windowDimensions = this.getDimensionsForNewWindow();
@@ -1632,7 +1632,7 @@ module.exports = class AtomApplication extends EventEmitter {
         devMode,
         safeMode,
         windowDimensions,
-        env
+        env,
       });
       this.addWindow(window);
       window.on('window:loaded', () => window.sendURIMessage(url));
@@ -1652,14 +1652,13 @@ module.exports = class AtomApplication extends EventEmitter {
     urlToOpen,
     devMode,
     safeMode,
-    env
+    env,
   ) {
-    const packagePath = this.getPackageManager(devMode).resolvePackagePath(
-      packageName
-    );
+    const packagePath =
+      this.getPackageManager(devMode).resolvePackagePath(packageName);
     const windowInitializationScript = path.resolve(
       packagePath,
-      packageUrlMain
+      packageUrlMain,
     );
     const windowDimensions = this.getDimensionsForNewWindow();
     const window = this.createWindow({
@@ -1669,7 +1668,7 @@ module.exports = class AtomApplication extends EventEmitter {
       safeMode,
       urlToOpen,
       windowDimensions,
-      env
+      env,
     });
     this.addWindow(window);
     return window;
@@ -1682,7 +1681,7 @@ module.exports = class AtomApplication extends EventEmitter {
       this.packages.initialize({
         configDirPath: process.env.ATOM_HOME,
         devMode,
-        resourcePath: this.resourcePath
+        resourcePath: this.resourcePath,
       });
     }
 
@@ -1706,7 +1705,7 @@ module.exports = class AtomApplication extends EventEmitter {
     logFile,
     safeMode,
     timeout,
-    env
+    env,
   }) {
     let windowInitializationScript;
     if (resourcePath !== this.resourcePath && !fs.existsSync(resourcePath)) {
@@ -1715,9 +1714,9 @@ module.exports = class AtomApplication extends EventEmitter {
 
     const timeoutInSeconds = Number.parseFloat(timeout);
     if (!Number.isNaN(timeoutInSeconds)) {
-      const timeoutHandler = function() {
+      const timeoutHandler = function () {
         console.log(
-          `The test suite has timed out because it has been running for more than ${timeoutInSeconds} seconds.`
+          `The test suite has timed out because it has been running for more than ${timeoutInSeconds} seconds.`,
         );
         return process.exit(124); // Use the same exit code as the UNIX timeout util.
       };
@@ -1726,17 +1725,17 @@ module.exports = class AtomApplication extends EventEmitter {
 
     try {
       windowInitializationScript = require.resolve(
-        path.resolve(this.devResourcePath, 'src', 'initialize-test-window')
+        path.resolve(this.devResourcePath, 'src', 'initialize-test-window'),
       );
     } catch (error) {
       windowInitializationScript = require.resolve(
-        path.resolve(__dirname, '..', '..', 'src', 'initialize-test-window')
+        path.resolve(__dirname, '..', '..', 'src', 'initialize-test-window'),
       );
     }
 
     const testPaths = [];
     if (pathsToOpen != null) {
-      for (let pathToOpen of pathsToOpen) {
+      for (const pathToOpen of pathsToOpen) {
         testPaths.push(path.resolve(executedFrom, fs.normalize(pathToOpen)));
       }
     }
@@ -1764,7 +1763,7 @@ module.exports = class AtomApplication extends EventEmitter {
       testPaths,
       logFile,
       safeMode,
-      env
+      env,
     });
     this.addWindow(window);
     if (env) window.replaceEnvironment(env);
@@ -1777,7 +1776,7 @@ module.exports = class AtomApplication extends EventEmitter {
     resourcePath,
     executedFrom,
     pathsToOpen,
-    env
+    env,
   }) {
     let windowInitializationScript;
     if (resourcePath !== this.resourcePath && !fs.existsSync(resourcePath)) {
@@ -1786,7 +1785,11 @@ module.exports = class AtomApplication extends EventEmitter {
 
     try {
       windowInitializationScript = require.resolve(
-        path.resolve(this.devResourcePath, 'src', 'initialize-benchmark-window')
+        path.resolve(
+          this.devResourcePath,
+          'src',
+          'initialize-benchmark-window',
+        ),
       );
     } catch (error) {
       windowInitializationScript = require.resolve(
@@ -1795,16 +1798,16 @@ module.exports = class AtomApplication extends EventEmitter {
           '..',
           '..',
           'src',
-          'initialize-benchmark-window'
-        )
+          'initialize-benchmark-window',
+        ),
       );
     }
 
     const benchmarkPaths = [];
     if (pathsToOpen != null) {
-      for (let pathToOpen of pathsToOpen) {
+      for (const pathToOpen of pathsToOpen) {
         benchmarkPaths.push(
-          path.resolve(executedFrom, fs.normalize(pathToOpen))
+          path.resolve(executedFrom, fs.normalize(pathToOpen)),
         );
       }
     }
@@ -1826,7 +1829,7 @@ module.exports = class AtomApplication extends EventEmitter {
       devMode,
       benchmarkPaths,
       safeMode,
-      env
+      env,
     });
     this.addWindow(window);
     return window;
@@ -1848,7 +1851,7 @@ module.exports = class AtomApplication extends EventEmitter {
         if (
           (testRunnerPath = Resolve.sync(packageMetadata.atomTestRunner, {
             basedir: packageRoot,
-            extensions: Object.keys(require.extensions)
+            extensions: Object.keys(require.extensions),
           }))
         ) {
           return testRunnerPath;
@@ -1856,7 +1859,7 @@ module.exports = class AtomApplication extends EventEmitter {
           process.stderr.write(
             `Error: Could not resolve test runner path '${
               packageMetadata.atomTestRunner
-            }'`
+            }'`,
           );
           process.exit(1);
         }
@@ -1869,11 +1872,11 @@ module.exports = class AtomApplication extends EventEmitter {
   resolveLegacyTestRunnerPath() {
     try {
       return require.resolve(
-        path.resolve(this.devResourcePath, 'spec', 'jasmine-test-runner')
+        path.resolve(this.devResourcePath, 'spec', 'jasmine-test-runner'),
       );
     } catch (error) {
       return require.resolve(
-        path.resolve(__dirname, '..', '..', 'spec', 'jasmine-test-runner')
+        path.resolve(__dirname, '..', '..', 'spec', 'jasmine-test-runner'),
       );
     }
   }
@@ -1886,9 +1889,9 @@ module.exports = class AtomApplication extends EventEmitter {
         initialLine: null,
         exists: false,
         isDirectory: false,
-        isFile: false
+        isFile: false,
       },
-      extra
+      extra,
     );
 
     if (!pathToOpen) {
@@ -1909,7 +1912,7 @@ module.exports = class AtomApplication extends EventEmitter {
     }
 
     const normalizedPath = path.normalize(
-      path.resolve(executedFrom, fs.normalize(result.pathToOpen))
+      path.resolve(executedFrom, fs.normalize(result.pathToOpen)),
     );
     if (!url.parse(pathToOpen).protocol) {
       result.pathToOpen = normalizedPath;
@@ -1955,7 +1958,7 @@ module.exports = class AtomApplication extends EventEmitter {
   promptForPathToOpen(type, { devMode, safeMode, window }, path = null) {
     return this.promptForPath(
       type,
-      async pathsToOpen => {
+      async (pathsToOpen) => {
         let targetWindow;
 
         // Open in :window as long as no chosen paths are folders. If any chosen path is a folder, open in a
@@ -1967,9 +1970,9 @@ module.exports = class AtomApplication extends EventEmitter {
         } else if (type === 'all') {
           const areDirectories = await Promise.all(
             pathsToOpen.map(
-              pathToOpen =>
-                new Promise(resolve => fs.isDirectory(pathToOpen, resolve))
-            )
+              (pathToOpen) =>
+                new Promise((resolve) => fs.isDirectory(pathToOpen, resolve)),
+            ),
           );
           if (!areDirectories.some(Boolean)) {
             targetWindow = window;
@@ -1980,10 +1983,10 @@ module.exports = class AtomApplication extends EventEmitter {
           pathsToOpen,
           devMode,
           safeMode,
-          window: targetWindow
+          window: targetWindow,
         });
       },
-      path
+      path,
     );
   }
 
@@ -2017,7 +2020,7 @@ module.exports = class AtomApplication extends EventEmitter {
           default:
             return 'Open';
         }
-      })()
+      })(),
     };
 
     // File dialog defaults to project directory of currently active editor
@@ -2039,8 +2042,8 @@ module.exports = class AtomApplication extends EventEmitter {
         title: 'Restart required',
         message:
           'You will need to restart Atom for this change to take effect.',
-        buttons: ['Restart Atom', 'Cancel']
-      }
+        buttons: ['Restart Atom', 'Cancel'],
+      },
     );
     if (result.response === 0) this.restart();
   }
@@ -2061,7 +2064,7 @@ module.exports = class AtomApplication extends EventEmitter {
 
   disableZoomOnDisplayChange() {
     const callback = () => {
-      this.getAllWindows().map(window => window.disableZoom());
+      this.getAllWindows().map((window) => window.disableZoom());
     };
 
     // Set the limits every time a display is added or removed, otherwise the
@@ -2104,7 +2107,7 @@ class WindowStack {
 
   getLastFocusedWindow(predicate) {
     if (predicate == null) {
-      predicate = win => true;
+      predicate = (win) => true;
     }
     return this.windows.find(predicate);
   }

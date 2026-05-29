@@ -74,7 +74,7 @@ module.exports = class CommandRegistry {
       this.rootNode.removeEventListener(
         commandName,
         this.handleCommandEvent,
-        true
+        true,
       );
     }
   }
@@ -135,7 +135,7 @@ module.exports = class CommandRegistry {
       for (commandName in commands) {
         listener = commands[commandName];
         disposable.add(
-          this.add(target, commandName, listener, throwOnInvalidSelector)
+          this.add(target, commandName, listener, throwOnInvalidSelector),
         );
       }
       return disposable;
@@ -155,7 +155,7 @@ module.exports = class CommandRegistry {
       typeof listener.didDispatch !== 'function'
     ) {
       throw new Error(
-        'Listener must be a callback function or an object with a didDispatch method.'
+        'Listener must be a callback function or an object with a didDispatch method.',
       );
     }
 
@@ -173,13 +173,12 @@ module.exports = class CommandRegistry {
     if (this.selectorBasedListenersByCommandName[commandName] == null) {
       this.selectorBasedListenersByCommandName[commandName] = [];
     }
-    const listenersForCommand = this.selectorBasedListenersByCommandName[
-      commandName
-    ];
+    const listenersForCommand =
+      this.selectorBasedListenersByCommandName[commandName];
     const selectorListener = new SelectorBasedListener(
       selector,
       commandName,
-      listener
+      listener,
     );
     listenersForCommand.push(selectorListener);
 
@@ -188,7 +187,7 @@ module.exports = class CommandRegistry {
     return new Disposable(() => {
       listenersForCommand.splice(
         listenersForCommand.indexOf(selectorListener),
-        1
+        1,
       );
       if (listenersForCommand.length === 0) {
         delete this.selectorBasedListenersByCommandName[commandName];
@@ -215,7 +214,7 @@ module.exports = class CommandRegistry {
     return new Disposable(() => {
       listenersForElement.splice(
         listenersForElement.indexOf(inlineListener),
-        1
+        1,
       );
       if (listenersForElement.length === 0) {
         listenersForCommand.delete(element);
@@ -251,7 +250,7 @@ module.exports = class CommandRegistry {
           commandNames.add(name);
           const targetListeners = listeners.get(currentTarget);
           commands.push(
-            ...targetListeners.map(listener => listener.descriptor)
+            ...targetListeners.map((listener) => listener.descriptor),
           );
         }
       }
@@ -328,46 +327,46 @@ module.exports = class CommandRegistry {
   handleCommandEvent(event) {
     let propagationStopped = false;
     let immediatePropagationStopped = false;
-    let matched = [];
+    const matched = [];
     let currentTarget = event.target;
 
     const dispatchedEvent = new CustomEvent(event.type, {
       bubbles: true,
-      detail: event.detail
+      detail: event.detail,
     });
     Object.defineProperty(dispatchedEvent, 'eventPhase', {
-      value: Event.BUBBLING_PHASE
+      value: Event.BUBBLING_PHASE,
     });
     Object.defineProperty(dispatchedEvent, 'currentTarget', {
       get() {
         return currentTarget;
-      }
+      },
     });
     Object.defineProperty(dispatchedEvent, 'target', { value: currentTarget });
     Object.defineProperty(dispatchedEvent, 'preventDefault', {
       value() {
         return event.preventDefault();
-      }
+      },
     });
     Object.defineProperty(dispatchedEvent, 'stopPropagation', {
       value() {
         event.stopPropagation();
         propagationStopped = true;
-      }
+      },
     });
     Object.defineProperty(dispatchedEvent, 'stopImmediatePropagation', {
       value() {
         event.stopImmediatePropagation();
         propagationStopped = true;
         immediatePropagationStopped = true;
-      }
+      },
     });
     Object.defineProperty(dispatchedEvent, 'abortKeyBinding', {
       value() {
         if (typeof event.abortKeyBinding === 'function') {
           event.abortKeyBinding();
         }
-      }
+      },
     });
 
     for (const key of Object.keys(event)) {
@@ -389,7 +388,7 @@ module.exports = class CommandRegistry {
         const selectorBasedListeners = (
           this.selectorBasedListenersByCommandName[event.type] || []
         )
-          .filter(listener => listener.matchesTarget(currentTarget))
+          .filter((listener) => listener.matchesTarget(currentTarget))
           .sort((a, b) => a.compare(b));
         listeners = selectorBasedListeners.concat(listeners);
       }
@@ -422,7 +421,7 @@ module.exports = class CommandRegistry {
   commandRegistered(commandName) {
     if (this.rootNode != null && !this.registeredCommands[commandName]) {
       this.rootNode.addEventListener(commandName, this.handleCommandEvent, {
-        capture: true
+        capture: true,
       });
       return (this.registeredCommands[commandName] = true);
     }
@@ -473,7 +472,7 @@ function extractDescriptor(name, listener) {
     name,
     displayName: listener.displayName
       ? listener.displayName
-      : _.humanizeEventName(name)
+      : _.humanizeEventName(name),
   });
 }
 

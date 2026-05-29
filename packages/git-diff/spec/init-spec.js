@@ -5,7 +5,7 @@ const temp = require('temp').track();
 const commands = [
   'git-diff:toggle-diff-list',
   'git-diff:move-to-next-diff',
-  'git-diff:move-to-previous-diff'
+  'git-diff:move-to-previous-diff',
 ];
 
 describe('git-diff', () => {
@@ -16,7 +16,7 @@ describe('git-diff', () => {
     fs.copySync(path.join(__dirname, 'fixtures', 'working-dir'), projectPath);
     fs.moveSync(
       path.join(projectPath, 'git.git'),
-      path.join(projectPath, '.git')
+      path.join(projectPath, '.git'),
     );
     atom.project.setPaths([projectPath]);
 
@@ -41,7 +41,7 @@ describe('git-diff', () => {
         atom.commands
           .findCommands({ target: element })
           .filter(({ name }) => commands.includes(name))
-          .forEach(command => expect(commands).not.toContain(command.name));
+          .forEach((command) => expect(commands).not.toContain(command.name));
       });
     });
   });

@@ -7,11 +7,11 @@ describe('GitDiff package', () => {
 
   beforeEach(() => {
     screenUpdates = 0;
-    spyOn(window, 'requestAnimationFrame').andCallFake(fn => {
+    spyOn(window, 'requestAnimationFrame').andCallFake((fn) => {
       fn();
       screenUpdates++;
     });
-    spyOn(window, 'cancelAnimationFrame').andCallFake(i => null);
+    spyOn(window, 'cancelAnimationFrame').andCallFake((i) => null);
 
     projectPath = temp.mkdirSync('git-diff-spec-');
     const otherPath = temp.mkdirSync('some-other-path-');
@@ -19,7 +19,7 @@ describe('GitDiff package', () => {
     fs.copySync(path.join(__dirname, 'fixtures', 'working-dir'), projectPath);
     fs.moveSync(
       path.join(projectPath, 'git.git'),
-      path.join(projectPath, '.git')
+      path.join(projectPath, '.git'),
     );
     atom.project.setPaths([otherPath, projectPath]);
 
@@ -50,7 +50,7 @@ describe('GitDiff package', () => {
   describe('when the editor has modified lines', () => {
     it('highlights the modified lines', () => {
       expect(editorElement.querySelectorAll('.git-line-modified').length).toBe(
-        0
+        0,
       );
       editor.insertText('a');
       advanceClock(editor.getBuffer().stoppedChangingDelay);
@@ -58,11 +58,11 @@ describe('GitDiff package', () => {
       waitsFor(() => editor.getMarkers().length > 0);
       runs(() => {
         expect(
-          editorElement.querySelectorAll('.git-line-modified').length
+          editorElement.querySelectorAll('.git-line-modified').length,
         ).toBe(1);
         expect(editorElement.querySelector('.git-line-modified')).toHaveData(
           'buffer-row',
-          0
+          0,
         );
       });
     });
@@ -78,11 +78,11 @@ describe('GitDiff package', () => {
       waitsFor(() => editor.getMarkers().length > 0);
       runs(() => {
         expect(editorElement.querySelectorAll('.git-line-added').length).toBe(
-          1
+          1,
         );
         expect(editorElement.querySelector('.git-line-added')).toHaveData(
           'buffer-row',
-          1
+          1,
         );
       });
     });
@@ -97,11 +97,11 @@ describe('GitDiff package', () => {
       waitsFor(() => editor.getMarkers().length > 0);
       runs(() => {
         expect(editorElement.querySelectorAll('.git-line-removed').length).toBe(
-          1
+          1,
         );
         expect(editorElement.querySelector('.git-line-removed')).toHaveData(
           'buffer-row',
-          4
+          4,
         );
       });
     });
@@ -116,10 +116,10 @@ describe('GitDiff package', () => {
       waitsFor(() => editor.getMarkers().length > 0);
       runs(() => {
         expect(
-          editorElement.querySelectorAll('.git-previous-line-removed').length
+          editorElement.querySelectorAll('.git-previous-line-removed').length,
         ).toBe(1);
         expect(
-          editorElement.querySelector('.git-previous-line-removed')
+          editorElement.querySelector('.git-previous-line-removed'),
         ).toHaveData('buffer-row', 0);
       });
     });
@@ -128,26 +128,26 @@ describe('GitDiff package', () => {
   describe('when a modified line is restored to the HEAD version contents', () => {
     it('removes the diff highlight', () => {
       expect(editorElement.querySelectorAll('.git-line-modified').length).toBe(
-        0
+        0,
       );
       editor.insertText('a');
       advanceClock(editor.getBuffer().stoppedChangingDelay);
       waitsFor(
-        () => editorElement.querySelectorAll('.git-line-modified').length > 0
+        () => editorElement.querySelectorAll('.git-line-modified').length > 0,
       );
       runs(() => {
         expect(
-          editorElement.querySelectorAll('.git-line-modified').length
+          editorElement.querySelectorAll('.git-line-modified').length,
         ).toBe(1);
         editor.backspace();
         advanceClock(editor.getBuffer().stoppedChangingDelay);
       });
       waitsFor(
-        () => editorElement.querySelectorAll('.git-line-modified').length < 1
+        () => editorElement.querySelectorAll('.git-line-modified').length < 1,
       );
       runs(() => {
         expect(
-          editorElement.querySelectorAll('.git-line-modified').length
+          editorElement.querySelectorAll('.git-line-modified').length,
         ).toBe(0);
       });
     });
@@ -157,11 +157,11 @@ describe('GitDiff package', () => {
     it('highlights the changed lines', () => {
       fs.writeFileSync(
         path.join(projectPath, 'sample.txt'),
-        'Some different text.'
+        'Some different text.',
       );
 
       waitsForPromise(() =>
-        atom.workspace.open(path.join(projectPath, 'sample.txt'))
+        atom.workspace.open(path.join(projectPath, 'sample.txt')),
       );
 
       runs(() => {
@@ -173,11 +173,11 @@ describe('GitDiff package', () => {
 
       runs(() => {
         expect(
-          editorElement.querySelectorAll('.git-line-modified').length
+          editorElement.querySelectorAll('.git-line-modified').length,
         ).toBe(1);
         expect(editorElement.querySelector('.git-line-modified')).toHaveData(
           'buffer-row',
-          0
+          0,
         );
       });
     });
@@ -235,7 +235,7 @@ describe('GitDiff package', () => {
 
     describe('when the wrapAroundOnMoveToDiff config option is false', () => {
       beforeEach(() =>
-        atom.config.set('git-diff.wrapAroundOnMoveToDiff', false)
+        atom.config.set('git-diff.wrapAroundOnMoveToDiff', false),
       );
 
       it('does not wraps around to the first/last diff in the file', () => {
@@ -255,13 +255,13 @@ describe('GitDiff package', () => {
 
           atom.commands.dispatch(
             editorElement,
-            'git-diff:move-to-previous-diff'
+            'git-diff:move-to-previous-diff',
           );
           expect(editor.getCursorBufferPosition()).toEqual([0, 0]);
 
           atom.commands.dispatch(
             editorElement,
-            'git-diff:move-to-previous-diff'
+            'git-diff:move-to-previous-diff',
           );
           expect(editor.getCursorBufferPosition()).toEqual([0, 0]);
         });
@@ -278,7 +278,7 @@ describe('GitDiff package', () => {
       waitsFor(() => screenUpdates > 0);
       runs(() => {
         expect(editorElement.querySelector('.gutter')).toHaveClass(
-          'git-diff-icon'
+          'git-diff-icon',
         );
       });
     });
@@ -289,12 +289,12 @@ describe('GitDiff package', () => {
       runs(() => {
         atom.config.set('editor.showLineNumbers', false);
         expect(editorElement.querySelector('.gutter')).not.toHaveClass(
-          'git-diff-icon'
+          'git-diff-icon',
         );
 
         atom.config.set('editor.showLineNumbers', true);
         expect(editorElement.querySelector('.gutter')).toHaveClass(
-          'git-diff-icon'
+          'git-diff-icon',
         );
       });
     });
@@ -305,7 +305,7 @@ describe('GitDiff package', () => {
       runs(() => {
         atom.config.set('git-diff.showIconsInEditorGutter', false);
         expect(editorElement.querySelector('.gutter')).not.toHaveClass(
-          'git-diff-icon'
+          'git-diff-icon',
         );
       });
     });

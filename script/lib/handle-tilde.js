@@ -4,7 +4,7 @@ const os = require('os');
 const passwdUser = require('passwd-user');
 const path = require('path');
 
-module.exports = function(aPath) {
+module.exports = function (aPath) {
   if (!aPath.startsWith('~')) {
     return aPath;
   }
@@ -19,7 +19,7 @@ module.exports = function(aPath) {
           const passwd = passwdUser.sync(user);
           if (passwd === undefined) {
             throw new Error(
-              `Failed to expand the tilde in ${aPath} - user "${user}" does not exist`
+              `Failed to expand the tilde in ${aPath} - user "${user}" does not exist`,
             );
           }
           return passwd.homedir;

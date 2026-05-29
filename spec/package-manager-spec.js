@@ -27,7 +27,7 @@ describe('PackageManager', () => {
       packageManger.initialize({ configDirPath });
       expect(packageManger.packageDirPaths.length).toBe(1);
       expect(packageManger.packageDirPaths[0]).toBe(
-        path.join(configDirPath, 'packages')
+        path.join(configDirPath, 'packages'),
       );
     });
 
@@ -38,13 +38,13 @@ describe('PackageManager', () => {
       packageManger.initialize({ configDirPath, resourcePath, devMode: true });
       expect(packageManger.packageDirPaths.length).toBe(3);
       expect(packageManger.packageDirPaths).toContain(
-        path.join(configDirPath, 'packages')
+        path.join(configDirPath, 'packages'),
       );
       expect(packageManger.packageDirPaths).toContain(
-        path.join(configDirPath, 'dev', 'packages')
+        path.join(configDirPath, 'dev', 'packages'),
       );
       expect(packageManger.packageDirPaths).toContain(
-        path.join(resourcePath, 'packages')
+        path.join(resourcePath, 'packages'),
       );
     });
   });
@@ -56,7 +56,7 @@ describe('PackageManager', () => {
         'app',
         'apm',
         'bin',
-        'apm'
+        'apm',
       );
       if (process.platform === 'win32') {
         apmPath += '.cmd';
@@ -116,10 +116,10 @@ describe('PackageManager', () => {
       expect(() => pack.reloadStylesheets()).not.toThrow();
       expect(addErrorHandler.callCount).toBe(2);
       expect(addErrorHandler.argsForCall[1][0].message).toContain(
-        'Failed to reload the package-with-invalid-styles package stylesheets'
+        'Failed to reload the package-with-invalid-styles package stylesheets',
       );
       expect(addErrorHandler.argsForCall[1][0].options.packageName).toEqual(
-        'package-with-invalid-styles'
+        'package-with-invalid-styles',
       );
     });
 
@@ -128,31 +128,31 @@ describe('PackageManager', () => {
       const addErrorHandler = jasmine.createSpy();
       atom.notifications.onDidAddNotification(addErrorHandler);
       expect(
-        atom.packages.loadPackage('package-with-broken-package-json')
+        atom.packages.loadPackage('package-with-broken-package-json'),
       ).toBeNull();
       expect(addErrorHandler.callCount).toBe(1);
       expect(addErrorHandler.argsForCall[0][0].message).toContain(
-        'Failed to load the package-with-broken-package-json package'
+        'Failed to load the package-with-broken-package-json package',
       );
       expect(addErrorHandler.argsForCall[0][0].options.packageName).toEqual(
-        'package-with-broken-package-json'
+        'package-with-broken-package-json',
       );
     });
 
     it('returns null if the package name or path starts with a dot', () => {
       expect(
-        atom.packages.loadPackage('/Users/user/.atom/packages/.git')
+        atom.packages.loadPackage('/Users/user/.atom/packages/.git'),
       ).toBeNull();
     });
 
     it('normalizes short repository urls in package.json', () => {
       let { metadata } = atom.packages.loadPackage(
-        'package-with-short-url-package-json'
+        'package-with-short-url-package-json',
       );
       expect(metadata.repository.type).toBe('git');
       expect(metadata.repository.url).toBe('https://github.com/example/repo');
       ({ metadata } = atom.packages.loadPackage(
-        'package-with-invalid-url-package-json'
+        'package-with-invalid-url-package-json',
       ));
       expect(metadata.repository.type).toBe('git');
       expect(metadata.repository.url).toBe('foo');
@@ -160,7 +160,7 @@ describe('PackageManager', () => {
 
     it('trims git+ from the beginning and .git from the end of repository URLs, even if npm already normalized them ', () => {
       const { metadata } = atom.packages.loadPackage(
-        'package-with-prefixed-and-suffixed-repo-url'
+        'package-with-prefixed-and-suffixed-repo-url',
       );
       expect(metadata.repository.type).toBe('git');
       expect(metadata.repository.url).toBe('https://github.com/example/repo');
@@ -169,7 +169,7 @@ describe('PackageManager', () => {
     it('returns null if the package is not found in any package directory', () => {
       spyOn(console, 'warn');
       expect(
-        atom.packages.loadPackage('this-package-cannot-be-found')
+        atom.packages.loadPackage('this-package-cannot-be-found'),
       ).toBeNull();
       expect(console.warn.callCount).toBe(1);
       expect(console.warn.argsForCall[0][0]).toContain('Could not resolve');
@@ -180,20 +180,20 @@ describe('PackageManager', () => {
         spyOn(console, 'warn');
         expect(
           atom.packages.loadPackage(
-            path.join(__dirname, 'fixtures', 'packages', 'wordcount')
-          )
+            path.join(__dirname, 'fixtures', 'packages', 'wordcount'),
+          ),
         ).toBeNull();
         expect(atom.packages.isDeprecatedPackage('wordcount', '2.1.9')).toBe(
-          true
+          true,
         );
         expect(atom.packages.isDeprecatedPackage('wordcount', '2.2.0')).toBe(
-          true
+          true,
         );
         expect(atom.packages.isDeprecatedPackage('wordcount', '2.2.1')).toBe(
-          false
+          false,
         );
         expect(
-          atom.packages.getDeprecatedPackageMetadata('wordcount').version
+          atom.packages.getDeprecatedPackageMetadata('wordcount').version,
         ).toBe('<=2.2.0');
       });
     });
@@ -201,7 +201,7 @@ describe('PackageManager', () => {
     it('invokes ::onDidLoadPackage listeners with the loaded package', () => {
       let loadedPackage = null;
 
-      atom.packages.onDidLoadPackage(pack => {
+      atom.packages.onDidLoadPackage((pack) => {
         loadedPackage = pack;
       });
 
@@ -216,13 +216,13 @@ describe('PackageManager', () => {
       const state1 = { deserializer: 'Deserializer1', a: 'b' };
       expect(atom.deserializers.deserialize(state1)).toEqual({
         wasDeserializedBy: 'deserializeMethod1',
-        state: state1
+        state: state1,
       });
 
       const state2 = { deserializer: 'Deserializer2', c: 'd' };
       expect(atom.deserializers.deserialize(state2)).toEqual({
         wasDeserializedBy: 'deserializeMethod2',
-        state: state2
+        state: state2,
       });
     });
 
@@ -233,12 +233,12 @@ describe('PackageManager', () => {
       atom.packages.serviceHub.consume(
         'atom.directory-provider',
         '^0.1.0',
-        provider => providers.push(provider)
+        (provider) => providers.push(provider),
       );
 
       atom.packages.loadPackage('package-with-directory-provider');
-      expect(providers.map(p => p.name)).toEqual([
-        'directory provider from package-with-directory-provider'
+      expect(providers.map((p) => p.name)).toEqual([
+        'directory provider from package-with-directory-provider',
       ]);
     });
 
@@ -279,13 +279,13 @@ describe('PackageManager', () => {
         spyOn(atom.views, 'addViewProvider').andCallThrough();
         atom.deserializers.deserialize({
           deserializer: 'DeserializerFromPackageWithViewProviders',
-          a: 'b'
+          a: 'b',
         });
         expect(atom.views.addViewProvider.callCount).toBe(2);
 
         atom.deserializers.deserialize({
           deserializer: 'DeserializerFromPackageWithViewProviders',
-          a: 'b'
+          a: 'b',
         });
         expect(atom.views.addViewProvider.callCount).toBe(2);
 
@@ -305,8 +305,8 @@ describe('PackageManager', () => {
         type: 'object',
         properties: {
           a: { type: 'number', default: 5 },
-          b: { type: 'string', default: 'five' }
-        }
+          b: { type: 'string', default: 'five' },
+        },
       });
 
       expect(pack.mainModule).toBeNull();
@@ -319,8 +319,8 @@ describe('PackageManager', () => {
         type: 'object',
         properties: {
           a: { type: 'number', default: 5 },
-          b: { type: 'string', default: 'five' }
-        }
+          b: { type: 'string', default: 'five' },
+        },
       });
     });
 
@@ -339,14 +339,14 @@ describe('PackageManager', () => {
 
       it("does not defer loading the package's main module if the package previously used Atom APIs when its main module was required", () => {
         const pack1 = atom.packages.loadPackage(
-          'package-with-eval-time-api-calls'
+          'package-with-eval-time-api-calls',
         );
         expect(pack1.mainModule).toBeDefined();
 
         atom.packages.unloadPackage('package-with-eval-time-api-calls');
 
         const pack2 = atom.packages.loadPackage(
-          'package-with-eval-time-api-calls'
+          'package-with-eval-time-api-calls',
         );
         expect(pack2.mainModule).not.toBeNull();
       });
@@ -358,41 +358,41 @@ describe('PackageManager', () => {
       it('adds the package path to the module cache', () => {
         const availablePackage = atom.packages
           .getAvailablePackages()
-          .find(p => p.name === 'spell-check');
+          .find((p) => p.name === 'spell-check');
         availablePackage.isBundled = true;
         expect(
-          atom.packages.preloadedPackages[availablePackage.name]
+          atom.packages.preloadedPackages[availablePackage.name],
         ).toBeUndefined();
         expect(atom.packages.isPackageLoaded(availablePackage.name)).toBe(
-          false
+          false,
         );
 
         const metadata = atom.packages.loadPackageMetadata(availablePackage);
         atom.packages.preloadPackage(availablePackage.name, {
           rootDirPath: path.relative(
             atom.packages.resourcePath,
-            availablePackage.path
+            availablePackage.path,
           ),
-          metadata
+          metadata,
         });
         atom.packages.loadAvailablePackage(availablePackage);
         expect(atom.packages.isPackageLoaded(availablePackage.name)).toBe(true);
         expect(ModuleCache.add).toHaveBeenCalledWith(
           availablePackage.path,
-          metadata
+          metadata,
         );
       });
 
       it('deactivates it if it had been disabled', () => {
         const availablePackage = atom.packages
           .getAvailablePackages()
-          .find(p => p.name === 'spell-check');
+          .find((p) => p.name === 'spell-check');
         availablePackage.isBundled = true;
         expect(
-          atom.packages.preloadedPackages[availablePackage.name]
+          atom.packages.preloadedPackages[availablePackage.name],
         ).toBeUndefined();
         expect(atom.packages.isPackageLoaded(availablePackage.name)).toBe(
-          false
+          false,
         );
 
         const metadata = atom.packages.loadPackageMetadata(availablePackage);
@@ -401,10 +401,10 @@ describe('PackageManager', () => {
           {
             rootDirPath: path.relative(
               atom.packages.resourcePath,
-              availablePackage.path
+              availablePackage.path,
             ),
-            metadata
-          }
+            metadata,
+          },
         );
         expect(preloadedPackage.keymapActivated).toBe(true);
         expect(preloadedPackage.settingsActivated).toBe(true);
@@ -412,10 +412,10 @@ describe('PackageManager', () => {
 
         atom.packages.loadAvailablePackage(
           availablePackage,
-          new Set([availablePackage.name])
+          new Set([availablePackage.name]),
         );
         expect(atom.packages.isPackageLoaded(availablePackage.name)).toBe(
-          false
+          false,
         );
         expect(preloadedPackage.keymapActivated).toBe(false);
         expect(preloadedPackage.settingsActivated).toBe(false);
@@ -425,13 +425,13 @@ describe('PackageManager', () => {
       it('deactivates it and reloads the new one if trying to load the same package outside of the bundle', () => {
         const availablePackage = atom.packages
           .getAvailablePackages()
-          .find(p => p.name === 'spell-check');
+          .find((p) => p.name === 'spell-check');
         availablePackage.isBundled = true;
         expect(
-          atom.packages.preloadedPackages[availablePackage.name]
+          atom.packages.preloadedPackages[availablePackage.name],
         ).toBeUndefined();
         expect(atom.packages.isPackageLoaded(availablePackage.name)).toBe(
-          false
+          false,
         );
 
         const metadata = atom.packages.loadPackageMetadata(availablePackage);
@@ -440,10 +440,10 @@ describe('PackageManager', () => {
           {
             rootDirPath: path.relative(
               atom.packages.resourcePath,
-              availablePackage.path
+              availablePackage.path,
             ),
-            metadata
-          }
+            metadata,
+          },
         );
         expect(preloadedPackage.keymapActivated).toBe(true);
         expect(preloadedPackage.settingsActivated).toBe(true);
@@ -462,13 +462,13 @@ describe('PackageManager', () => {
       it('adds the package path to the module cache', () => {
         const availablePackage = atom.packages
           .getAvailablePackages()
-          .find(p => p.name === 'spell-check');
+          .find((p) => p.name === 'spell-check');
         availablePackage.isBundled = true;
         const metadata = atom.packages.loadPackageMetadata(availablePackage);
         atom.packages.loadAvailablePackage(availablePackage);
         expect(ModuleCache.add).toHaveBeenCalledWith(
           availablePackage.path,
-          metadata
+          metadata,
         );
       });
     });
@@ -478,28 +478,28 @@ describe('PackageManager', () => {
     it('requires the main module, loads the config schema and activates keymaps, menus and settings without reactivating them during package activation', () => {
       const availablePackage = atom.packages
         .getAvailablePackages()
-        .find(p => p.name === 'spell-check');
+        .find((p) => p.name === 'spell-check');
       availablePackage.isBundled = true;
       const metadata = atom.packages.loadPackageMetadata(availablePackage);
       expect(
-        atom.packages.preloadedPackages[availablePackage.name]
+        atom.packages.preloadedPackages[availablePackage.name],
       ).toBeUndefined();
       expect(atom.packages.isPackageLoaded(availablePackage.name)).toBe(false);
 
       atom.packages.packagesCache = {};
       atom.packages.packagesCache[availablePackage.name] = {
         main: path.join(availablePackage.path, metadata.main),
-        grammarPaths: []
+        grammarPaths: [],
       };
       const preloadedPackage = atom.packages.preloadPackage(
         availablePackage.name,
         {
           rootDirPath: path.relative(
             atom.packages.resourcePath,
-            availablePackage.path
+            availablePackage.path,
           ),
-          metadata
-        }
+          metadata,
+        },
       );
       expect(preloadedPackage.keymapActivated).toBe(true);
       expect(preloadedPackage.settingsActivated).toBe(true);
@@ -514,7 +514,7 @@ describe('PackageManager', () => {
 
       atom.packages.loadAvailablePackage(availablePackage);
       expect(preloadedPackage.getMainModulePath()).toBe(
-        path.join(availablePackage.path, metadata.main)
+        path.join(availablePackage.path, metadata.main),
       );
 
       atom.packages.activatePackage(availablePackage.name);
@@ -532,28 +532,28 @@ describe('PackageManager', () => {
     it('deactivates disabled keymaps during package activation', () => {
       const availablePackage = atom.packages
         .getAvailablePackages()
-        .find(p => p.name === 'spell-check');
+        .find((p) => p.name === 'spell-check');
       availablePackage.isBundled = true;
       const metadata = atom.packages.loadPackageMetadata(availablePackage);
       expect(
-        atom.packages.preloadedPackages[availablePackage.name]
+        atom.packages.preloadedPackages[availablePackage.name],
       ).toBeUndefined();
       expect(atom.packages.isPackageLoaded(availablePackage.name)).toBe(false);
 
       atom.packages.packagesCache = {};
       atom.packages.packagesCache[availablePackage.name] = {
         main: path.join(availablePackage.path, metadata.main),
-        grammarPaths: []
+        grammarPaths: [],
       };
       const preloadedPackage = atom.packages.preloadPackage(
         availablePackage.name,
         {
           rootDirPath: path.relative(
             atom.packages.resourcePath,
-            availablePackage.path
+            availablePackage.path,
           ),
-          metadata
-        }
+          metadata,
+        },
       );
       expect(preloadedPackage.keymapActivated).toBe(true);
       expect(preloadedPackage.settingsActivated).toBe(true);
@@ -561,7 +561,7 @@ describe('PackageManager', () => {
 
       atom.packages.loadAvailablePackage(availablePackage);
       atom.config.set('core.packagesWithKeymapsDisabled', [
-        availablePackage.name
+        availablePackage.name,
       ]);
       atom.packages.activatePackage(availablePackage.name);
 
@@ -604,7 +604,7 @@ describe('PackageManager', () => {
     it('invokes ::onDidUnloadPackage listeners with the unloaded package', () => {
       atom.packages.loadPackage('package-with-main');
       let unloadedPackage;
-      atom.packages.onDidUnloadPackage(pack => {
+      atom.packages.onDidUnloadPackage((pack) => {
         unloadedPackage = pack;
       });
       atom.packages.unloadPackage('package-with-main');
@@ -645,9 +645,8 @@ describe('PackageManager', () => {
           const indexModule = require('./fixtures/packages/package-with-index/index');
           spyOn(indexModule, 'activate');
 
-          const pack = await atom.packages.activatePackage(
-            'package-with-index'
-          );
+          const pack =
+            await atom.packages.activatePackage('package-with-index');
           expect(indexModule.activate).toHaveBeenCalled();
           expect(pack.mainModule).toBe(indexModule);
         });
@@ -655,24 +654,24 @@ describe('PackageManager', () => {
 
       it('assigns config schema, including defaults when package contains a schema', async () => {
         expect(
-          atom.config.get('package-with-config-schema.numbers.one')
+          atom.config.get('package-with-config-schema.numbers.one'),
         ).toBeUndefined();
 
         await atom.packages.activatePackage('package-with-config-schema');
         expect(atom.config.get('package-with-config-schema.numbers.one')).toBe(
-          1
+          1,
         );
         expect(atom.config.get('package-with-config-schema.numbers.two')).toBe(
-          2
+          2,
         );
         expect(
-          atom.config.set('package-with-config-schema.numbers.one', 'nope')
+          atom.config.set('package-with-config-schema.numbers.one', 'nope'),
         ).toBe(false);
         expect(
-          atom.config.set('package-with-config-schema.numbers.one', '10')
+          atom.config.set('package-with-config-schema.numbers.one', '10'),
         ).toBe(true);
         expect(atom.config.get('package-with-config-schema.numbers.one')).toBe(
-          10
+          10,
         );
       });
 
@@ -686,16 +685,16 @@ describe('PackageManager', () => {
           spyOn(mainModule, 'activate').andCallThrough();
 
           workspaceCommandListener = jasmine.createSpy(
-            'workspaceCommandListener'
+            'workspaceCommandListener',
           );
           registration = atom.commands.add(
             'atom-workspace',
             'activation-command',
-            workspaceCommandListener
+            workspaceCommandListener,
           );
 
           promise = atom.packages.activatePackage(
-            'package-with-activation-commands'
+            'package-with-activation-commands',
           );
         });
 
@@ -712,7 +711,7 @@ describe('PackageManager', () => {
           atom.workspace
             .getElement()
             .dispatchEvent(
-              new CustomEvent('activation-command', { bubbles: true })
+              new CustomEvent('activation-command', { bubbles: true }),
             );
 
           await promise;
@@ -726,12 +725,12 @@ describe('PackageManager', () => {
             .getActiveTextEditor()
             .getElement();
           const editorCommandListener = jasmine.createSpy(
-            'editorCommandListener'
+            'editorCommandListener',
           );
           atom.commands.add(
             'atom-text-editor',
             'activation-command',
-            editorCommandListener
+            editorCommandListener,
           );
 
           atom.commands.dispatch(editorElement, 'activation-command');
@@ -752,7 +751,7 @@ describe('PackageManager', () => {
           spyOn(mainModule, 'activate').andCallThrough();
 
           atom.packages.activatePackage(
-            'package-with-empty-activation-commands'
+            'package-with-empty-activation-commands',
           );
 
           expect(mainModule.activate.callCount).toBe(1);
@@ -764,15 +763,15 @@ describe('PackageManager', () => {
           atom.notifications.onDidAddNotification(addErrorHandler);
           expect(() =>
             atom.packages.activatePackage(
-              'package-with-invalid-activation-commands'
-            )
+              'package-with-invalid-activation-commands',
+            ),
           ).not.toThrow();
           expect(addErrorHandler.callCount).toBe(1);
           expect(addErrorHandler.argsForCall[0][0].message).toContain(
-            'Failed to activate the package-with-invalid-activation-commands package'
+            'Failed to activate the package-with-invalid-activation-commands package',
           );
           expect(addErrorHandler.argsForCall[0][0].options.packageName).toEqual(
-            'package-with-invalid-activation-commands'
+            'package-with-invalid-activation-commands',
           );
         });
 
@@ -781,60 +780,60 @@ describe('PackageManager', () => {
           const addErrorHandler = jasmine.createSpy();
           atom.notifications.onDidAddNotification(addErrorHandler);
           expect(() =>
-            atom.packages.activatePackage('package-with-invalid-context-menu')
+            atom.packages.activatePackage('package-with-invalid-context-menu'),
           ).not.toThrow();
           expect(addErrorHandler.callCount).toBe(1);
           expect(addErrorHandler.argsForCall[0][0].message).toContain(
-            'Failed to activate the package-with-invalid-context-menu package'
+            'Failed to activate the package-with-invalid-context-menu package',
           );
           expect(addErrorHandler.argsForCall[0][0].options.packageName).toEqual(
-            'package-with-invalid-context-menu'
+            'package-with-invalid-context-menu',
           );
         });
 
         it('adds a notification when the grammar is invalid', async () => {
           let notificationEvent;
 
-          await new Promise(resolve => {
+          await new Promise((resolve) => {
             const subscription = atom.notifications.onDidAddNotification(
-              event => {
+              (event) => {
                 notificationEvent = event;
                 subscription.dispose();
                 resolve();
-              }
+              },
             );
 
             atom.packages.activatePackage('package-with-invalid-grammar');
           });
 
           expect(notificationEvent.message).toContain(
-            'Failed to load a package-with-invalid-grammar package grammar'
+            'Failed to load a package-with-invalid-grammar package grammar',
           );
           expect(notificationEvent.options.packageName).toEqual(
-            'package-with-invalid-grammar'
+            'package-with-invalid-grammar',
           );
         });
 
         it('adds a notification when the settings are invalid', async () => {
           let notificationEvent;
 
-          await new Promise(resolve => {
+          await new Promise((resolve) => {
             const subscription = atom.notifications.onDidAddNotification(
-              event => {
+              (event) => {
                 notificationEvent = event;
                 subscription.dispose();
                 resolve();
-              }
+              },
             );
 
             atom.packages.activatePackage('package-with-invalid-settings');
           });
 
           expect(notificationEvent.message).toContain(
-            'Failed to load the package-with-invalid-settings package settings'
+            'Failed to load the package-with-invalid-settings package settings',
           );
           expect(notificationEvent.options.packageName).toEqual(
-            'package-with-invalid-settings'
+            'package-with-invalid-settings',
           );
         });
       });
@@ -849,16 +848,16 @@ describe('PackageManager', () => {
           mainModule.activationCommandCallCount = 0;
           spyOn(mainModule, 'activate').andCallThrough();
           workspaceCommandListener = jasmine.createSpy(
-            'workspaceCommandListener'
+            'workspaceCommandListener',
           );
           registration = atom.commands.add(
             '.workspace',
             'activation-command-2',
-            workspaceCommandListener
+            workspaceCommandListener,
           );
 
           promise = atom.packages.activatePackage(
-            'package-with-activation-commands-and-deserializers'
+            'package-with-activation-commands-and-deserializers',
           );
         });
 
@@ -875,7 +874,7 @@ describe('PackageManager', () => {
           const state1 = { deserializer: 'Deserializer1', a: 'b' };
           expect(atom.deserializers.deserialize(state1, atom)).toEqual({
             wasDeserializedBy: 'deserializeMethod1',
-            state: state1
+            state: state1,
           });
 
           await promise;
@@ -888,7 +887,7 @@ describe('PackageManager', () => {
           atom.workspace
             .getElement()
             .dispatchEvent(
-              new CustomEvent('activation-command-2', { bubbles: true })
+              new CustomEvent('activation-command-2', { bubbles: true }),
             );
 
           await promise;
@@ -908,11 +907,11 @@ describe('PackageManager', () => {
 
         it('defers requiring/activating the main module until an triggering of an activation hook occurs', async () => {
           promise = atom.packages.activatePackage(
-            'package-with-activation-hooks'
+            'package-with-activation-hooks',
           );
           expect(Package.prototype.requireMainModule.callCount).toBe(0);
           atom.packages.triggerActivationHook(
-            'language-fictitious:grammar-used'
+            'language-fictitious:grammar-used',
           );
           atom.packages.triggerDeferredActivationHooks();
 
@@ -922,11 +921,11 @@ describe('PackageManager', () => {
 
         it('does not double register activation hooks when deactivating and reactivating', async () => {
           promise = atom.packages.activatePackage(
-            'package-with-activation-hooks'
+            'package-with-activation-hooks',
           );
           expect(mainModule.activate.callCount).toBe(0);
           atom.packages.triggerActivationHook(
-            'language-fictitious:grammar-used'
+            'language-fictitious:grammar-used',
           );
           atom.packages.triggerDeferredActivationHooks();
 
@@ -934,14 +933,14 @@ describe('PackageManager', () => {
           expect(mainModule.activate.callCount).toBe(1);
 
           await atom.packages.deactivatePackage(
-            'package-with-activation-hooks'
+            'package-with-activation-hooks',
           );
 
           promise = atom.packages.activatePackage(
-            'package-with-activation-hooks'
+            'package-with-activation-hooks',
           );
           atom.packages.triggerActivationHook(
-            'language-fictitious:grammar-used'
+            'language-fictitious:grammar-used',
           );
           atom.packages.triggerDeferredActivationHooks();
 
@@ -956,7 +955,7 @@ describe('PackageManager', () => {
           expect(Package.prototype.requireMainModule.callCount).toBe(0);
 
           await atom.packages.activatePackage(
-            'package-with-empty-activation-hooks'
+            'package-with-empty-activation-hooks',
           );
           expect(mainModule.activate.callCount).toBe(1);
           expect(Package.prototype.requireMainModule.callCount).toBe(1);
@@ -964,7 +963,7 @@ describe('PackageManager', () => {
 
         it('activates the package immediately if the activation hook had already been triggered', async () => {
           atom.packages.triggerActivationHook(
-            'language-fictitious:grammar-used'
+            'language-fictitious:grammar-used',
           );
           atom.packages.triggerDeferredActivationHooks();
           expect(Package.prototype.requireMainModule.callCount).toBe(0);
@@ -985,7 +984,7 @@ describe('PackageManager', () => {
 
         it('defers requiring/activating the main module until a registered opener is called', async () => {
           promise = atom.packages.activatePackage(
-            'package-with-workspace-openers'
+            'package-with-workspace-openers',
           );
           expect(Package.prototype.requireMainModule.callCount).toBe(0);
           atom.workspace.open('atom://fictitious');
@@ -1011,7 +1010,7 @@ describe('PackageManager', () => {
         spyOn(console, 'error');
         spyOn(console, 'warn').andCallThrough();
         expect(() =>
-          atom.packages.activatePackage('package-without-module')
+          atom.packages.activatePackage('package-without-module'),
         ).not.toThrow();
         expect(console.error).not.toHaveBeenCalled();
         expect(console.warn).not.toHaveBeenCalled();
@@ -1028,7 +1027,7 @@ describe('PackageManager', () => {
 
     it("passes the activate method the package's previously serialized state if it exists", async () => {
       const pack = await atom.packages.activatePackage(
-        'package-with-serialization'
+        'package-with-serialization',
       );
       expect(pack.mainModule.someNumber).not.toBe(77);
       pack.mainModule.someNumber = 77;
@@ -1042,7 +1041,7 @@ describe('PackageManager', () => {
 
     it('invokes ::onDidActivatePackage listeners with the activated package', async () => {
       let activatedPackage;
-      atom.packages.onDidActivatePackage(pack => {
+      atom.packages.onDidActivatePackage((pack) => {
         activatedPackage = pack;
       });
 
@@ -1057,21 +1056,21 @@ describe('PackageManager', () => {
         const addErrorHandler = jasmine.createSpy();
         atom.notifications.onDidAddNotification(addErrorHandler);
         expect(() =>
-          atom.packages.activatePackage('package-that-throws-an-exception')
+          atom.packages.activatePackage('package-that-throws-an-exception'),
         ).not.toThrow();
         expect(addErrorHandler.callCount).toBe(1);
         expect(addErrorHandler.argsForCall[0][0].message).toContain(
-          'Failed to load the package-that-throws-an-exception package'
+          'Failed to load the package-that-throws-an-exception package',
         );
         expect(addErrorHandler.argsForCall[0][0].options.packageName).toEqual(
-          'package-that-throws-an-exception'
+          'package-that-throws-an-exception',
         );
       });
 
       it('re-throws the exception in test mode', () => {
         atom.config.set('core.disabledPackages', []);
         expect(() =>
-          atom.packages.activatePackage('package-that-throws-an-exception')
+          atom.packages.activatePackage('package-that-throws-an-exception'),
         ).toThrow('This package throws an exception');
       });
     });
@@ -1087,7 +1086,7 @@ describe('PackageManager', () => {
         } catch (error) {
           expect(console.warn.callCount).toBe(1);
           expect(error.message).toContain(
-            "Failed to load package 'this-doesnt-exist'"
+            "Failed to load package 'this-doesnt-exist'",
           );
         }
       });
@@ -1102,40 +1101,40 @@ describe('PackageManager', () => {
           expect(
             atom.keymaps.findKeyBindings({
               keystrokes: 'ctrl-z',
-              target: element1
-            })
+              target: element1,
+            }),
           ).toHaveLength(0);
           expect(
             atom.keymaps.findKeyBindings({
               keystrokes: 'ctrl-z',
-              target: element2
-            })
+              target: element2,
+            }),
           ).toHaveLength(0);
           expect(
             atom.keymaps.findKeyBindings({
               keystrokes: 'ctrl-z',
-              target: element3
-            })
+              target: element3,
+            }),
           ).toHaveLength(0);
 
           await atom.packages.activatePackage('package-with-keymaps');
           expect(
             atom.keymaps.findKeyBindings({
               keystrokes: 'ctrl-z',
-              target: element1
-            })[0].command
+              target: element1,
+            })[0].command,
           ).toBe('test-1');
           expect(
             atom.keymaps.findKeyBindings({
               keystrokes: 'ctrl-z',
-              target: element2
-            })[0].command
+              target: element2,
+            })[0].command,
           ).toBe('test-2');
           expect(
             atom.keymaps.findKeyBindings({
               keystrokes: 'ctrl-z',
-              target: element3
-            })
+              target: element3,
+            }),
           ).toHaveLength(0);
         });
       });
@@ -1147,28 +1146,28 @@ describe('PackageManager', () => {
           expect(
             atom.keymaps.findKeyBindings({
               keystrokes: 'ctrl-z',
-              target: element1
-            })
+              target: element1,
+            }),
           ).toHaveLength(0);
 
           await atom.packages.activatePackage('package-with-keymaps-manifest');
           expect(
             atom.keymaps.findKeyBindings({
               keystrokes: 'ctrl-z',
-              target: element1
-            })[0].command
+              target: element1,
+            })[0].command,
           ).toBe('keymap-1');
           expect(
             atom.keymaps.findKeyBindings({
               keystrokes: 'ctrl-n',
-              target: element1
-            })[0].command
+              target: element1,
+            })[0].command,
           ).toBe('keymap-2');
           expect(
             atom.keymaps.findKeyBindings({
               keystrokes: 'ctrl-y',
-              target: element3
-            })
+              target: element3,
+            }),
           ).toHaveLength(0);
         });
       });
@@ -1177,7 +1176,7 @@ describe('PackageManager', () => {
         it('does not throw an error on activation', async () => {
           await atom.packages.activatePackage('package-with-empty-keymap');
           expect(
-            atom.packages.isPackageActive('package-with-empty-keymap')
+            atom.packages.isPackageActive('package-with-empty-keymap'),
           ).toBe(true);
         });
       });
@@ -1188,19 +1187,19 @@ describe('PackageManager', () => {
           expect(
             atom.keymaps.findKeyBindings({
               keystrokes: 'ctrl-z',
-              target: element1
-            })
+              target: element1,
+            }),
           ).toHaveLength(0);
 
           atom.config.set('core.packagesWithKeymapsDisabled', [
-            'package-with-keymaps-manifest'
+            'package-with-keymaps-manifest',
           ]);
           await atom.packages.activatePackage('package-with-keymaps-manifest');
           expect(
             atom.keymaps.findKeyBindings({
               keystrokes: 'ctrl-z',
-              target: element1
-            })
+              target: element1,
+            }),
           ).toHaveLength(0);
         });
       });
@@ -1211,11 +1210,11 @@ describe('PackageManager', () => {
 
           expect(() =>
             atom.config.set('core.packagesWithKeymapsDisabled', [
-              'package-does-not-exist'
-            ])
+              'package-does-not-exist',
+            ]),
           ).not.toThrow();
           expect(() =>
-            atom.config.set('core.packagesWithKeymapsDisabled', [])
+            atom.config.set('core.packagesWithKeymapsDisabled', []),
           ).not.toThrow();
         });
       });
@@ -1228,21 +1227,21 @@ describe('PackageManager', () => {
           await atom.packages.activatePackage('package-with-keymaps-manifest');
 
           atom.config.set('core.packagesWithKeymapsDisabled', [
-            'package-with-keymaps-manifest'
+            'package-with-keymaps-manifest',
           ]);
           expect(
             atom.keymaps.findKeyBindings({
               keystrokes: 'ctrl-z',
-              target: element1
-            })
+              target: element1,
+            }),
           ).toHaveLength(0);
 
           atom.config.set('core.packagesWithKeymapsDisabled', []);
           expect(
             atom.keymaps.findKeyBindings({
               keystrokes: 'ctrl-z',
-              target: element1
-            })[0].command
+              target: element1,
+            })[0].command,
           ).toBe('keymap-1');
         });
       });
@@ -1258,8 +1257,8 @@ describe('PackageManager', () => {
           jasmine.attachToDOM(element);
 
           events = [];
-          element.addEventListener('user-command', e => events.push(e));
-          element.addEventListener('test-1', e => events.push(e));
+          element.addEventListener('user-command', (e) => events.push(e));
+          element.addEventListener('test-1', (e) => events.push(e));
         });
 
         afterEach(() => {
@@ -1275,13 +1274,13 @@ describe('PackageManager', () => {
         it("doesn't override user-defined keymaps", async () => {
           fs.writeFileSync(
             userKeymapPath,
-            `".test-1": {"ctrl-z": "user-command"}`
+            `".test-1": {"ctrl-z": "user-command"}`,
           );
           atom.keymaps.loadUserKeymap();
 
           await atom.packages.activatePackage('package-with-keymaps');
           atom.keymaps.handleKeyboardEvent(
-            buildKeydownEvent('z', { ctrl: true, target: element })
+            buildKeydownEvent('z', { ctrl: true, target: element }),
           );
           expect(events.length).toBe(1);
           expect(events[0].type).toBe('user-command');
@@ -1289,7 +1288,7 @@ describe('PackageManager', () => {
           await atom.packages.deactivatePackage('package-with-keymaps');
           await atom.packages.activatePackage('package-with-keymaps');
           atom.keymaps.handleKeyboardEvent(
-            buildKeydownEvent('z', { ctrl: true, target: element })
+            buildKeydownEvent('z', { ctrl: true, target: element }),
           );
           expect(events.length).toBe(2);
           expect(events[1].type).toBe('user-command');
@@ -1313,13 +1312,13 @@ describe('PackageManager', () => {
           expect(atom.menu.template[0].label).toBe('Second to Last');
           expect(atom.menu.template[1].label).toBe('Last');
           expect(atom.contextMenu.templateForElement(element)[0].label).toBe(
-            'Menu item 1'
+            'Menu item 1',
           );
           expect(atom.contextMenu.templateForElement(element)[1].label).toBe(
-            'Menu item 2'
+            'Menu item 2',
           );
           expect(atom.contextMenu.templateForElement(element)[2].label).toBe(
-            'Menu item 3'
+            'Menu item 3',
           );
         });
       });
@@ -1333,13 +1332,13 @@ describe('PackageManager', () => {
           expect(atom.menu.template[0].label).toBe('Second to Last');
           expect(atom.menu.template[1].label).toBe('Last');
           expect(atom.contextMenu.templateForElement(element)[0].label).toBe(
-            'Menu item 2'
+            'Menu item 2',
           );
           expect(atom.contextMenu.templateForElement(element)[1].label).toBe(
-            'Menu item 1'
+            'Menu item 1',
           );
           expect(
-            atom.contextMenu.templateForElement(element)[2]
+            atom.contextMenu.templateForElement(element)[2],
           ).toBeUndefined();
         });
       });
@@ -1348,7 +1347,7 @@ describe('PackageManager', () => {
         it('does not throw an error on activation', async () => {
           await atom.packages.activatePackage('package-with-empty-menu');
           expect(atom.packages.isPackageActive('package-with-empty-menu')).toBe(
-            true
+            true,
           );
         });
       });
@@ -1357,47 +1356,40 @@ describe('PackageManager', () => {
     describe('stylesheet loading', () => {
       describe("when the metadata contains a 'styleSheets' manifest", () => {
         it('loads style sheets from the styles directory as specified by the manifest', async () => {
-          const one = require.resolve(
-            './fixtures/packages/package-with-style-sheets-manifest/styles/1.css'
-          );
-          const two = require.resolve(
-            './fixtures/packages/package-with-style-sheets-manifest/styles/2.less'
-          );
-          const three = require.resolve(
-            './fixtures/packages/package-with-style-sheets-manifest/styles/3.css'
-          );
+          const one =
+            require.resolve('./fixtures/packages/package-with-style-sheets-manifest/styles/1.css');
+          const two =
+            require.resolve('./fixtures/packages/package-with-style-sheets-manifest/styles/2.less');
+          const three =
+            require.resolve('./fixtures/packages/package-with-style-sheets-manifest/styles/3.css');
 
           expect(atom.themes.stylesheetElementForId(one)).toBeNull();
           expect(atom.themes.stylesheetElementForId(two)).toBeNull();
           expect(atom.themes.stylesheetElementForId(three)).toBeNull();
 
           await atom.packages.activatePackage(
-            'package-with-style-sheets-manifest'
+            'package-with-style-sheets-manifest',
           );
           expect(atom.themes.stylesheetElementForId(one)).not.toBeNull();
           expect(atom.themes.stylesheetElementForId(two)).not.toBeNull();
           expect(atom.themes.stylesheetElementForId(three)).toBeNull();
           expect(
             getComputedStyle(document.querySelector('#jasmine-content'))
-              .fontSize
+              .fontSize,
           ).toBe('1px');
         });
       });
 
       describe("when the metadata does not contain a 'styleSheets' manifest", () => {
         it('loads all style sheets from the styles directory', async () => {
-          const one = require.resolve(
-            './fixtures/packages/package-with-styles/styles/1.css'
-          );
-          const two = require.resolve(
-            './fixtures/packages/package-with-styles/styles/2.less'
-          );
-          const three = require.resolve(
-            './fixtures/packages/package-with-styles/styles/3.test-context.css'
-          );
-          const four = require.resolve(
-            './fixtures/packages/package-with-styles/styles/4.css'
-          );
+          const one =
+            require.resolve('./fixtures/packages/package-with-styles/styles/1.css');
+          const two =
+            require.resolve('./fixtures/packages/package-with-styles/styles/2.less');
+          const three =
+            require.resolve('./fixtures/packages/package-with-styles/styles/3.test-context.css');
+          const four =
+            require.resolve('./fixtures/packages/package-with-styles/styles/4.css');
 
           expect(atom.themes.stylesheetElementForId(one)).toBeNull();
           expect(atom.themes.stylesheetElementForId(two)).toBeNull();
@@ -1411,7 +1403,7 @@ describe('PackageManager', () => {
           expect(atom.themes.stylesheetElementForId(four)).not.toBeNull();
           expect(
             getComputedStyle(document.querySelector('#jasmine-content'))
-              .fontSize
+              .fontSize,
           ).toBe('3px');
         });
       });
@@ -1420,7 +1412,7 @@ describe('PackageManager', () => {
         await atom.packages.activatePackage('package-with-styles');
 
         let count = 0;
-        for (let styleElement of atom.styles.getStyleElements()) {
+        for (const styleElement of atom.styles.getStyleElements()) {
           if (styleElement.sourcePath.match(/1.css/)) {
             expect(styleElement.context).toBe(undefined);
             count++;
@@ -1467,8 +1459,8 @@ describe('PackageManager', () => {
         await atom.packages.activatePackage('package-with-settings');
         expect(
           atom.config.get('editor.increaseIndentPattern', {
-            scope: ['.source.omg']
-          })
+            scope: ['.source.omg'],
+          }),
         ).toBe('^a');
       });
     });
@@ -1480,7 +1472,7 @@ describe('PackageManager', () => {
         spyOn(mod, 'handleURI');
         spyOn(atom.packages, 'hasLoadedInitialPackages').andReturn(true);
         const activationPromise = atom.packages.activatePackage(
-          'package-with-uri-handler'
+          'package-with-uri-handler',
         );
         atom.dispatchURIMessage(uri);
         await activationPromise;
@@ -1498,30 +1490,30 @@ describe('PackageManager', () => {
         spyOn(consumerModule, 'consumeFirstServiceV3').andReturn(
           new Disposable(() => {
             firstServiceV3Disposed = true;
-          })
+          }),
         );
         spyOn(consumerModule, 'consumeFirstServiceV4').andReturn(
           new Disposable(() => {
             firstServiceV4Disposed = true;
-          })
+          }),
         );
         spyOn(consumerModule, 'consumeSecondService').andReturn(
           new Disposable(() => {
             secondServiceDisposed = true;
-          })
+          }),
         );
 
         await atom.packages.activatePackage('package-with-consumed-services');
         await atom.packages.activatePackage('package-with-provided-services');
         expect(consumerModule.consumeFirstServiceV3.callCount).toBe(1);
         expect(consumerModule.consumeFirstServiceV3).toHaveBeenCalledWith(
-          'first-service-v3'
+          'first-service-v3',
         );
         expect(consumerModule.consumeFirstServiceV4).toHaveBeenCalledWith(
-          'first-service-v4'
+          'first-service-v4',
         );
         expect(consumerModule.consumeSecondService).toHaveBeenCalledWith(
-          'second-service'
+          'second-service',
         );
 
         consumerModule.consumeFirstServiceV3.reset();
@@ -1545,20 +1537,20 @@ describe('PackageManager', () => {
         atom.notifications.onDidAddNotification(addErrorHandler);
 
         await atom.packages.activatePackage(
-          'package-with-missing-consumed-services'
+          'package-with-missing-consumed-services',
         );
         await atom.packages.activatePackage(
-          'package-with-missing-provided-services'
+          'package-with-missing-provided-services',
         );
         expect(
           atom.packages.isPackageActive(
-            'package-with-missing-consumed-services'
-          )
+            'package-with-missing-consumed-services',
+          ),
         ).toBe(true);
         expect(
           atom.packages.isPackageActive(
-            'package-with-missing-provided-services'
-          )
+            'package-with-missing-provided-services',
+          ),
         ).toBe(true);
         expect(addErrorHandler.callCount).toBe(0);
       });
@@ -1571,7 +1563,7 @@ describe('PackageManager', () => {
       spyOn(console, 'warn');
 
       const badPack = await atom.packages.activatePackage(
-        'package-that-throws-on-activate'
+        'package-that-throws-on-activate',
       );
       spyOn(badPack.mainModule, 'serialize').andCallThrough();
 
@@ -1586,10 +1578,10 @@ describe('PackageManager', () => {
       await atom.packages.activatePackage('package-with-serialization');
       atom.packages.serialize();
       expect(
-        atom.packages.packageStates['package-with-serialize-error']
+        atom.packages.packageStates['package-with-serialize-error'],
       ).toBeUndefined();
       expect(atom.packages.packageStates['package-with-serialization']).toEqual(
-        { someNumber: 1 }
+        { someNumber: 1 },
       );
       expect(console.error).toHaveBeenCalled();
     });
@@ -1598,10 +1590,10 @@ describe('PackageManager', () => {
   describe('::deactivatePackages()', () => {
     it('deactivates all packages but does not serialize them', async () => {
       const pack1 = await atom.packages.activatePackage(
-        'package-with-deactivate'
+        'package-with-deactivate',
       );
       const pack2 = await atom.packages.activatePackage(
-        'package-with-serialization'
+        'package-with-serialization',
       );
 
       spyOn(pack1.mainModule, 'deactivate');
@@ -1619,10 +1611,10 @@ describe('PackageManager', () => {
       spyOn(atom, 'inSpecMode').andReturn(false);
 
       const pack = await atom.packages.activatePackage(
-        'package-with-deactivate'
+        'package-with-deactivate',
       );
       expect(
-        atom.packages.isPackageActive('package-with-deactivate')
+        atom.packages.isPackageActive('package-with-deactivate'),
       ).toBeTruthy();
       spyOn(pack.mainModule, 'deactivate').andCallThrough();
 
@@ -1632,17 +1624,17 @@ describe('PackageManager', () => {
 
       spyOn(console, 'warn');
       const badPack = await atom.packages.activatePackage(
-        'package-that-throws-on-activate'
+        'package-that-throws-on-activate',
       );
       expect(
-        atom.packages.isPackageActive('package-that-throws-on-activate')
+        atom.packages.isPackageActive('package-that-throws-on-activate'),
       ).toBeTruthy();
       spyOn(badPack.mainModule, 'deactivate').andCallThrough();
 
       await atom.packages.deactivatePackage('package-that-throws-on-activate');
       expect(badPack.mainModule.deactivate).not.toHaveBeenCalled();
       expect(
-        atom.packages.isPackageActive('package-that-throws-on-activate')
+        atom.packages.isPackageActive('package-that-throws-on-activate'),
       ).toBeFalsy();
     });
 
@@ -1650,7 +1642,7 @@ describe('PackageManager', () => {
       spyOn(console, 'error');
       await atom.packages.activatePackage('package-that-throws-on-deactivate');
       await atom.packages.deactivatePackage(
-        'package-that-throws-on-deactivate'
+        'package-that-throws-on-deactivate',
       );
       expect(console.error).toHaveBeenCalled();
     });
@@ -1660,7 +1652,7 @@ describe('PackageManager', () => {
       await atom.packages.deactivatePackage('package-with-grammars');
       expect(atom.grammars.selectGrammar('a.alot').name).toBe('Null Grammar');
       expect(atom.grammars.selectGrammar('a.alittle').name).toBe(
-        'Null Grammar'
+        'Null Grammar',
       );
     });
 
@@ -1670,14 +1662,14 @@ describe('PackageManager', () => {
       expect(
         atom.keymaps.findKeyBindings({
           keystrokes: 'ctrl-z',
-          target: createTestElement('test-1')
-        })
+          target: createTestElement('test-1'),
+        }),
       ).toHaveLength(0);
       expect(
         atom.keymaps.findKeyBindings({
           keystrokes: 'ctrl-z',
-          target: createTestElement('test-2')
-        })
+          target: createTestElement('test-2'),
+        }),
       ).toHaveLength(0);
     });
 
@@ -1685,15 +1677,12 @@ describe('PackageManager', () => {
       await atom.packages.activatePackage('package-with-styles');
       await atom.packages.deactivatePackage('package-with-styles');
 
-      const one = require.resolve(
-        './fixtures/packages/package-with-style-sheets-manifest/styles/1.css'
-      );
-      const two = require.resolve(
-        './fixtures/packages/package-with-style-sheets-manifest/styles/2.less'
-      );
-      const three = require.resolve(
-        './fixtures/packages/package-with-style-sheets-manifest/styles/3.css'
-      );
+      const one =
+        require.resolve('./fixtures/packages/package-with-style-sheets-manifest/styles/1.css');
+      const two =
+        require.resolve('./fixtures/packages/package-with-style-sheets-manifest/styles/2.less');
+      const three =
+        require.resolve('./fixtures/packages/package-with-style-sheets-manifest/styles/3.css');
       expect(atom.themes.stylesheetElementForId(one)).not.toExist();
       expect(atom.themes.stylesheetElementForId(two)).not.toExist();
       expect(atom.themes.stylesheetElementForId(three)).not.toExist();
@@ -1703,15 +1692,15 @@ describe('PackageManager', () => {
       await atom.packages.activatePackage('package-with-settings');
       expect(
         atom.config.get('editor.increaseIndentPattern', {
-          scope: ['.source.omg']
-        })
+          scope: ['.source.omg'],
+        }),
       ).toBe('^a');
 
       await atom.packages.deactivatePackage('package-with-settings');
       expect(
         atom.config.get('editor.increaseIndentPattern', {
-          scope: ['.source.omg']
-        })
+          scope: ['.source.omg'],
+        }),
       ).toBeUndefined();
     });
 
@@ -1719,7 +1708,7 @@ describe('PackageManager', () => {
       await atom.packages.activatePackage('package-with-main');
 
       let deactivatedPackage;
-      atom.packages.onDidDeactivatePackage(pack => {
+      atom.packages.onDidDeactivatePackage((pack) => {
         deactivatedPackage = pack;
       });
 
@@ -1764,30 +1753,30 @@ describe('PackageManager', () => {
       expect(themeActivator).toHaveBeenCalled();
 
       const packages = packageActivator.mostRecentCall.args[0];
-      for (let pack of packages) {
+      for (const pack of packages) {
         expect(['atom', 'textmate']).toContain(pack.getType());
       }
 
       const themes = themeActivator.mostRecentCall.args[0];
-      themes.map(theme => expect(['theme']).toContain(theme.getType()));
+      themes.map((theme) => expect(['theme']).toContain(theme.getType()));
     });
 
     it('calls callbacks registered with ::onDidActivateInitialPackages', async () => {
       const package1 = atom.packages.loadPackage('package-with-main');
       const package2 = atom.packages.loadPackage('package-with-index');
       const package3 = atom.packages.loadPackage(
-        'package-with-activation-commands'
+        'package-with-activation-commands',
       );
       spyOn(atom.packages, 'getLoadedPackages').andReturn([
         package1,
         package2,
-        package3
+        package3,
       ]);
       spyOn(atom.themes, 'activatePackages');
 
       atom.packages.activate();
-      await new Promise(resolve =>
-        atom.packages.onDidActivateInitialPackages(resolve)
+      await new Promise((resolve) =>
+        atom.packages.onDidActivateInitialPackages(resolve),
       );
 
       jasmine.unspy(atom.packages, 'getLoadedPackages');
@@ -1806,14 +1795,14 @@ describe('PackageManager', () => {
         expect(atom.config.get('core.disabledPackages')).toContain(packageName);
 
         const pack = atom.packages.enablePackage(packageName);
-        await new Promise(resolve =>
-          atom.packages.onDidActivatePackage(resolve)
+        await new Promise((resolve) =>
+          atom.packages.onDidActivatePackage(resolve),
         );
 
         expect(atom.packages.getLoadedPackages()).toContain(pack);
         expect(atom.packages.getActivePackages()).toContain(pack);
         expect(atom.config.get('core.disabledPackages')).not.toContain(
-          packageName
+          packageName,
         );
       });
 
@@ -1823,9 +1812,9 @@ describe('PackageManager', () => {
 
         atom.packages.observeDisabledPackages();
         expect(atom.config.get('core.disabledPackages')).not.toContain(
-          packageName
+          packageName,
         );
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           atom.packages.onDidDeactivatePackage(resolve);
           atom.packages.disablePackage(packageName);
         });
@@ -1849,7 +1838,7 @@ describe('PackageManager', () => {
         atom.packages.disablePackage(packageName);
         const packagesDisabled = atom.config
           .get('core.disabledPackages')
-          .filter(pack => pack === packageName);
+          .filter((pack) => pack === packageName);
         expect(packagesDisabled.length).toEqual(1);
       });
     });
@@ -1862,21 +1851,21 @@ describe('PackageManager', () => {
         const packageName = 'theme-with-package-file';
         expect(atom.config.get('core.themes')).not.toContain(packageName);
         expect(atom.config.get('core.disabledPackages')).not.toContain(
-          packageName
+          packageName,
         );
 
         // enabling of theme
         const pack = atom.packages.enablePackage(packageName);
-        await new Promise(resolve =>
-          atom.packages.onDidActivatePackage(resolve)
+        await new Promise((resolve) =>
+          atom.packages.onDidActivatePackage(resolve),
         );
         expect(atom.packages.isPackageActive(packageName)).toBe(true);
         expect(atom.config.get('core.themes')).toContain(packageName);
         expect(atom.config.get('core.disabledPackages')).not.toContain(
-          packageName
+          packageName,
         );
 
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           atom.themes.onDidChangeActiveThemes(resolve);
           atom.packages.disablePackage(packageName);
         });
@@ -1885,7 +1874,7 @@ describe('PackageManager', () => {
         expect(atom.config.get('core.themes')).not.toContain(packageName);
         expect(atom.config.get('core.themes')).not.toContain(packageName);
         expect(atom.config.get('core.disabledPackages')).not.toContain(
-          packageName
+          packageName,
         );
       });
     });
@@ -1898,11 +1887,11 @@ describe('PackageManager', () => {
         'fixtures',
         'packages',
         'folder',
-        'package-symlinked'
+        'package-symlinked',
       );
       const destination = path.join(
         atom.packages.getPackageDirPaths()[0],
-        'package-symlinked'
+        'package-symlinked',
       );
       if (!fs.isDirectorySync(destination)) {
         fs.symlinkSync(packageSymLinkedSource, destination, 'junction');

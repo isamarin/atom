@@ -13,14 +13,12 @@ module.exports = class WindowEventHandler {
     this.handleEnterFullScreen = this.handleEnterFullScreen.bind(this);
     this.handleLeaveFullScreen = this.handleLeaveFullScreen.bind(this);
     this.handleWindowBeforeunload = this.handleWindowBeforeunload.bind(this);
-    this.handleWindowToggleFullScreen = this.handleWindowToggleFullScreen.bind(
-      this
-    );
+    this.handleWindowToggleFullScreen =
+      this.handleWindowToggleFullScreen.bind(this);
     this.handleWindowClose = this.handleWindowClose.bind(this);
     this.handleWindowReload = this.handleWindowReload.bind(this);
-    this.handleWindowToggleDevTools = this.handleWindowToggleDevTools.bind(
-      this
-    );
+    this.handleWindowToggleDevTools =
+      this.handleWindowToggleDevTools.bind(this);
     this.handleWindowToggleMenuBar = this.handleWindowToggleMenuBar.bind(this);
     this.handleLinkClick = this.handleLinkClick.bind(this);
     this.handleDocumentContextmenu = this.handleDocumentContextmenu.bind(this);
@@ -40,67 +38,67 @@ module.exports = class WindowEventHandler {
         'window:toggle-full-screen': this.handleWindowToggleFullScreen,
         'window:close': this.handleWindowClose,
         'window:reload': this.handleWindowReload,
-        'window:toggle-dev-tools': this.handleWindowToggleDevTools
-      })
+        'window:toggle-dev-tools': this.handleWindowToggleDevTools,
+      }),
     );
 
     if (['win32', 'linux'].includes(process.platform)) {
       this.subscriptions.add(
         this.atomEnvironment.commands.add(this.window, {
-          'window:toggle-menu-bar': this.handleWindowToggleMenuBar
-        })
+          'window:toggle-menu-bar': this.handleWindowToggleMenuBar,
+        }),
       );
     }
 
     this.subscriptions.add(
       this.atomEnvironment.commands.add(this.document, {
         'core:focus-next': this.handleFocusNext,
-        'core:focus-previous': this.handleFocusPrevious
-      })
+        'core:focus-previous': this.handleFocusPrevious,
+      }),
     );
 
     this.addEventListener(
       this.window,
       'beforeunload',
-      this.handleWindowBeforeunload
+      this.handleWindowBeforeunload,
     );
     this.addEventListener(this.window, 'focus', this.handleWindowFocus);
     this.addEventListener(this.window, 'blur', this.handleWindowBlur);
     this.addEventListener(
       this.window,
       'resize',
-      debounce(this.handleWindowResize, 500)
+      debounce(this.handleWindowResize, 500),
     );
 
     this.addEventListener(this.document, 'keyup', this.handleDocumentKeyEvent);
     this.addEventListener(
       this.document,
       'keydown',
-      this.handleDocumentKeyEvent
+      this.handleDocumentKeyEvent,
     );
     this.addEventListener(this.document, 'drop', this.handleDocumentDrop);
     this.addEventListener(
       this.document,
       'dragover',
-      this.handleDocumentDragover
+      this.handleDocumentDragover,
     );
     this.addEventListener(
       this.document,
       'contextmenu',
-      this.handleDocumentContextmenu
+      this.handleDocumentContextmenu,
     );
     this.subscriptions.add(
-      listen(this.document, 'click', 'a', this.handleLinkClick)
+      listen(this.document, 'click', 'a', this.handleLinkClick),
     );
     this.subscriptions.add(
-      listen(this.document, 'submit', 'form', this.handleFormSubmit)
+      listen(this.document, 'submit', 'form', this.handleFormSubmit),
     );
 
     this.subscriptions.add(
-      this.applicationDelegate.onDidEnterFullScreen(this.handleEnterFullScreen)
+      this.applicationDelegate.onDidEnterFullScreen(this.handleEnterFullScreen),
     );
     this.subscriptions.add(
-      this.applicationDelegate.onDidLeaveFullScreen(this.handleLeaveFullScreen)
+      this.applicationDelegate.onDidLeaveFullScreen(this.handleLeaveFullScreen),
     );
   }
 
@@ -112,10 +110,10 @@ module.exports = class WindowEventHandler {
         this.atomEnvironment.commands.add(
           '.native-key-bindings',
           command,
-          event =>
+          (event) =>
             this.applicationDelegate.getCurrentWindow().webContents[action](),
-          false
-        )
+          false,
+        ),
       );
     };
 
@@ -134,18 +132,18 @@ module.exports = class WindowEventHandler {
   on(target, eventName, handler) {
     target.on(eventName, handler);
     this.subscriptions.add(
-      new Disposable(function() {
+      new Disposable(function () {
         target.removeListener(eventName, handler);
-      })
+      }),
     );
   }
 
   addEventListener(target, eventName, handler) {
     target.addEventListener(eventName, handler);
     this.subscriptions.add(
-      new Disposable(function() {
+      new Disposable(function () {
         target.removeEventListener(eventName, handler);
-      })
+      }),
     );
   }
 
@@ -166,7 +164,7 @@ module.exports = class WindowEventHandler {
   }
 
   eachTabIndexedElement(callback) {
-    for (let element of this.document.querySelectorAll('[tabindex]')) {
+    for (const element of this.document.querySelectorAll('[tabindex]')) {
       if (element.disabled) {
         continue;
       }
@@ -187,7 +185,7 @@ module.exports = class WindowEventHandler {
     let nextTabIndex = Infinity;
     let lowestElement = null;
     let lowestTabIndex = Infinity;
-    this.eachTabIndexedElement(function(element, tabIndex) {
+    this.eachTabIndexedElement(function (element, tabIndex) {
       if (tabIndex < lowestTabIndex) {
         lowestTabIndex = tabIndex;
         lowestElement = element;
@@ -216,7 +214,7 @@ module.exports = class WindowEventHandler {
     let previousTabIndex = -Infinity;
     let highestElement = null;
     let highestTabIndex = -Infinity;
-    this.eachTabIndexedElement(function(element, tabIndex) {
+    this.eachTabIndexedElement(function (element, tabIndex) {
       if (tabIndex > highestTabIndex) {
         highestTabIndex = tabIndex;
         highestElement = element;
@@ -290,7 +288,7 @@ module.exports = class WindowEventHandler {
   handleWindowToggleMenuBar() {
     this.atomEnvironment.config.set(
       'core.autoHideMenuBar',
-      !this.atomEnvironment.config.get('core.autoHideMenuBar')
+      !this.atomEnvironment.config.get('core.autoHideMenuBar'),
     );
 
     if (this.atomEnvironment.config.get('core.autoHideMenuBar')) {

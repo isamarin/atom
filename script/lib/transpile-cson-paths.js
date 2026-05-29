@@ -7,16 +7,18 @@ const path = require('path');
 
 const CONFIG = require('../config');
 
-module.exports = function() {
+module.exports = function () {
   console.log(`Transpiling CSON paths in ${CONFIG.intermediateAppPath}`);
-  for (let path of getPathsToTranspile()) {
+  for (const path of getPathsToTranspile()) {
     transpileCsonPath(path);
   }
 };
 
 function getPathsToTranspile() {
   let paths = [];
-  for (let packageName of Object.keys(CONFIG.appMetadata.packageDependencies)) {
+  for (const packageName of Object.keys(
+    CONFIG.appMetadata.packageDependencies,
+  )) {
     paths = paths.concat(
       glob.sync(
         path.join(
@@ -24,7 +26,7 @@ function getPathsToTranspile() {
           'node_modules',
           packageName,
           '**',
-          '*.cson'
+          '*.cson',
         ),
         {
           ignore: path.join(
@@ -33,11 +35,11 @@ function getPathsToTranspile() {
             packageName,
             'spec',
             '**',
-            '*.cson'
+            '*.cson',
           ),
-          nodir: true
-        }
-      )
+          nodir: true,
+        },
+      ),
     );
   }
   return paths;
@@ -48,8 +50,8 @@ function transpileCsonPath(csonPath) {
   fs.writeFileSync(
     jsonPath,
     JSON.stringify(
-      CompileCache.addPathToCache(csonPath, CONFIG.atomHomeDirPath)
-    )
+      CompileCache.addPathToCache(csonPath, CONFIG.atomHomeDirPath),
+    ),
   );
   fs.unlinkSync(csonPath);
 }

@@ -19,9 +19,9 @@ describe('Smoke Test', () => {
         welcome: { showOnStartup: false },
         core: {
           telemetryConsent: 'no',
-          disabledPackages: ['github']
-        }
-      }
+          disabledPackages: ['github'],
+        },
+      },
     });
   });
 
@@ -31,11 +31,14 @@ describe('Smoke Test', () => {
 
     fs.writeFileSync(filePath, '', { encoding: 'utf8' });
 
-    runAtom([tempDirPath], { ATOM_HOME: atomHome }, async client => {
+    runAtom([tempDirPath], { ATOM_HOME: atomHome }, async (client) => {
       const roots = await client.treeViewRootDirectories();
       expect(roots).toEqual([tempDirPath]);
 
-      await client.execute(filePath => atom.workspace.open(filePath), filePath);
+      await client.execute(
+        (filePath) => atom.workspace.open(filePath),
+        filePath,
+      );
 
       const textEditorElement = await client.$('atom-text-editor');
       await textEditorElement.waitForExist(5000);
@@ -45,14 +48,14 @@ describe('Smoke Test', () => {
       await textEditorElement.click();
 
       const closestElement = await client.execute(() =>
-        document.activeElement.closest('atom-text-editor')
+        document.activeElement.closest('atom-text-editor'),
       );
       expect(closestElement).not.toBeNull();
 
       await client.keys('Hello!');
 
       const text = await client.execute(() =>
-        atom.workspace.getActiveTextEditor().getText()
+        atom.workspace.getActiveTextEditor().getText(),
       );
       expect(text).toBe('Hello!');
 

@@ -7,7 +7,7 @@ const path = require('path');
 
 const CONFIG = require('../config');
 
-module.exports = packagedAppPath => {
+module.exports = (packagedAppPath) => {
   const archSuffix = process.arch === 'ia32' ? '' : '-' + process.arch;
   const updateUrlPrefix =
     process.env.ATOM_UPDATE_URL_PREFIX || 'https://atom.io';
@@ -24,7 +24,7 @@ module.exports = packagedAppPath => {
       CONFIG.repositoryRootPath,
       'resources',
       'win',
-      'loading.gif'
+      'loading.gif',
     ),
     outputDirectory: CONFIG.buildOutputPath,
     noMsi: true,
@@ -37,8 +37,8 @@ module.exports = packagedAppPath => {
       'resources',
       'app-icons',
       CONFIG.channel,
-      'atom.ico'
-    )
+      'atom.ico',
+    ),
   };
 
   const cleanUp = () => {
@@ -47,14 +47,14 @@ module.exports = packagedAppPath => {
       fs.renameSync(releasesPath, `${releasesPath}-x64`);
     }
 
-    let appName =
+    const appName =
       CONFIG.channel === 'stable' ? 'atom' : `atom-${CONFIG.channel}`;
-    for (let nupkgPath of glob.sync(
-      `${CONFIG.buildOutputPath}/${appName}-*.nupkg`
+    for (const nupkgPath of glob.sync(
+      `${CONFIG.buildOutputPath}/${appName}-*.nupkg`,
     )) {
       if (!nupkgPath.includes(CONFIG.computedAppVersion)) {
         console.log(
-          `Deleting downloaded nupkg for previous version at ${nupkgPath} to prevent it from being stored as an artifact`
+          `Deleting downloaded nupkg for previous version at ${nupkgPath} to prevent it from being stored as an artifact`,
         );
         fs.unlinkSync(nupkgPath);
       } else {
@@ -62,7 +62,7 @@ module.exports = packagedAppPath => {
           // Use the original .nupkg filename to generate the `atom-x64` name by inserting `-x64` after `atom`
           const newNupkgPath = nupkgPath.replace(
             `${appName}-`,
-            `${appName}-x64-`
+            `${appName}-x64-`,
           );
           fs.renameSync(nupkgPath, newNupkgPath);
         }
@@ -75,7 +75,7 @@ module.exports = packagedAppPath => {
   console.log(`Creating Windows Installer for ${packagedAppPath}`);
   return electronInstaller
     .createWindowsInstaller(options)
-    .then(cleanUp, error => {
+    .then(cleanUp, (error) => {
       cleanUp();
       return Promise.reject(error);
     });

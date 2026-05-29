@@ -10,14 +10,14 @@ module.exports = class WorkspaceCenter {
     this.paneContainer = new PaneContainer(params);
     this.didActivate = params.didActivate;
     this.paneContainer.onDidActivatePane(() => this.didActivate(this));
-    this.paneContainer.onDidChangeActivePane(pane => {
+    this.paneContainer.onDidChangeActivePane((pane) => {
       params.didChangeActivePane(this, pane);
     });
-    this.paneContainer.onDidChangeActivePaneItem(item => {
+    this.paneContainer.onDidChangeActivePaneItem((item) => {
       params.didChangeActivePaneItem(this, item);
     });
-    this.paneContainer.onDidDestroyPaneItem(item =>
-      params.didDestroyPaneItem(item)
+    this.paneContainer.onDidDestroyPaneItem((item) =>
+      params.didDestroyPaneItem(item),
     );
   }
 
@@ -58,7 +58,7 @@ module.exports = class WorkspaceCenter {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   observeTextEditors(callback) {
-    for (let textEditor of this.getTextEditors()) {
+    for (const textEditor of this.getTextEditors()) {
       callback(textEditor);
     }
     return this.onDidAddTextEditor(({ textEditor }) => callback(textEditor));
@@ -274,7 +274,7 @@ module.exports = class WorkspaceCenter {
   //
   // Returns an {Array} of {TextEditor}s.
   getTextEditors() {
-    return this.getPaneItems().filter(item => item instanceof TextEditor);
+    return this.getPaneItems().filter((item) => item instanceof TextEditor);
   }
 
   // Essential: Get the active item if it is an {TextEditor}.

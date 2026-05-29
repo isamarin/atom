@@ -5,7 +5,7 @@ const MAX_SIZE_IN_KB = 10 * 1024;
 const SIZE_STEP_IN_KB = 1024;
 const LINE_TEXT = 'Lorem ipsum dolor sit amet\n';
 const TEXT = LINE_TEXT.repeat(
-  Math.ceil((MAX_SIZE_IN_KB * 1024) / LINE_TEXT.length)
+  Math.ceil((MAX_SIZE_IN_KB * 1024) / LINE_TEXT.length),
 );
 
 module.exports = async ({ test }) => {
@@ -16,7 +16,7 @@ module.exports = async ({ test }) => {
   atom.packages.loadPackages();
   await atom.packages.activate();
 
-  for (let pane of atom.workspace.getPanes()) {
+  for (const pane of atom.workspace.getPanes()) {
     pane.destroy();
   }
 
@@ -33,7 +33,7 @@ module.exports = async ({ test }) => {
     const editor = new TextEditor({
       buffer,
       autoHeight: false,
-      largeFileMode: true
+      largeFileMode: true,
     });
     atom.grammars.autoAssignLanguageMode(buffer);
     atom.workspace.getActivePane().activateItem(editor);
@@ -42,7 +42,7 @@ module.exports = async ({ test }) => {
     data.push({
       name: 'Opening a large file',
       x: sizeInKB,
-      duration: t1 - t0
+      duration: t1 - t0,
     });
 
     const tickDurations = [];
@@ -57,22 +57,22 @@ module.exports = async ({ test }) => {
     data.push({
       name: 'Max time event loop was blocked after opening a large file',
       x: sizeInKB,
-      duration: Math.max(...tickDurations)
+      duration: Math.max(...tickDurations),
     });
 
     t0 = window.performance.now();
     editor.setCursorScreenPosition(
       editor.element.screenPositionForPixelPosition({
         top: 100,
-        left: 30
-      })
+        left: 30,
+      }),
     );
     t1 = window.performance.now();
 
     data.push({
       name: 'Clicking the editor after opening a large file',
       x: sizeInKB,
-      duration: t1 - t0
+      duration: t1 - t0,
     });
 
     t0 = window.performance.now();
@@ -82,7 +82,7 @@ module.exports = async ({ test }) => {
     data.push({
       name: 'Scrolling down after opening a large file',
       x: sizeInKB,
-      duration: t1 - t0
+      duration: t1 - t0,
     });
 
     editor.destroy();
@@ -96,5 +96,5 @@ module.exports = async ({ test }) => {
 };
 
 function timeout(duration) {
-  return new Promise(resolve => setTimeout(resolve, duration));
+  return new Promise((resolve) => setTimeout(resolve, duration));
 }

@@ -23,7 +23,7 @@ class PackageTranspilationRegistry {
       name: packageName,
       meta: packageMeta,
       path: packagePath,
-      specs: config.map(spec => Object.assign({}, spec))
+      specs: config.map((spec) => Object.assign({}, spec)),
     };
   }
 
@@ -32,7 +32,7 @@ class PackageTranspilationRegistry {
     const packagePathWithSep = packagePath.endsWith(path.sep)
       ? path.join(packagePath)
       : path.join(packagePath) + path.sep;
-    Object.keys(this.specByFilePath).forEach(filePath => {
+    Object.keys(this.specByFilePath).forEach((filePath) => {
       if (path.join(filePath).startsWith(packagePathWithSep)) {
         delete this.specByFilePath[filePath];
       }
@@ -59,7 +59,7 @@ class PackageTranspilationRegistry {
           return this.transpileWithPackageTranspiler(
             sourceCode,
             filePath,
-            spec
+            spec,
           );
         }
 
@@ -76,7 +76,7 @@ class PackageTranspilationRegistry {
         }
 
         return transpiler.shouldCompile(sourceCode, filePath);
-      }
+      },
     };
   }
 
@@ -92,7 +92,7 @@ class PackageTranspilationRegistry {
     // only iterates four times, even if there are hundreds of configs registered.
     while (thisPath !== lastPath) {
       // until we reach the root
-      let config = this.configByPackagePath[thisPath];
+      const config = this.configByPackagePath[thisPath];
       if (config) {
         const relativePath = path.relative(thisPath, filePath);
         if (
@@ -126,7 +126,7 @@ class PackageTranspilationRegistry {
     spec._transpilerSource = transpilerSource;
     const transpiler = this.getTranspiler(spec);
 
-    let hash = crypto
+    const hash = crypto
       .createHash('sha1')
       .update(JSON.stringify(spec.options || {}))
       .update(transpilerSource, 'utf8')
@@ -138,7 +138,7 @@ class PackageTranspilationRegistry {
         sourceCode,
         filePath,
         spec.options || {},
-        meta
+        meta,
       );
       hash.update(additionalCacheData, 'utf8');
     }
@@ -146,7 +146,7 @@ class PackageTranspilationRegistry {
     return path.join(
       'package-transpile',
       spec._config.name,
-      hash.digest('hex')
+      hash.digest('hex'),
     );
   }
 
@@ -159,7 +159,7 @@ class PackageTranspilationRegistry {
         sourceCode,
         filePath,
         spec.options || {},
-        meta
+        meta,
       );
       if (result === undefined || (result && result.code === undefined)) {
         return sourceCode;
@@ -168,7 +168,7 @@ class PackageTranspilationRegistry {
       } else {
         throw new Error(
           'Could not find a property `.code` on the transpilation results of ' +
-            filePath
+            filePath,
         );
       }
     } else {
@@ -177,7 +177,7 @@ class PackageTranspilationRegistry {
           spec.transpiler +
           "' from '" +
           spec._config.path +
-          "'"
+          "'",
       );
       throw err;
     }
@@ -187,7 +187,7 @@ class PackageTranspilationRegistry {
     return {
       name: spec._config.name,
       path: spec._config.path,
-      meta: spec._config.meta
+      meta: spec._config.meta,
     };
   }
 
@@ -195,7 +195,7 @@ class PackageTranspilationRegistry {
     Resolve = Resolve || require('resolve');
     return Resolve.sync(spec.transpiler, {
       basedir: spec._config.path,
-      extensions: Object.keys(require.extensions)
+      extensions: Object.keys(require.extensions),
     });
   }
 

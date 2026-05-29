@@ -30,7 +30,7 @@ describe('line ending selector', () => {
 
     beforeEach(() => {
       waitsForPromise(() => {
-        return atom.workspace.open('mixed-endings.md').then(e => {
+        return atom.workspace.open('mixed-endings.md').then((e) => {
           editor = e;
           editorElement = atom.views.getView(editor);
           jasmine.attachToDOM(editorElement);
@@ -43,7 +43,7 @@ describe('line ending selector', () => {
         editorElement.focus();
         atom.commands.dispatch(
           document.activeElement,
-          'line-ending-selector:convert-to-LF'
+          'line-ending-selector:convert-to-LF',
         );
         expect(editor.getText()).toBe('Hello\nGoodbye\nMixed\n');
       });
@@ -54,7 +54,7 @@ describe('line ending selector', () => {
         editorElement.focus();
         atom.commands.dispatch(
           document.activeElement,
-          'line-ending-selector:convert-to-CRLF'
+          'line-ending-selector:convert-to-CRLF',
         );
         expect(editor.getText()).toBe('Hello\r\nGoodbye\r\nMixed\r\n');
       });
@@ -64,16 +64,16 @@ describe('line ending selector', () => {
   describe('Status bar tile', () => {
     describe('when an empty file is opened', () => {
       it('uses the default line endings for the platform', () => {
-        waitsFor(done => {
+        waitsFor((done) => {
           spyOn(helpers, 'getProcessPlatform').andReturn('win32');
 
-          atom.workspace.open('').then(editor => {
+          atom.workspace.open('').then((editor) => {
             const subscription = lineEndingTile.onDidChange(() => {
               subscription.dispose();
               expect(lineEndingTile.element.textContent).toBe('CRLF');
               expect(editor.getBuffer().getPreferredLineEnding()).toBe('\r\n');
               expect(getTooltipText(lineEndingTile.element)).toBe(
-                'File uses CRLF (Windows) line endings'
+                'File uses CRLF (Windows) line endings',
               );
 
               done();
@@ -81,16 +81,16 @@ describe('line ending selector', () => {
           });
         });
 
-        waitsFor(done => {
+        waitsFor((done) => {
           helpers.getProcessPlatform.andReturn('darwin');
 
-          atom.workspace.open('').then(editor => {
+          atom.workspace.open('').then((editor) => {
             const subscription = lineEndingTile.onDidChange(() => {
               subscription.dispose();
               expect(lineEndingTile.element.textContent).toBe('LF');
               expect(editor.getBuffer().getPreferredLineEnding()).toBe('\n');
               expect(getTooltipText(lineEndingTile.element)).toBe(
-                'File uses LF (Unix) line endings'
+                'File uses LF (Unix) line endings',
               );
 
               done();
@@ -105,10 +105,10 @@ describe('line ending selector', () => {
         });
 
         it('uses LF line endings, regardless of the platform', () => {
-          waitsFor(done => {
+          waitsFor((done) => {
             spyOn(helpers, 'getProcessPlatform').andReturn('win32');
 
-            atom.workspace.open('').then(editor => {
+            atom.workspace.open('').then((editor) => {
               lineEndingTile.onDidChange(() => {
                 expect(lineEndingTile.element.textContent).toBe('LF');
                 expect(editor.getBuffer().getPreferredLineEnding()).toBe('\n');
@@ -125,12 +125,12 @@ describe('line ending selector', () => {
         });
 
         it('uses CRLF line endings, regardless of the platform', () => {
-          waitsFor(done => {
-            atom.workspace.open('').then(editor => {
+          waitsFor((done) => {
+            atom.workspace.open('').then((editor) => {
               lineEndingTile.onDidChange(() => {
                 expect(lineEndingTile.element.textContent).toBe('CRLF');
                 expect(editor.getBuffer().getPreferredLineEnding()).toBe(
-                  '\r\n'
+                  '\r\n',
                 );
                 done();
               });
@@ -142,7 +142,7 @@ describe('line ending selector', () => {
 
     describe('when a file is opened that contains only CRLF line endings', () => {
       it('displays "CRLF" as the line ending', () => {
-        waitsFor(done => {
+        waitsFor((done) => {
           atom.workspace.open('windows-endings.md').then(() => {
             lineEndingTile.onDidChange(() => {
               expect(lineEndingTile.element.textContent).toBe('CRLF');
@@ -155,8 +155,8 @@ describe('line ending selector', () => {
 
     describe('when a file is opened that contains only LF line endings', () => {
       it('displays "LF" as the line ending', () => {
-        waitsFor(done => {
-          atom.workspace.open('unix-endings.md').then(editor => {
+        waitsFor((done) => {
+          atom.workspace.open('unix-endings.md').then((editor) => {
             lineEndingTile.onDidChange(() => {
               expect(lineEndingTile.element.textContent).toBe('LF');
               expect(editor.getBuffer().getPreferredLineEnding()).toBe(null);
@@ -169,7 +169,7 @@ describe('line ending selector', () => {
 
     describe('when a file is opened that contains mixed line endings', () => {
       it('displays "Mixed" as the line ending', () => {
-        waitsFor(done => {
+        waitsFor((done) => {
           atom.workspace.open('mixed-endings.md').then(() => {
             lineEndingTile.onDidChange(() => {
               expect(lineEndingTile.element.textContent).toBe('Mixed');
@@ -186,10 +186,10 @@ describe('line ending selector', () => {
       beforeEach(() => {
         jasmine.attachToDOM(atom.views.getView(atom.workspace));
 
-        waitsFor(done =>
+        waitsFor((done) =>
           atom.workspace
             .open('unix-endings.md')
-            .then(() => lineEndingTile.onDidChange(done))
+            .then(() => lineEndingTile.onDidChange(done)),
         );
       });
 
@@ -198,7 +198,7 @@ describe('line ending selector', () => {
           atom.workspace.getCenter().activate();
           const item = atom.workspace.getActivePaneItem();
           expect(item.getFileName && item.getFileName()).toBe(
-            'unix-endings.md'
+            'unix-endings.md',
           );
 
           lineEndingTile.element.dispatchEvent(new MouseEvent('click', {}));
@@ -207,9 +207,9 @@ describe('line ending selector', () => {
 
           expect(lineEndingModal.isVisible()).toBe(true);
           expect(
-            lineEndingSelector.element.contains(document.activeElement)
+            lineEndingSelector.element.contains(document.activeElement),
           ).toBe(true);
-          let listItems = lineEndingSelector.element.querySelectorAll('li');
+          const listItems = lineEndingSelector.element.querySelectorAll('li');
           expect(listItems[0].textContent).toBe('LF');
           expect(listItems[1].textContent).toBe('CRLF');
         });
@@ -227,9 +227,9 @@ describe('line ending selector', () => {
 
           expect(lineEndingModal.isVisible()).toBe(true);
           expect(
-            lineEndingSelector.element.contains(document.activeElement)
+            lineEndingSelector.element.contains(document.activeElement),
           ).toBe(true);
-          let listItems = lineEndingSelector.element.querySelectorAll('li');
+          const listItems = lineEndingSelector.element.querySelectorAll('li');
           expect(listItems[0].textContent).toBe('LF');
           expect(listItems[1].textContent).toBe('CRLF');
         });
@@ -241,7 +241,7 @@ describe('line ending selector', () => {
           lineEndingModal = atom.workspace.getModalPanels()[0];
           lineEndingSelector = lineEndingModal.getItem();
 
-          const lineEndingChangedPromise = new Promise(resolve => {
+          const lineEndingChangedPromise = new Promise((resolve) => {
             lineEndingTile.onDidChange(() => {
               expect(lineEndingTile.element.textContent).toBe('CRLF');
               const editor = atom.workspace.getActiveTextEditor();
@@ -286,8 +286,8 @@ describe('line ending selector', () => {
       let editor;
 
       beforeEach(() => {
-        waitsFor(done => {
-          atom.workspace.open('unix-endings.md').then(e => {
+        waitsFor((done) => {
+          atom.workspace.open('unix-endings.md').then((e) => {
             editor = e;
             lineEndingTile.onDidChange(done);
           });
@@ -305,19 +305,32 @@ describe('line ending selector', () => {
           set(text) {
             tileUpdateCount++;
             tileText = text;
-          }
+          },
         });
 
         expect(lineEndingTile.element.textContent).toBe('LF');
         expect(getTooltipText(lineEndingTile.element)).toBe(
-          'File uses LF (Unix) line endings'
+          'File uses LF (Unix) line endings',
         );
 
-        waitsFor(done => {
-          editor.setTextInBufferRange([[0, 0], [0, 0]], '... ');
-          editor.setTextInBufferRange([[0, Infinity], [1, 0]], '\r\n', {
-            normalizeLineEndings: false
-          });
+        waitsFor((done) => {
+          editor.setTextInBufferRange(
+            [
+              [0, 0],
+              [0, 0],
+            ],
+            '... ',
+          );
+          editor.setTextInBufferRange(
+            [
+              [0, Infinity],
+              [1, 0],
+            ],
+            '\r\n',
+            {
+              normalizeLineEndings: false,
+            },
+          );
           lineEndingTile.onDidChange(done);
         });
 
@@ -325,14 +338,14 @@ describe('line ending selector', () => {
           expect(tileUpdateCount).toBe(1);
           expect(lineEndingTile.element.textContent).toBe('Mixed');
           expect(getTooltipText(lineEndingTile.element)).toBe(
-            'File uses mixed line endings'
+            'File uses mixed line endings',
           );
         });
 
-        waitsFor(done => {
+        waitsFor((done) => {
           atom.commands.dispatch(
             editor.getElement(),
-            'line-ending-selector:convert-to-CRLF'
+            'line-ending-selector:convert-to-CRLF',
           );
           lineEndingTile.onDidChange(done);
         });
@@ -341,14 +354,14 @@ describe('line ending selector', () => {
           expect(tileUpdateCount).toBe(2);
           expect(lineEndingTile.element.textContent).toBe('CRLF');
           expect(getTooltipText(lineEndingTile.element)).toBe(
-            'File uses CRLF (Windows) line endings'
+            'File uses CRLF (Windows) line endings',
           );
         });
 
-        waitsFor(done => {
+        waitsFor((done) => {
           atom.commands.dispatch(
             editor.getElement(),
-            'line-ending-selector:convert-to-LF'
+            'line-ending-selector:convert-to-LF',
           );
           lineEndingTile.onDidChange(done);
         });
@@ -359,7 +372,13 @@ describe('line ending selector', () => {
         });
 
         runs(() => {
-          editor.setTextInBufferRange([[0, 0], [0, 0]], '\n');
+          editor.setTextInBufferRange(
+            [
+              [0, 0],
+              [0, 0],
+            ],
+            '\n',
+          );
         });
 
         waits(100);

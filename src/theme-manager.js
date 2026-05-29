@@ -16,7 +16,7 @@ module.exports = class ThemeManager {
     config,
     styleManager,
     notificationManager,
-    viewRegistry
+    viewRegistry,
   }) {
     this.packageManager = packageManager;
     this.config = config;
@@ -30,7 +30,7 @@ module.exports = class ThemeManager {
     this.packageManager.registerPackageActivator(this, ['theme']);
     this.packageManager.onDidActivateInitialPackages(() => {
       this.onDidChangeActiveThemes(() =>
-        this.packageManager.reloadActivePackageStyleSheets()
+        this.packageManager.reloadActivePackageStyleSheets(),
       );
     });
   }
@@ -80,14 +80,14 @@ module.exports = class ThemeManager {
 
   // Public: Returns an {Array} of {String}s of all the loaded theme names.
   getLoadedThemeNames() {
-    return this.getLoadedThemes().map(theme => theme.name);
+    return this.getLoadedThemes().map((theme) => theme.name);
   }
 
   // Public: Returns an {Array} of all the loaded themes.
   getLoadedThemes() {
     return this.packageManager
       .getLoadedPackages()
-      .filter(pack => pack.isTheme());
+      .filter((pack) => pack.isTheme());
   }
 
   /*
@@ -96,14 +96,14 @@ module.exports = class ThemeManager {
 
   // Public: Returns an {Array} of {String}s of all the active theme names.
   getActiveThemeNames() {
-    return this.getActiveThemes().map(theme => theme.name);
+    return this.getActiveThemes().map((theme) => theme.name);
   }
 
   // Public: Returns an {Array} of all the active themes.
   getActiveThemes() {
     return this.packageManager
       .getActivePackages()
-      .filter(pack => pack.isTheme());
+      .filter((pack) => pack.isTheme());
   }
 
   activatePackages() {
@@ -119,7 +119,7 @@ module.exports = class ThemeManager {
     if (!Array.isArray(themeNames)) {
       themeNames = [themeNames];
     }
-    for (let themeName of themeNames) {
+    for (const themeName of themeNames) {
       if (
         !themeName ||
         typeof themeName !== 'string' ||
@@ -139,9 +139,9 @@ module.exports = class ThemeManager {
       themeNames = [themeNames];
     }
     themeNames = themeNames.filter(
-      themeName =>
+      (themeName) =>
         typeof themeName === 'string' &&
-        this.packageManager.resolvePackagePath(themeName)
+        this.packageManager.resolvePackagePath(themeName),
     );
 
     // Use a built-in syntax and UI theme any time the configured themes are not
@@ -155,7 +155,7 @@ module.exports = class ThemeManager {
         'base16-tomorrow-dark-theme',
         'base16-tomorrow-light-theme',
         'solarized-dark-syntax',
-        'solarized-light-syntax'
+        'solarized-light-syntax',
       ];
       themeNames = _.intersection(themeNames, builtInThemeNames);
       if (themeNames.length === 0) {
@@ -190,16 +190,16 @@ module.exports = class ThemeManager {
   requireStylesheet(
     stylesheetPath,
     priority,
-    skipDeprecatedSelectorsTransformation
+    skipDeprecatedSelectorsTransformation,
   ) {
-    let fullPath = this.resolveStylesheet(stylesheetPath);
+    const fullPath = this.resolveStylesheet(stylesheetPath);
     if (fullPath) {
       const content = this.loadStylesheet(fullPath);
       return this.applyStylesheet(
         fullPath,
         content,
         priority,
-        skipDeprecatedSelectorsTransformation
+        skipDeprecatedSelectorsTransformation,
       );
     } else {
       throw new Error(`Could not find a file at path '${stylesheetPath}'`);
@@ -229,13 +229,13 @@ module.exports = class ThemeManager {
       this.userStylesheetSubscriptions = new CompositeDisposable();
       const reloadStylesheet = () => this.loadUserStylesheet();
       this.userStylesheetSubscriptions.add(
-        this.userStylesheetFile.onDidChange(reloadStylesheet)
+        this.userStylesheetFile.onDidChange(reloadStylesheet),
       );
       this.userStylesheetSubscriptions.add(
-        this.userStylesheetFile.onDidRename(reloadStylesheet)
+        this.userStylesheetFile.onDidRename(reloadStylesheet),
       );
       this.userStylesheetSubscriptions.add(
-        this.userStylesheetFile.onDidDelete(reloadStylesheet)
+        this.userStylesheetFile.onDidDelete(reloadStylesheet),
       );
     } catch (error) {
       const message = `\
@@ -258,7 +258,7 @@ On linux there are currently problems with watch sizes. See
 
     this.userStyleSheetDisposable = this.styleManager.addStyleSheet(
       userStylesheetContents,
-      { sourcePath: userStylesheetPath, priority: 2 }
+      { sourcePath: userStylesheetPath, priority: 2 },
     );
   }
 
@@ -273,7 +273,7 @@ On linux there are currently problems with watch sizes. See
   stylesheetElementForId(id) {
     const escapedId = id.replace(/\\/g, '\\\\');
     return document.head.querySelector(
-      `atom-styles style[source-path="${escapedId}"]`
+      `atom-styles style[source-path="${escapedId}"]`,
     );
   }
 
@@ -298,9 +298,9 @@ On linux there are currently problems with watch sizes. See
       this.lessCache = new LessCompileCache({
         resourcePath: this.resourcePath,
         lessSourcesByRelativeFilePath: this.lessSourcesByRelativeFilePath,
-        importedFilePathsByRelativeImportPath: this
-          .importedFilePathsByRelativeImportPath,
-        importPaths: this.getImportPaths()
+        importedFilePathsByRelativeImportPath:
+          this.importedFilePathsByRelativeImportPath,
+        importPaths: this.getImportPaths(),
       });
     }
 
@@ -312,7 +312,7 @@ On linux there are currently problems with watch sizes. See
 `;
         const relativeFilePath = path.relative(
           this.resourcePath,
-          lessStylesheetPath
+          lessStylesheetPath,
         );
         const lessSource = this.lessSourcesByRelativeFilePath[relativeFilePath];
 
@@ -358,19 +358,18 @@ On linux there are currently problems with watch sizes. See
   }
 
   applyStylesheet(path, text, priority, skipDeprecatedSelectorsTransformation) {
-    this.styleSheetDisposablesBySourcePath[
-      path
-    ] = this.styleManager.addStyleSheet(text, {
-      priority,
-      skipDeprecatedSelectorsTransformation,
-      sourcePath: path
-    });
+    this.styleSheetDisposablesBySourcePath[path] =
+      this.styleManager.addStyleSheet(text, {
+        priority,
+        skipDeprecatedSelectorsTransformation,
+        sourcePath: path,
+      });
 
     return this.styleSheetDisposablesBySourcePath[path];
   }
 
   activateThemes() {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       // @config.observe runs the callback once, then on subsequent changes.
       this.config.observe('core.themes', () => {
         this.deactivateThemes().then(() => {
@@ -383,7 +382,7 @@ On linux there are currently problems with watch sizes. See
               promises.push(this.packageManager.activatePackage(themeName));
             } else {
               console.warn(
-                `Failed to activate theme '${themeName}' because it isn't installed.`
+                `Failed to activate theme '${themeName}' because it isn't installed.`,
               );
             }
           }
@@ -405,11 +404,11 @@ On linux there are currently problems with watch sizes. See
   deactivateThemes() {
     this.removeActiveThemeClasses();
     this.unwatchUserStylesheet();
-    const results = this.getActiveThemes().map(pack =>
-      this.packageManager.deactivatePackage(pack.name)
+    const results = this.getActiveThemes().map((pack) =>
+      this.packageManager.deactivatePackage(pack.name),
     );
     return Promise.all(
-      results.filter(r => r != null && typeof r.then === 'function')
+      results.filter((r) => r != null && typeof r.then === 'function'),
     );
   }
 
@@ -442,8 +441,8 @@ On linux there are currently problems with watch sizes. See
     const activeThemes = this.getActiveThemes();
     if (activeThemes.length > 0) {
       themePaths = activeThemes
-        .filter(theme => theme)
-        .map(theme => theme.getStylesheetsPath());
+        .filter((theme) => theme)
+        .map((theme) => theme.getStylesheetsPath());
     } else {
       themePaths = [];
       for (const themeName of this.getEnabledThemeNames()) {
@@ -459,6 +458,6 @@ On linux there are currently problems with watch sizes. See
       }
     }
 
-    return themePaths.filter(themePath => fs.isDirectorySync(themePath));
+    return themePaths.filter((themePath) => fs.isDirectorySync(themePath));
   }
 };

@@ -8,21 +8,19 @@ if (process.env.ELECTRON_CUSTOM_VERSION !== electronVersion) {
     `env var ELECTRON_CUSTOM_VERSION is not set,\n` +
       `or doesn't match electronVersion in ../package.json.\n` +
       `(is: "${electronEnv}", wanted: "${electronVersion}").\n` +
-      `Setting, and re-downloading chromedriver and mksnapshot.\n`
+      `Setting, and re-downloading chromedriver and mksnapshot.\n`,
   );
 
   process.env.ELECTRON_CUSTOM_VERSION = electronVersion;
-  const downloadChromedriverPath = require.resolve(
-    'electron-chromedriver/download-chromedriver.js'
-  );
-  const downloadMksnapshotPath = require.resolve(
-    'electron-mksnapshot/download-mksnapshot.js'
-  );
+  const downloadChromedriverPath =
+    require.resolve('electron-chromedriver/download-chromedriver.js');
+  const downloadMksnapshotPath =
+    require.resolve('electron-mksnapshot/download-mksnapshot.js');
   const downloadChromedriver = spawn('node', [downloadChromedriverPath]);
   const downloadMksnapshot = spawn('node', [downloadMksnapshotPath]);
-  var exitStatus;
+  let exitStatus;
 
-  downloadChromedriver.on('close', code => {
+  downloadChromedriver.on('close', (code) => {
     if (code === 0) {
       exitStatus = 'success';
     } else {
@@ -30,11 +28,11 @@ if (process.env.ELECTRON_CUSTOM_VERSION !== electronVersion) {
     }
 
     console.info(
-      `info: Done re-downloading chromedriver. Status: ${exitStatus}`
+      `info: Done re-downloading chromedriver. Status: ${exitStatus}`,
     );
   });
 
-  downloadMksnapshot.on('close', code => {
+  downloadMksnapshot.on('close', (code) => {
     if (code === 0) {
       exitStatus = 'success';
     } else {
@@ -45,6 +43,6 @@ if (process.env.ELECTRON_CUSTOM_VERSION !== electronVersion) {
   });
 } else {
   console.info(
-    'info: env var "ELECTRON_CUSTOM_VERSION" is already set correctly.\n(No need to re-download chromedriver or mksnapshot). Skipping.\n'
+    'info: env var "ELECTRON_CUSTOM_VERSION" is already set correctly.\n(No need to re-download chromedriver or mksnapshot). Skipping.\n',
   );
 }

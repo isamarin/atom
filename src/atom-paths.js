@@ -1,7 +1,7 @@
 const fs = require('fs-plus');
 const path = require('path');
 
-const hasWriteAccess = dir => {
+const hasWriteAccess = (dir) => {
   const testFilePath = path.join(dir, 'write.test');
   try {
     fs.writeFileSync(testFilePath, new Date().toISOString(), { flag: 'w+' });
@@ -17,7 +17,7 @@ const getAppDirectory = () => {
     case 'darwin':
       return process.execPath.substring(
         0,
-        process.execPath.indexOf('.app') + 4
+        process.execPath.indexOf('.app') + 4,
       );
     case 'linux':
     case 'win32':
@@ -26,7 +26,7 @@ const getAppDirectory = () => {
 };
 
 module.exports = {
-  setAtomHome: homePath => {
+  setAtomHome: (homePath) => {
     // When a read-writeable .atom folder exists above app use that
     const portableHomePath = path.join(getAppDirectory(), '..', '.atom');
     if (fs.existsSync(portableHomePath)) {
@@ -35,7 +35,7 @@ module.exports = {
       } else {
         // A path exists so it was intended to be used but we didn't have rights, so warn.
         console.log(
-          `Insufficient permission to portable Atom home "${portableHomePath}".`
+          `Insufficient permission to portable Atom home "${portableHomePath}".`,
         );
       }
     }
@@ -49,10 +49,10 @@ module.exports = {
     process.env.ATOM_HOME = path.join(homePath, '.atom');
   },
 
-  setUserData: app => {
+  setUserData: (app) => {
     const electronUserDataPath = path.join(
       process.env.ATOM_HOME,
-      'electronUserData'
+      'electronUserData',
     );
     if (fs.existsSync(electronUserDataPath)) {
       if (hasWriteAccess(electronUserDataPath)) {
@@ -60,11 +60,11 @@ module.exports = {
       } else {
         // A path exists so it was intended to be used but we didn't have rights, so warn.
         console.log(
-          `Insufficient permission to Electron user data "${electronUserDataPath}".`
+          `Insufficient permission to Electron user data "${electronUserDataPath}".`,
         );
       }
     }
   },
 
-  getAppDirectory: getAppDirectory
+  getAppDirectory,
 };

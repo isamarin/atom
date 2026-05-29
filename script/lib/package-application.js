@@ -14,12 +14,12 @@ const template = require('lodash.template');
 const CONFIG = require('../config');
 const HOST_ARCH = hostArch();
 
-module.exports = function() {
+module.exports = function () {
   const appName = getAppName();
   console.log(
     `Running electron-packager on ${
       CONFIG.intermediateAppPath
-    } with app name "${appName}"`
+    } with app name "${appName}"`,
   );
   return runPackager({
     appBundleId: 'com.github.atom',
@@ -36,7 +36,7 @@ module.exports = function() {
       CONFIG.repositoryRootPath,
       'resources',
       'mac',
-      'atom-Info.plist'
+      'atom-Info.plist',
     ),
     helperBundleId: 'com.github.atom.helper',
     icon: path.join(
@@ -44,7 +44,7 @@ module.exports = function() {
       'resources',
       'app-icons',
       CONFIG.channel,
-      'atom'
+      'atom',
     ),
     name: appName,
     out: CONFIG.buildOutputPath,
@@ -55,15 +55,15 @@ module.exports = function() {
     win32metadata: {
       CompanyName: 'GitHub, Inc.',
       FileDescription: 'Atom',
-      ProductName: CONFIG.appName
-    }
-  }).then(packagedAppPath => {
+      ProductName: CONFIG.appName,
+    },
+  }).then((packagedAppPath) => {
     let bundledResourcesPath;
     if (process.platform === 'darwin') {
       bundledResourcesPath = path.join(
         packagedAppPath,
         'Contents',
-        'Resources'
+        'Resources',
       );
       setAtomHelperVersion(packagedAppPath);
     } else if (process.platform === 'linux') {
@@ -77,7 +77,7 @@ module.exports = function() {
       () => {
         console.log(`Application bundle created at ${packagedAppPath}`);
         return packagedAppPath;
-      }
+      },
     );
   });
 };
@@ -89,10 +89,10 @@ function copyNonASARResources(packagedAppPath, bundledResourcesPath) {
       CONFIG.repositoryRootPath,
       'apm',
       'node_modules',
-      'atom-package-manager'
+      'atom-package-manager',
     ),
     path.join(bundledResourcesPath, 'app', 'apm'),
-    { filter: includePathInPackagedApp }
+    { filter: includePathInPackagedApp },
   );
   if (process.platform !== 'win32') {
     // Existing symlinks on user systems point to an outdated path, so just symlink it to the real location of the apm binary.
@@ -105,18 +105,18 @@ function copyNonASARResources(packagedAppPath, bundledResourcesPath) {
         'apm',
         'node_modules',
         '.bin',
-        'apm'
-      )
+        'apm',
+      ),
     );
     fs.copySync(
       path.join(CONFIG.repositoryRootPath, 'atom.sh'),
-      path.join(bundledResourcesPath, 'app', 'atom.sh')
+      path.join(bundledResourcesPath, 'app', 'atom.sh'),
     );
   }
   if (process.platform === 'darwin') {
     fs.copySync(
       path.join(CONFIG.repositoryRootPath, 'resources', 'mac', 'file.icns'),
-      path.join(bundledResourcesPath, 'file.icns')
+      path.join(bundledResourcesPath, 'file.icns'),
     );
   } else if (process.platform === 'linux') {
     fs.copySync(
@@ -126,9 +126,9 @@ function copyNonASARResources(packagedAppPath, bundledResourcesPath) {
         'app-icons',
         CONFIG.channel,
         'png',
-        '1024.png'
+        '1024.png',
       ),
-      path.join(packagedAppPath, 'atom.png')
+      path.join(packagedAppPath, 'atom.png'),
     );
   } else if (process.platform === 'win32') {
     [
@@ -137,12 +137,12 @@ function copyNonASARResources(packagedAppPath, bundledResourcesPath) {
       'apm.cmd',
       'apm.sh',
       'file.ico',
-      'folder.ico'
-    ].forEach(file =>
+      'folder.ico',
+    ].forEach((file) =>
       fs.copySync(
         path.join(CONFIG.repositoryRootPath, 'resources', 'win', file),
-        path.join(bundledResourcesPath, 'cli', file)
-      )
+        path.join(bundledResourcesPath, 'cli', file),
+      ),
     );
 
     // Customize atom.cmd for the channel-specific atom.exe name (e.g. atom-beta.exe)
@@ -150,10 +150,10 @@ function copyNonASARResources(packagedAppPath, bundledResourcesPath) {
   }
 
   console.log(`Writing LICENSE.md to ${bundledResourcesPath}`);
-  return getLicenseText().then(licenseText => {
+  return getLicenseText().then((licenseText) => {
     fs.writeFileSync(
       path.join(bundledResourcesPath, 'LICENSE.md'),
-      licenseText
+      licenseText,
     );
   });
 }
@@ -164,26 +164,26 @@ function setAtomHelperVersion(packagedAppPath) {
     'Atom Helper.app',
     'Atom Helper (GPU).app',
     'Atom Helper (Plugin).app',
-    'Atom Helper (Renderer).app'
+    'Atom Helper (Renderer).app',
   ];
   for (const helperApp of helperApps) {
     const helperPListPath = path.join(
       frameworksPath,
       helperApp,
       'Contents',
-      'Info.plist'
+      'Info.plist',
     );
     if (!fs.existsSync(helperPListPath)) continue;
     console.log(`Setting Atom Helper Version for ${helperPListPath}`);
     spawnSync('/usr/libexec/PlistBuddy', [
       '-c',
       `Add CFBundleVersion string ${CONFIG.appMetadata.version}`,
-      helperPListPath
+      helperPListPath,
     ]);
     spawnSync('/usr/libexec/PlistBuddy', [
       '-c',
       `Add CFBundleShortVersionString string ${CONFIG.appMetadata.version}`,
-      helperPListPath
+      helperPListPath,
     ]);
   }
 }
@@ -191,7 +191,7 @@ function setAtomHelperVersion(packagedAppPath) {
 function chmodNodeFiles(packagedAppPath) {
   console.log(`Changing permissions for node files in ${packagedAppPath}`);
   childProcess.execSync(
-    `find "${packagedAppPath}" -type f -name *.node -exec chmod a-x {} \\;`
+    `find "${packagedAppPath}" -type f -name *.node -exec chmod a-x {} \\;`,
   );
 }
 
@@ -206,7 +206,7 @@ function buildAsarUnpackGlobExpression() {
     path.join('**', 'node_modules', 'dugite', 'git', '**'),
     path.join('**', 'node_modules', 'github', 'bin', '**'),
     path.join('**', 'node_modules', 'vscode-ripgrep', 'bin', '**'),
-    path.join('**', 'resources', 'atom.png')
+    path.join('**', 'resources', 'atom.png'),
   ];
 
   return `{${unpack.join(',')}}`;
@@ -227,7 +227,7 @@ async function runPackager(options) {
 
   assert(
     packageOutputDirPaths.length === 1,
-    'Generated more than one electron application!'
+    'Generated more than one electron application!',
   );
 
   return renamePackagedAppDir(packageOutputDirPaths[0]);
@@ -241,7 +241,7 @@ function renamePackagedAppDir(packageOutputDirPath) {
     if (fs.existsSync(packagedAppPath)) fs.removeSync(packagedAppPath);
     fs.renameSync(
       path.join(packageOutputDirPath, appBundleName),
-      packagedAppPath
+      packagedAppPath,
     );
   } else if (process.platform === 'linux') {
     const appName =
@@ -256,7 +256,7 @@ function renamePackagedAppDir(packageOutputDirPath) {
     }
     packagedAppPath = path.join(
       CONFIG.buildOutputPath,
-      `${appName}-${CONFIG.appMetadata.version}-${architecture}`
+      `${appName}-${CONFIG.appMetadata.version}-${architecture}`,
     );
     if (fs.existsSync(packagedAppPath)) fs.removeSync(packagedAppPath);
     fs.renameSync(packageOutputDirPath, packagedAppPath);
@@ -273,13 +273,13 @@ function renamePackagedAppDir(packageOutputDirPath) {
 
 function generateAtomCmdForChannel(bundledResourcesPath) {
   const atomCmdTemplate = fs.readFileSync(
-    path.join(CONFIG.repositoryRootPath, 'resources', 'win', 'atom.cmd')
+    path.join(CONFIG.repositoryRootPath, 'resources', 'win', 'atom.cmd'),
   );
   const atomCmdContents = template(atomCmdTemplate)({
-    atomExeName: CONFIG.executableName
+    atomExeName: CONFIG.executableName,
   });
   fs.writeFileSync(
     path.join(bundledResourcesPath, 'cli', 'atom.cmd'),
-    atomCmdContents
+    atomCmdContents,
   );
 }

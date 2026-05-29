@@ -7,7 +7,7 @@ module.exports = class TreeIndenter {
     this.scopes =
       scopes ||
       languageMode.config.get('editor.scopes', {
-        scope: this.languageMode.rootScopeDescriptor
+        scope: this.languageMode.rootScopeDescriptor,
       });
     log('[TreeIndenter] constructor', this.scopes);
   }
@@ -102,7 +102,7 @@ module.exports = class TreeIndenter {
             node.parent.endIndex,
             lastScope.node.endIndex,
             isScope3,
-            node.endIndex
+            node.endIndex,
           );
       }
 
@@ -110,7 +110,7 @@ module.exports = class TreeIndenter {
         node,
         notFirstOrLastSibling,
         type: node.parent.type,
-        increment
+        increment,
       });
       const newLastScope =
         isScope || isScope2 ? { node: node.parent } : lastScope;
@@ -123,7 +123,7 @@ module.exports = class TreeIndenter {
     const line = this.languageMode.buffer.lineForRow(row);
     const currentIndentation = this.languageMode.indentLevelForLine(
       line,
-      tabLength
+      tabLength,
     );
 
     const syntaxNode = this._getHighestSyntaxNodeAtPosition(row);
@@ -131,7 +131,7 @@ module.exports = class TreeIndenter {
       const previousRow = Math.max(row - 1, 0);
       const previousIndentation = this.languageMode.indentLevelForLine(
         this.languageMode.indentLevelForLine(previousRow),
-        tabLength
+        tabLength,
       );
       return previousIndentation;
     }

@@ -45,7 +45,7 @@ module.exports = class ThemePackage extends Package {
           } catch (error) {
             this.handleError(
               `Failed to activate the ${this.name} theme`,
-              error
+              error,
             );
           }
         });

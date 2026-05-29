@@ -180,12 +180,10 @@ module.exports = class Workspace extends Model {
     this.updateWindowTitle = this.updateWindowTitle.bind(this);
     this.updateDocumentEdited = this.updateDocumentEdited.bind(this);
     this.didDestroyPaneItem = this.didDestroyPaneItem.bind(this);
-    this.didChangeActivePaneOnPaneContainer = this.didChangeActivePaneOnPaneContainer.bind(
-      this
-    );
-    this.didChangeActivePaneItemOnPaneContainer = this.didChangeActivePaneItemOnPaneContainer.bind(
-      this
-    );
+    this.didChangeActivePaneOnPaneContainer =
+      this.didChangeActivePaneOnPaneContainer.bind(this);
+    this.didChangeActivePaneItemOnPaneContainer =
+      this.didChangeActivePaneItemOnPaneContainer.bind(this);
     this.didActivatePaneContainer = this.didActivatePaneContainer.bind(this);
 
     this.enablePersistence = params.enablePersistence;
@@ -216,7 +214,7 @@ module.exports = class Workspace extends Model {
       center: this.createCenter(),
       left: this.createDock('left'),
       right: this.createDock('right'),
-      bottom: this.createDock('bottom')
+      bottom: this.createDock('bottom'),
     };
     this.activePaneContainer = this.paneContainers.center;
     this.hasActiveTextEditor = false;
@@ -224,35 +222,35 @@ module.exports = class Workspace extends Model {
     this.panelContainers = {
       top: new PanelContainer({
         viewRegistry: this.viewRegistry,
-        location: 'top'
+        location: 'top',
       }),
       left: new PanelContainer({
         viewRegistry: this.viewRegistry,
         location: 'left',
-        dock: this.paneContainers.left
+        dock: this.paneContainers.left,
       }),
       right: new PanelContainer({
         viewRegistry: this.viewRegistry,
         location: 'right',
-        dock: this.paneContainers.right
+        dock: this.paneContainers.right,
       }),
       bottom: new PanelContainer({
         viewRegistry: this.viewRegistry,
         location: 'bottom',
-        dock: this.paneContainers.bottom
+        dock: this.paneContainers.bottom,
       }),
       header: new PanelContainer({
         viewRegistry: this.viewRegistry,
-        location: 'header'
+        location: 'header',
       }),
       footer: new PanelContainer({
         viewRegistry: this.viewRegistry,
-        location: 'footer'
+        location: 'footer',
       }),
       modal: new PanelContainer({
         viewRegistry: this.viewRegistry,
-        location: 'modal'
-      })
+        location: 'modal',
+      }),
     };
 
     this.incoming = new Map();
@@ -260,7 +258,7 @@ module.exports = class Workspace extends Model {
 
   get paneContainer() {
     Grim.deprecate(
-      '`atom.workspace.paneContainer` has always been private, but it is now gone. Please use `atom.workspace.getCenter()` instead and consult the workspace API docs for public methods.'
+      '`atom.workspace.paneContainer` has always been private, but it is now gone. Please use `atom.workspace.getCenter()` instead and consult the workspace API docs for public methods.',
     );
     return this.paneContainers.center.paneContainer;
   }
@@ -271,7 +269,7 @@ module.exports = class Workspace extends Model {
         config: this.config,
         project: this.project,
         viewRegistry: this.viewRegistry,
-        styleManager: this.styleManager
+        styleManager: this.styleManager,
       });
     }
     return this.element;
@@ -287,7 +285,7 @@ module.exports = class Workspace extends Model {
       didActivate: this.didActivatePaneContainer,
       didChangeActivePane: this.didChangeActivePaneOnPaneContainer,
       didChangeActivePaneItem: this.didChangeActivePaneItemOnPaneContainer,
-      didDestroyPaneItem: this.didDestroyPaneItem
+      didDestroyPaneItem: this.didDestroyPaneItem,
     });
   }
 
@@ -302,7 +300,7 @@ module.exports = class Workspace extends Model {
       didActivate: this.didActivatePaneContainer,
       didChangeActivePane: this.didChangeActivePaneOnPaneContainer,
       didChangeActivePaneItem: this.didChangeActivePaneItemOnPaneContainer,
-      didDestroyPaneItem: this.didDestroyPaneItem
+      didDestroyPaneItem: this.didDestroyPaneItem,
     });
   }
 
@@ -316,7 +314,7 @@ module.exports = class Workspace extends Model {
     this.paneContainers.right.destroy();
     this.paneContainers.bottom.destroy();
 
-    _.values(this.panelContainers).forEach(panelContainer => {
+    _.values(this.panelContainers).forEach((panelContainer) => {
       panelContainer.destroy();
     });
 
@@ -324,7 +322,7 @@ module.exports = class Workspace extends Model {
       center: this.createCenter(),
       left: this.createDock('left'),
       right: this.createDock('right'),
-      bottom: this.createDock('bottom')
+      bottom: this.createDock('bottom'),
     };
     this.activePaneContainer = this.paneContainers.center;
     this.hasActiveTextEditor = false;
@@ -332,35 +330,35 @@ module.exports = class Workspace extends Model {
     this.panelContainers = {
       top: new PanelContainer({
         viewRegistry: this.viewRegistry,
-        location: 'top'
+        location: 'top',
       }),
       left: new PanelContainer({
         viewRegistry: this.viewRegistry,
         location: 'left',
-        dock: this.paneContainers.left
+        dock: this.paneContainers.left,
       }),
       right: new PanelContainer({
         viewRegistry: this.viewRegistry,
         location: 'right',
-        dock: this.paneContainers.right
+        dock: this.paneContainers.right,
       }),
       bottom: new PanelContainer({
         viewRegistry: this.viewRegistry,
         location: 'bottom',
-        dock: this.paneContainers.bottom
+        dock: this.paneContainers.bottom,
       }),
       header: new PanelContainer({
         viewRegistry: this.viewRegistry,
-        location: 'header'
+        location: 'header',
       }),
       footer: new PanelContainer({
         viewRegistry: this.viewRegistry,
-        location: 'footer'
+        location: 'footer',
       }),
       modal: new PanelContainer({
         viewRegistry: this.viewRegistry,
-        location: 'modal'
-      })
+        location: 'modal',
+      }),
     };
 
     this.openers = [];
@@ -384,8 +382,8 @@ module.exports = class Workspace extends Model {
 
   consumeServices({ serviceHub }) {
     this.directorySearchers = [];
-    serviceHub.consume('atom.directory-searcher', '^0.1.0', provider =>
-      this.directorySearchers.unshift(provider)
+    serviceHub.consume('atom.directory-searcher', '^0.1.0', (provider) =>
+      this.directorySearchers.unshift(provider),
     );
   }
 
@@ -402,8 +400,8 @@ module.exports = class Workspace extends Model {
         center: this.paneContainers.center.serialize(),
         left: this.paneContainers.left.serialize(),
         right: this.paneContainers.right.serialize(),
-        bottom: this.paneContainers.bottom.serialize()
-      }
+        bottom: this.paneContainers.bottom.serialize(),
+      },
     };
   }
 
@@ -412,7 +410,7 @@ module.exports = class Workspace extends Model {
       state.packagesWithActiveGrammars != null
         ? state.packagesWithActiveGrammars
         : [];
-    for (let packageName of packagesWithActiveGrammars) {
+    for (const packageName of packagesWithActiveGrammars) {
       const pkg = this.packageManager.getLoadedPackage(packageName);
       if (pkg != null) {
         pkg.loadGrammarsSync();
@@ -425,25 +423,25 @@ module.exports = class Workspace extends Model {
     if (state.paneContainers) {
       this.paneContainers.center.deserialize(
         state.paneContainers.center,
-        deserializerManager
+        deserializerManager,
       );
       this.paneContainers.left.deserialize(
         state.paneContainers.left,
-        deserializerManager
+        deserializerManager,
       );
       this.paneContainers.right.deserialize(
         state.paneContainers.right,
-        deserializerManager
+        deserializerManager,
       );
       this.paneContainers.bottom.deserialize(
         state.paneContainers.bottom,
-        deserializerManager
+        deserializerManager,
       );
     } else if (state.paneContainer) {
       // TODO: Remove this fallback once a lot of time has passed since 1.17 was released
       this.paneContainers.center.deserialize(
         state.paneContainer,
-        deserializerManager
+        deserializerManager,
       );
     }
 
@@ -464,7 +462,7 @@ module.exports = class Workspace extends Model {
       }
 
       packageNames.push(packageName);
-      for (let scopeName of includedGrammarScopes != null
+      for (const scopeName of includedGrammarScopes != null
         ? includedGrammarScopes
         : []) {
         addGrammar(this.grammarRegistry.grammarForScopeName(scopeName));
@@ -472,12 +470,12 @@ module.exports = class Workspace extends Model {
     };
 
     const editors = this.getTextEditors();
-    for (let editor of editors) {
+    for (const editor of editors) {
       addGrammar(editor.getGrammar());
     }
 
     if (editors.length > 0) {
-      for (let grammar of this.grammarRegistry.getGrammars()) {
+      for (const grammar of this.grammarRegistry.getGrammars()) {
         if (grammar.injectionSelector) {
           addGrammar(grammar);
         }
@@ -491,19 +489,19 @@ module.exports = class Workspace extends Model {
     if (paneContainer !== this.getActivePaneContainer()) {
       this.activePaneContainer = paneContainer;
       this.didChangeActivePaneItem(
-        this.activePaneContainer.getActivePaneItem()
+        this.activePaneContainer.getActivePaneItem(),
       );
       this.emitter.emit(
         'did-change-active-pane-container',
-        this.activePaneContainer
+        this.activePaneContainer,
       );
       this.emitter.emit(
         'did-change-active-pane',
-        this.activePaneContainer.getActivePane()
+        this.activePaneContainer.getActivePane(),
       );
       this.emitter.emit(
         'did-change-active-pane-item',
-        this.activePaneContainer.getActivePaneItem()
+        this.activePaneContainer.getActivePaneItem(),
       );
     }
   }
@@ -555,12 +553,12 @@ module.exports = class Workspace extends Model {
 
     if (item != null && typeof item.onDidChangeModified === 'function') {
       modifiedSubscription = item.onDidChangeModified(
-        this.updateDocumentEdited
+        this.updateDocumentEdited,
       );
     } else if (item != null && typeof item.on === 'function') {
       modifiedSubscription = item.on(
         'modified-status-changed',
-        this.updateDocumentEdited
+        this.updateDocumentEdited,
       );
       if (
         modifiedSubscription == null ||
@@ -593,7 +591,7 @@ module.exports = class Workspace extends Model {
   }
 
   setDraggingItem(draggingItem) {
-    _.values(this.paneContainers).forEach(dock => {
+    _.values(this.paneContainers).forEach((dock) => {
       dock.setDraggingItem(draggingItem);
     });
   }
@@ -603,7 +601,7 @@ module.exports = class Workspace extends Model {
       if (item instanceof TextEditor) {
         const subscriptions = new CompositeDisposable(
           this.textEditorRegistry.add(item),
-          this.textEditorRegistry.maintainConfig(item)
+          this.textEditorRegistry.maintainConfig(item),
         );
         if (!this.project.findBufferForId(item.buffer.id)) {
           this.project.addBuffer(item.buffer);
@@ -614,7 +612,7 @@ module.exports = class Workspace extends Model {
         this.emitter.emit('did-add-text-editor', {
           textEditor: item,
           pane,
-          index
+          index,
         });
         // It's important to call handleGrammarUsed after emitting the did-add event:
         // if we activate a package between adding the editor to the registry and emitting
@@ -622,7 +620,7 @@ module.exports = class Workspace extends Model {
         // (Note that the item can be destroyed by an `observeTextEditors` handler.)
         if (!item.isDestroyed()) {
           subscriptions.add(
-            item.observeGrammar(this.handleGrammarUsed.bind(this))
+            item.observeGrammar(this.handleGrammarUsed.bind(this)),
           );
         }
       }
@@ -633,10 +631,10 @@ module.exports = class Workspace extends Model {
     const docks = [
       this.getLeftDock(),
       this.getRightDock(),
-      this.getBottomDock()
+      this.getBottomDock(),
     ];
-    docks.forEach(dock => {
-      dock.onDidChangeVisible(visible => {
+    docks.forEach((dock) => {
+      dock.onDidChangeVisible((visible) => {
         if (visible) return;
         const { activeElement } = document;
         const dockElement = dock.getElement();
@@ -652,7 +650,7 @@ module.exports = class Workspace extends Model {
 
   subscribeToMovedItems() {
     for (const paneContainer of this.getPaneContainers()) {
-      paneContainer.observePanes(pane => {
+      paneContainer.observePanes((pane) => {
         pane.onDidAddItem(({ item }) => {
           if (typeof item.getURI === 'function' && this.enablePersistence) {
             const uri = item.getURI();
@@ -698,11 +696,11 @@ module.exports = class Workspace extends Model {
           : longTitle;
       projectPath = _.find(
         projectPaths,
-        projectPath =>
+        (projectPath) =>
           itemPath === projectPath ||
           (itemPath != null
             ? itemPath.startsWith(projectPath + path.sep)
-            : undefined)
+            : undefined),
       );
     }
     if (itemTitle == null) {
@@ -764,7 +762,7 @@ module.exports = class Workspace extends Model {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   observeTextEditors(callback) {
-    for (let textEditor of this.getTextEditors()) {
+    for (const textEditor of this.getTextEditors()) {
       callback(textEditor);
     }
     return this.onDidAddTextEditor(({ textEditor }) => callback(textEditor));
@@ -780,9 +778,9 @@ module.exports = class Workspace extends Model {
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   observePaneItems(callback) {
     return new CompositeDisposable(
-      ...this.getPaneContainers().map(container =>
-        container.observePaneItems(callback)
-      )
+      ...this.getPaneContainers().map((container) =>
+        container.observePaneItems(callback),
+      ),
     );
   }
 
@@ -883,9 +881,9 @@ module.exports = class Workspace extends Model {
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidAddPane(callback) {
     return new CompositeDisposable(
-      ...this.getPaneContainers().map(container =>
-        container.onDidAddPane(callback)
-      )
+      ...this.getPaneContainers().map((container) =>
+        container.onDidAddPane(callback),
+      ),
     );
   }
 
@@ -899,9 +897,9 @@ module.exports = class Workspace extends Model {
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onWillDestroyPane(callback) {
     return new CompositeDisposable(
-      ...this.getPaneContainers().map(container =>
-        container.onWillDestroyPane(callback)
-      )
+      ...this.getPaneContainers().map((container) =>
+        container.onWillDestroyPane(callback),
+      ),
     );
   }
 
@@ -915,9 +913,9 @@ module.exports = class Workspace extends Model {
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidDestroyPane(callback) {
     return new CompositeDisposable(
-      ...this.getPaneContainers().map(container =>
-        container.onDidDestroyPane(callback)
-      )
+      ...this.getPaneContainers().map((container) =>
+        container.onDidDestroyPane(callback),
+      ),
     );
   }
 
@@ -931,9 +929,9 @@ module.exports = class Workspace extends Model {
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   observePanes(callback) {
     return new CompositeDisposable(
-      ...this.getPaneContainers().map(container =>
-        container.observePanes(callback)
-      )
+      ...this.getPaneContainers().map((container) =>
+        container.observePanes(callback),
+      ),
     );
   }
 
@@ -972,9 +970,9 @@ module.exports = class Workspace extends Model {
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidAddPaneItem(callback) {
     return new CompositeDisposable(
-      ...this.getPaneContainers().map(container =>
-        container.onDidAddPaneItem(callback)
-      )
+      ...this.getPaneContainers().map((container) =>
+        container.onDidAddPaneItem(callback),
+      ),
     );
   }
 
@@ -992,9 +990,9 @@ module.exports = class Workspace extends Model {
   // Returns a {Disposable} on which `.dispose` can be called to unsubscribe.
   onWillDestroyPaneItem(callback) {
     return new CompositeDisposable(
-      ...this.getPaneContainers().map(container =>
-        container.onWillDestroyPaneItem(callback)
-      )
+      ...this.getPaneContainers().map((container) =>
+        container.onWillDestroyPaneItem(callback),
+      ),
     );
   }
 
@@ -1010,9 +1008,9 @@ module.exports = class Workspace extends Model {
   // Returns a {Disposable} on which `.dispose` can be called to unsubscribe.
   onDidDestroyPaneItem(callback) {
     return new CompositeDisposable(
-      ...this.getPaneContainers().map(container =>
-        container.onDidDestroyPaneItem(callback)
-      )
+      ...this.getPaneContainers().map((container) =>
+        container.onDidDestroyPaneItem(callback),
+      ),
     );
   }
 
@@ -1089,9 +1087,9 @@ module.exports = class Workspace extends Model {
       if (!incomingItem) {
         this.incoming.set(
           uri,
-          new Promise(resolve => {
+          new Promise((resolve) => {
             resolveItem = resolve;
-          })
+          }),
         );
       } else {
         await incomingItem;
@@ -1232,7 +1230,7 @@ module.exports = class Workspace extends Model {
         }
         if (typeof item.scrollToBufferPosition === 'function') {
           item.scrollToBufferPosition([initialLine, initialColumn], {
-            center: true
+            center: true,
           });
         }
       }
@@ -1376,7 +1374,7 @@ module.exports = class Workspace extends Model {
           return Promise.resolve();
         case 'EACCES':
           this.notificationManager.addWarning(
-            `Permission denied '${error.path}'`
+            `Permission denied '${error.path}'`,
           );
           return Promise.resolve();
         case 'EPERM':
@@ -1392,7 +1390,7 @@ module.exports = class Workspace extends Model {
         case 'EAGAIN':
           this.notificationManager.addWarning(
             `Unable to open '${error.path != null ? error.path : uri}'`,
-            { detail: error.message }
+            { detail: error.message },
           );
           return Promise.resolve();
         default:
@@ -1425,9 +1423,9 @@ module.exports = class Workspace extends Model {
             message:
               'Atom will be unresponsive during the loading of very large files.',
             detail: 'Do you still want to load this file?',
-            buttons: ['Proceed', 'Cancel']
+            buttons: ['Proceed', 'Cancel'],
           },
-          response => {
+          (response) => {
             if (response === 1) {
               const error = new Error();
               error.code = 'CANCELLED';
@@ -1435,14 +1433,14 @@ module.exports = class Workspace extends Model {
             } else {
               resolve();
             }
-          }
+          },
         );
       });
     }
 
     const buffer = await this.project.bufferForPath(filePath, options);
     return this.textEditorRegistry.build(
-      Object.assign({ buffer, autoHeight: false }, options)
+      Object.assign({ buffer, autoHeight: false }, options),
     );
   }
 
@@ -1451,10 +1449,10 @@ module.exports = class Workspace extends Model {
       return;
     }
     this.packageManager.triggerActivationHook(
-      `${grammar.scopeName}:root-scope-used`
+      `${grammar.scopeName}:root-scope-used`,
     );
     this.packageManager.triggerActivationHook(
-      `${grammar.packageName}:grammar-used`
+      `${grammar.packageName}:grammar-used`,
     );
   }
 
@@ -1541,7 +1539,7 @@ module.exports = class Workspace extends Model {
   // Returns an {Array} of items.
   getPaneItems() {
     return _.flatten(
-      this.getPaneContainers().map(container => container.getPaneItems())
+      this.getPaneContainers().map((container) => container.getPaneItems()),
     );
   }
 
@@ -1556,7 +1554,7 @@ module.exports = class Workspace extends Model {
   //
   // Returns an {Array} of {TextEditor}s.
   getTextEditors() {
-    return this.getPaneItems().filter(item => item instanceof TextEditor);
+    return this.getPaneItems().filter((item) => item instanceof TextEditor);
   }
 
   // Essential: Get the workspace center's active item if it is a {TextEditor}.
@@ -1572,15 +1570,17 @@ module.exports = class Workspace extends Model {
 
   // Save all pane items.
   saveAll() {
-    this.getPaneContainers().forEach(container => {
+    this.getPaneContainers().forEach((container) => {
       container.saveAll();
     });
   }
 
   confirmClose(options) {
     return Promise.all(
-      this.getPaneContainers().map(container => container.confirmClose(options))
-    ).then(results => !results.includes(false));
+      this.getPaneContainers().map((container) =>
+        container.confirmClose(options),
+      ),
+    ).then((results) => !results.includes(false));
   }
 
   // Save the active pane item.
@@ -1590,9 +1590,7 @@ module.exports = class Workspace extends Model {
   // {::saveActivePaneItemAs} # will be called instead. This method does nothing
   // if the active item does not implement a `.save` method.
   saveActivePaneItem() {
-    return this.getCenter()
-      .getActivePane()
-      .saveActiveItem();
+    return this.getCenter().getActivePane().saveActiveItem();
   }
 
   // Prompt the user for a path and save the active pane item to it.
@@ -1601,9 +1599,7 @@ module.exports = class Workspace extends Model {
   // `.saveAs` on the item with the selected path. This method does nothing if
   // the active item does not implement a `.saveAs` method.
   saveActivePaneItemAs() {
-    this.getCenter()
-      .getActivePane()
-      .saveActiveItemAs();
+    this.getCenter().getActivePane().saveActiveItemAs();
   }
 
   // Destroy (close) the active pane item.
@@ -1630,13 +1626,13 @@ module.exports = class Workspace extends Model {
   // Returns an {Array} of {Pane}s.
   getPanes() {
     return _.flatten(
-      this.getPaneContainers().map(container => container.getPanes())
+      this.getPaneContainers().map((container) => container.getPanes()),
     );
   }
 
   getVisiblePanes() {
     return _.flatten(
-      this.getVisiblePaneContainers().map(container => container.getPanes())
+      this.getVisiblePaneContainers().map((container) => container.getPanes()),
     );
   }
 
@@ -1665,8 +1661,8 @@ module.exports = class Workspace extends Model {
   // Returns a {Dock}, the {WorkspaceCenter}, or `undefined` if no item exists
   // with the given URI.
   paneContainerForURI(uri) {
-    return this.getPaneContainers().find(container =>
-      container.paneForURI(uri)
+    return this.getPaneContainers().find((container) =>
+      container.paneForURI(uri),
     );
   }
 
@@ -1677,8 +1673,8 @@ module.exports = class Workspace extends Model {
   // Returns a {Dock}, the {WorkspaceCenter}, or `undefined` if no item exists
   // with the given URI.
   paneContainerForItem(uri) {
-    return this.getPaneContainers().find(container =>
-      container.paneForItem(uri)
+    return this.getPaneContainers().find((container) =>
+      container.paneForItem(uri),
     );
   }
 
@@ -1688,7 +1684,7 @@ module.exports = class Workspace extends Model {
   //
   // Returns a {Pane} or `undefined` if no item exists with the given URI.
   paneForURI(uri) {
-    for (let location of this.getPaneContainers()) {
+    for (const location of this.getPaneContainers()) {
       const pane = location.paneForURI(uri);
       if (pane != null) {
         return pane;
@@ -1702,7 +1698,7 @@ module.exports = class Workspace extends Model {
   //
   // Returns a {Pane} or `undefined` if no pane exists for the given item.
   paneForItem(item) {
-    for (let location of this.getPaneContainers()) {
+    for (const location of this.getPaneContainers()) {
       const pane = location.paneForItem(item);
       if (pane != null) {
         return pane;
@@ -1722,9 +1718,7 @@ module.exports = class Workspace extends Model {
   // empty, or the current window if there is only the empty root pane.
   closeActivePaneItemOrEmptyPaneOrWindow() {
     if (this.getCenter().getActivePaneItem() != null) {
-      this.getCenter()
-        .getActivePane()
-        .destroyActiveItem();
+      this.getCenter().getActivePane().destroyActiveItem();
     } else if (this.getCenter().getPanes().length > 1) {
       this.getCenter().destroyActivePane();
     } else if (this.config.get('core.closeEmptyWindows')) {
@@ -1749,7 +1743,7 @@ module.exports = class Workspace extends Model {
   resetFontSize() {
     this.config.set(
       'editor.fontSize',
-      this.config.get('editor.defaultFontSize')
+      this.config.get('editor.defaultFontSize'),
     );
   }
 
@@ -1823,7 +1817,7 @@ module.exports = class Workspace extends Model {
       this.paneContainers.center,
       this.paneContainers.left,
       this.paneContainers.right,
-      this.paneContainers.bottom
+      this.paneContainers.bottom,
     ];
   }
 
@@ -1831,7 +1825,7 @@ module.exports = class Workspace extends Model {
     const center = this.getCenter();
     return atom.workspace
       .getPaneContainers()
-      .filter(container => container === center || container.isVisible());
+      .filter((container) => container === center || container.isVisible());
   }
 
   /*
@@ -2005,7 +1999,7 @@ module.exports = class Workspace extends Model {
   //
   // * `item` Item the panel contains
   panelForItem(item) {
-    for (let location in this.panelContainers) {
+    for (const location in this.panelContainers) {
       const container = this.panelContainers[location];
       const panel = container.panelForItem(item);
       if (panel != null) {
@@ -2024,7 +2018,7 @@ module.exports = class Workspace extends Model {
       options = {};
     }
     return this.panelContainers[location].addPanel(
-      new Panel(options, this.viewRegistry)
+      new Panel(options, this.viewRegistry),
     );
   }
 
@@ -2082,7 +2076,7 @@ module.exports = class Workspace extends Model {
       const onPathsSearchedOption = options.onPathsSearched;
       let totalNumberOfPathsSearched = 0;
       const numberOfPathsSearchedForSearcher = new Map();
-      onPathsSearched = function(searcher, numberOfPathsSearched) {
+      onPathsSearched = function (searcher, numberOfPathsSearched) {
         const oldValue = numberOfPathsSearchedForSearcher.get(searcher);
         if (oldValue) {
           totalNumberOfPathsSearched -= oldValue;
@@ -2092,7 +2086,7 @@ module.exports = class Workspace extends Model {
         return onPathsSearchedOption(totalNumberOfPathsSearched);
       };
     } else {
-      onPathsSearched = function() {};
+      onPathsSearched = function () {};
     }
 
     // Kick off all of the searches and unify them into one Promise.
@@ -2107,7 +2101,7 @@ module.exports = class Workspace extends Model {
         leadingContextLineCount: options.leadingContextLineCount || 0,
         trailingContextLineCount: options.trailingContextLineCount || 0,
         PCRE2: options.PCRE2,
-        didMatch: result => {
+        didMatch: (result) => {
           if (!this.project.isPathModified(result.filePath)) {
             return iterator(result);
           }
@@ -2117,25 +2111,25 @@ module.exports = class Workspace extends Model {
         },
         didSearchPaths(count) {
           return onPathsSearched(searcher, count);
-        }
+        },
       };
       const directorySearcher = searcher.search(
         directories,
         regex,
-        searchOptions
+        searchOptions,
       );
       allSearches.push(directorySearcher);
     });
     const searchPromise = Promise.all(allSearches);
 
-    for (let buffer of this.project.getBuffers()) {
+    for (const buffer of this.project.getBuffers()) {
       if (buffer.isModified()) {
         const filePath = buffer.getPath();
         if (!this.project.contains(filePath)) {
           continue;
         }
-        var matches = [];
-        buffer.scan(regex, match => matches.push(match));
+        const matches = [];
+        buffer.scan(regex, (match) => matches.push(match));
         if (matches.length > 0) {
           iterator({ filePath, matches });
         }
@@ -2148,7 +2142,7 @@ module.exports = class Workspace extends Model {
     // package relies on this behavior.
     let isCancelled = false;
     const cancellablePromise = new Promise((resolve, reject) => {
-      const onSuccess = function() {
+      const onSuccess = function () {
         if (isCancelled) {
           resolve('cancelled');
         } else {
@@ -2156,8 +2150,8 @@ module.exports = class Workspace extends Model {
         }
       };
 
-      const onFailure = function(error) {
-        for (let promise of allSearches) {
+      const onFailure = function (error) {
+        for (const promise of allSearches) {
           promise.cancel();
         }
         reject(error);
@@ -2170,7 +2164,7 @@ module.exports = class Workspace extends Model {
       // Note that cancelling all of the members of allSearches will cause all of the searches
       // to resolve, which causes searchPromise to resolve, which is ultimately what causes
       // cancellablePromise to resolve.
-      allSearches.map(promise => promise.cancel());
+      allSearches.map((promise) => promise.cancel());
     };
 
     return cancellablePromise;
@@ -2190,7 +2184,7 @@ module.exports = class Workspace extends Model {
       let buffer;
       const openPaths = this.project
         .getBuffers()
-        .map(buffer => buffer.getPath());
+        .map((buffer) => buffer.getPath());
       const outOfProcessPaths = _.difference(filePaths, openPaths);
 
       let inProcessFinished = !openPaths.length;
@@ -2219,11 +2213,11 @@ module.exports = class Workspace extends Model {
           () => {
             outOfProcessFinished = true;
             checkFinished();
-          }
+          },
         );
 
         task.on('replace:path-replaced', iterator);
-        task.on('replace:file-error', error => {
+        task.on('replace:file-error', (error) => {
           iterator(null, error);
         });
       }
@@ -2247,7 +2241,7 @@ module.exports = class Workspace extends Model {
     if (editor.getPath()) {
       const checkoutHead = async () => {
         const repository = await this.project.repositoryForDirectory(
-          new Directory(editor.getDirectoryPath())
+          new Directory(editor.getDirectoryPath()),
         );
         if (repository) repository.checkoutHeadForEditor(editor);
       };
@@ -2257,11 +2251,11 @@ module.exports = class Workspace extends Model {
           {
             message: 'Confirm Checkout HEAD Revision',
             detail: `Are you sure you want to discard all changes to "${editor.getFileName()}" since the last Git commit?`,
-            buttons: ['OK', 'Cancel']
+            buttons: ['OK', 'Cancel'],
           },
-          response => {
+          (response) => {
             if (response === 0) checkoutHead();
-          }
+          },
         );
       } else {
         checkoutHead();

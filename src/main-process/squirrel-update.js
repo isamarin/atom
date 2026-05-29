@@ -33,53 +33,53 @@ const spawnUpdate = (args, callback) =>
 // This is done by adding .cmd shims to the root bin folder in the Atom
 // install directory that point to the newly installed versions inside
 // the versioned app directories.
-const addCommandsToPath = callback => {
+const addCommandsToPath = (callback) => {
   const atomCmdName = execName.replace('.exe', '.cmd');
   const apmCmdName = atomCmdName.replace('atom', 'apm');
   const atomShName = execName.replace('.exe', '');
   const apmShName = atomShName.replace('atom', 'apm');
 
-  const installCommands = callback => {
+  const installCommands = (callback) => {
     const atomCommandPath = path.join(binFolder, atomCmdName);
     const relativeAtomPath = path.relative(
       binFolder,
-      path.join(appFolder, 'resources', 'cli', 'atom.cmd')
+      path.join(appFolder, 'resources', 'cli', 'atom.cmd'),
     );
     const atomCommand = `@echo off\r\n"%~dp0\\${relativeAtomPath}" %*`;
 
     const atomShCommandPath = path.join(binFolder, atomShName);
     const relativeAtomShPath = path.relative(
       binFolder,
-      path.join(appFolder, 'resources', 'cli', 'atom.sh')
+      path.join(appFolder, 'resources', 'cli', 'atom.sh'),
     );
     const atomShCommand = `#!/bin/sh\r\n"$(dirname "$0")/${relativeAtomShPath.replace(
       /\\/g,
-      '/'
+      '/',
     )}" "$@"\r\necho`;
 
     const apmCommandPath = path.join(binFolder, apmCmdName);
     const relativeApmPath = path.relative(
       binFolder,
-      path.join(process.resourcesPath, 'app', 'apm', 'bin', 'apm.cmd')
+      path.join(process.resourcesPath, 'app', 'apm', 'bin', 'apm.cmd'),
     );
     const apmCommand = `@echo off\r\n"%~dp0\\${relativeApmPath}" %*`;
 
     const apmShCommandPath = path.join(binFolder, apmShName);
     const relativeApmShPath = path.relative(
       binFolder,
-      path.join(appFolder, 'resources', 'cli', 'apm.sh')
+      path.join(appFolder, 'resources', 'cli', 'apm.sh'),
     );
     const apmShCommand = `#!/bin/sh\r\n"$(dirname "$0")/${relativeApmShPath.replace(
       /\\/g,
-      '/'
+      '/',
     )}" "$@"`;
 
     fs.writeFile(atomCommandPath, atomCommand, () =>
       fs.writeFile(atomShCommandPath, atomShCommand, () =>
         fs.writeFile(apmCommandPath, apmCommand, () =>
-          fs.writeFile(apmShCommandPath, apmShCommand, () => callback())
-        )
-      )
+          fs.writeFile(apmShCommandPath, apmShCommand, () => callback()),
+        ),
+      ),
     );
   };
 
@@ -89,7 +89,7 @@ const addCommandsToPath = callback => {
     spawnSetx(['Path', newPathEnv], callback);
   };
 
-  installCommands(error => {
+  installCommands((error) => {
     if (error) return callback(error);
 
     WinPowerShell.getPath((error, pathEnv) => {
@@ -97,7 +97,7 @@ const addCommandsToPath = callback => {
 
       const pathSegments = pathEnv
         .split(/;+/)
-        .filter(pathSegment => pathSegment);
+        .filter((pathSegment) => pathSegment);
       if (pathSegments.indexOf(binFolder) === -1) {
         addBinToPath(pathSegments, callback);
       } else {
@@ -108,7 +108,7 @@ const addCommandsToPath = callback => {
 };
 
 // Remove atom and apm from the PATH
-const removeCommandsFromPath = callback =>
+const removeCommandsFromPath = (callback) =>
   WinPowerShell.getPath((error, pathEnv) => {
     if (error != null) {
       return callback(error);
@@ -116,7 +116,7 @@ const removeCommandsFromPath = callback =>
 
     const pathSegments = pathEnv
       .split(/;+/)
-      .filter(pathSegment => pathSegment && pathSegment !== binFolder);
+      .filter((pathSegment) => pathSegment && pathSegment !== binFolder);
     const newPathEnv = pathSegments.join(';');
 
     if (pathEnv !== newPathEnv) {
@@ -131,22 +131,22 @@ const removeCommandsFromPath = callback =>
 const createShortcuts = (locations, callback) =>
   spawnUpdate(
     ['--createShortcut', execName, '-l', locations.join(',')],
-    callback
+    callback,
   );
 
 // Update the desktop and start menu shortcuts by using the command line API
 // provided by Squirrel's Update.exe
-const updateShortcuts = callback => {
+const updateShortcuts = (callback) => {
   const homeDirectory = fs.getHomeDirectory();
   if (homeDirectory) {
     const desktopShortcutPath = path.join(
       homeDirectory,
       'Desktop',
-      `${getAppName()}.lnk`
+      `${getAppName()}.lnk`,
     );
     // Check if the desktop shortcut has been previously deleted and
     // and keep it deleted if it was
-    fs.exists(desktopShortcutPath, desktopShortcutExists => {
+    fs.exists(desktopShortcutPath, (desktopShortcutExists) => {
       const locations = ['StartMenu'];
       if (desktopShortcutExists) {
         locations.push('Desktop');
@@ -161,7 +161,7 @@ const updateShortcuts = callback => {
 
 // Remove the desktop and start menu shortcuts by using the command line API
 // provided by Squirrel's Update.exe
-const removeShortcuts = callback =>
+const removeShortcuts = (callback) =>
   spawnUpdate(['--removeShortcut', execName], callback);
 
 exports.spawn = spawnUpdate;
@@ -182,32 +182,32 @@ exports.restartAtom = () => {
   app.quit();
 };
 
-const updateContextMenus = callback =>
+const updateContextMenus = (callback) =>
   WinShell.fileContextMenu.update(() =>
     WinShell.folderContextMenu.update(() =>
-      WinShell.folderBackgroundContextMenu.update(() => callback())
-    )
+      WinShell.folderBackgroundContextMenu.update(() => callback()),
+    ),
   );
 
 // Handle squirrel events denoted by --squirrel-* command line arguments.
-exports.handleStartupEvent = squirrelCommand => {
+exports.handleStartupEvent = (squirrelCommand) => {
   switch (squirrelCommand) {
     case '--squirrel-install':
       createShortcuts(['Desktop', 'StartMenu'], () =>
         addCommandsToPath(() =>
           WinShell.fileHandler.register(() =>
-            updateContextMenus(() => app.quit())
-          )
-        )
+            updateContextMenus(() => app.quit()),
+          ),
+        ),
       );
       return true;
     case '--squirrel-updated':
       updateShortcuts(() =>
         addCommandsToPath(() =>
           WinShell.fileHandler.update(() =>
-            updateContextMenus(() => app.quit())
-          )
-        )
+            updateContextMenus(() => app.quit()),
+          ),
+        ),
       );
       return true;
     case '--squirrel-uninstall':
@@ -217,12 +217,12 @@ exports.handleStartupEvent = squirrelCommand => {
             WinShell.fileContextMenu.deregister(() =>
               WinShell.folderContextMenu.deregister(() =>
                 WinShell.folderBackgroundContextMenu.deregister(() =>
-                  app.quit()
-                )
-              )
-            )
-          )
-        )
+                  app.quit(),
+                ),
+              ),
+            ),
+          ),
+        ),
       );
       return true;
     case '--squirrel-obsolete':

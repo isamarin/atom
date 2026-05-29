@@ -13,7 +13,7 @@ module.exports = {
       () => {
         if (!grammarListView) grammarListView = new GrammarListView();
         grammarListView.toggle();
-      }
+      },
     );
   },
 
@@ -31,5 +31,5 @@ module.exports = {
   consumeStatusBar(statusBar) {
     grammarStatusView = new GrammarStatusView(statusBar);
     grammarStatusView.attach();
-  }
+  },
 };

@@ -30,7 +30,7 @@ module.exports = class ApplicationDelegate {
 
   pickFolder(callback) {
     const responseChannel = 'atom-pick-folder-response';
-    ipcRenderer.on(responseChannel, function(event, path) {
+    ipcRenderer.on(responseChannel, function (event, path) {
       ipcRenderer.removeAllListeners(responseChannel);
       return callback(path);
     });
@@ -160,7 +160,7 @@ module.exports = class ApplicationDelegate {
     return ipcHelpers.call(
       'window-method',
       'didClosePathWithWaitSession',
-      path
+      path,
     );
   }
 
@@ -202,7 +202,7 @@ module.exports = class ApplicationDelegate {
       await ipcHelpers.call(
         'set-user-settings',
         JSON.stringify(config),
-        configFilePath
+        configFilePath,
       );
     } finally {
       this.pendingSettingsUpdateCount--;
@@ -210,7 +210,7 @@ module.exports = class ApplicationDelegate {
   }
 
   onDidChangeUserSettings(callback) {
-    return this.ipcMessageEmitter().on('did-change-user-settings', detail => {
+    return this.ipcMessageEmitter().on('did-change-user-settings', (detail) => {
       if (this.pendingSettingsUpdateCount === 0) callback(detail);
     });
   }
@@ -218,7 +218,7 @@ module.exports = class ApplicationDelegate {
   onDidFailToReadUserSettings(callback) {
     return this.ipcMessageEmitter().on(
       'did-fail-to-read-user-setting',
-      callback
+      callback,
     );
   }
 
@@ -227,11 +227,11 @@ module.exports = class ApplicationDelegate {
       // Async version: pass options directly to Electron but set sane defaults
       options = Object.assign(
         { type: 'info', normalizeAccessKeys: true },
-        options
+        options,
       );
       remote.dialog
         .showMessageBox(remote.getCurrentWindow(), options)
-        .then(result => {
+        .then((result) => {
           callback(result.response, result.checkboxChecked);
         });
     } else {
@@ -254,8 +254,8 @@ module.exports = class ApplicationDelegate {
           message,
           detail: detailedMessage,
           buttons: buttonLabels,
-          normalizeAccessKeys: true
-        }
+          normalizeAccessKeys: true,
+        },
       );
 
       if (Array.isArray(buttons)) {
@@ -296,7 +296,7 @@ module.exports = class ApplicationDelegate {
     // if there is an update, so begin of downloading is a good proxy.
     return this.ipcMessageEmitter().on(
       'did-begin-downloading-update',
-      callback
+      callback,
     );
   }
 
@@ -325,7 +325,7 @@ module.exports = class ApplicationDelegate {
 
     ipcRenderer.on('command', outerCallback);
     return new Disposable(() =>
-      ipcRenderer.removeListener('command', outerCallback)
+      ipcRenderer.removeListener('command', outerCallback),
     );
   }
 
@@ -334,7 +334,7 @@ module.exports = class ApplicationDelegate {
 
     ipcRenderer.on('context-command', outerCallback);
     return new Disposable(() =>
-      ipcRenderer.removeListener('context-command', outerCallback)
+      ipcRenderer.removeListener('context-command', outerCallback),
     );
   }
 
@@ -343,7 +343,7 @@ module.exports = class ApplicationDelegate {
 
     ipcRenderer.on('uri-message', outerCallback);
     return new Disposable(() =>
-      ipcRenderer.removeListener('uri-message', outerCallback)
+      ipcRenderer.removeListener('uri-message', outerCallback),
     );
   }
 
@@ -355,7 +355,7 @@ module.exports = class ApplicationDelegate {
 
     ipcRenderer.on('prepare-to-unload', outerCallback);
     return new Disposable(() =>
-      ipcRenderer.removeListener('prepare-to-unload', outerCallback)
+      ipcRenderer.removeListener('prepare-to-unload', outerCallback),
     );
   }
 
@@ -364,7 +364,7 @@ module.exports = class ApplicationDelegate {
 
     ipcRenderer.on('did-change-history-manager', outerCallback);
     return new Disposable(() =>
-      ipcRenderer.removeListener('did-change-history-manager', outerCallback)
+      ipcRenderer.removeListener('did-change-history-manager', outerCallback),
     );
   }
 
@@ -410,7 +410,7 @@ module.exports = class ApplicationDelegate {
 
     ipcRenderer.on('did-resolve-proxy', outerCallback);
     return new Disposable(() =>
-      ipcRenderer.removeListener('did-resolve-proxy', outerCallback)
+      ipcRenderer.removeListener('did-resolve-proxy', outerCallback),
     );
   }
 };

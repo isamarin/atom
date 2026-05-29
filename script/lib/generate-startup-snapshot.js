@@ -5,7 +5,7 @@ const electronLink = require('electron-link');
 const terser = require('terser');
 const CONFIG = require('../config');
 
-module.exports = function(packagedAppPath) {
+module.exports = function (packagedAppPath) {
   const snapshotScriptPath = path.join(CONFIG.buildOutputPath, 'startup.js');
   const coreModules = new Set([
     'electron',
@@ -15,7 +15,7 @@ module.exports = function(packagedAppPath) {
     'lapack',
     'remote',
     '@electron/remote',
-    '@electron/remote/main'
+    '@electron/remote/main',
   ]);
   const baseDirPath = path.join(CONFIG.intermediateAppPath, 'static');
   let processedFiles = 0;
@@ -26,7 +26,7 @@ module.exports = function(packagedAppPath) {
       baseDirPath,
       '..',
       'src',
-      'initialize-application-window.js'
+      'initialize-application-window.js',
     ),
     cachePath: path.join(CONFIG.atomHomeDirPath, 'snapshot-cache'),
     auxiliaryData: CONFIG.snapshotAuxiliaryData,
@@ -35,30 +35,30 @@ module.exports = function(packagedAppPath) {
         process.stdout.write('\r');
       }
       process.stdout.write(
-        `Generating snapshot script at "${snapshotScriptPath}" (${++processedFiles})`
+        `Generating snapshot script at "${snapshotScriptPath}" (${++processedFiles})`,
       );
 
       const requiringModuleRelativePath = path.relative(
         baseDirPath,
-        requiringModulePath
+        requiringModulePath,
       );
       const requiredModuleRelativePath = path.relative(
         baseDirPath,
-        requiredModulePath
+        requiredModulePath,
       );
       return (
         requiredModulePath.endsWith('.node') ||
         coreModules.has(requiredModulePath) ||
         requiringModuleRelativePath.endsWith(
-          path.join('node_modules/xregexp/xregexp-all.js')
+          path.join('node_modules/xregexp/xregexp-all.js'),
         ) ||
         (requiredModuleRelativePath.startsWith(path.join('..', 'src')) &&
           requiredModuleRelativePath.endsWith('-element.js')) ||
         requiredModuleRelativePath.startsWith(
-          path.join('..', 'node_modules', 'dugite')
+          path.join('..', 'node_modules', 'dugite'),
         ) ||
         requiredModuleRelativePath.startsWith(
-          path.join('..', 'node_modules', 'typescript-simple')
+          path.join('..', 'node_modules', 'typescript-simple'),
         ) ||
         requiredModuleRelativePath.endsWith(
           path.join(
@@ -66,35 +66,35 @@ module.exports = function(packagedAppPath) {
             'coffee-script',
             'lib',
             'coffee-script',
-            'register.js'
-          )
+            'register.js',
+          ),
         ) ||
         requiredModuleRelativePath.endsWith(
-          path.join('node_modules', 'fs-extra', 'lib', 'index.js')
+          path.join('node_modules', 'fs-extra', 'lib', 'index.js'),
         ) ||
         requiredModuleRelativePath.endsWith(
-          path.join('node_modules', 'graceful-fs', 'graceful-fs.js')
+          path.join('node_modules', 'graceful-fs', 'graceful-fs.js'),
         ) ||
         requiredModuleRelativePath.endsWith(
-          path.join('node_modules', 'htmlparser2', 'lib', 'index.js')
+          path.join('node_modules', 'htmlparser2', 'lib', 'index.js'),
         ) ||
         requiredModuleRelativePath.endsWith(
-          path.join('node_modules', 'minimatch', 'minimatch.js')
+          path.join('node_modules', 'minimatch', 'minimatch.js'),
         ) ||
         requiredModuleRelativePath.endsWith(
-          path.join('node_modules', 'request', 'index.js')
+          path.join('node_modules', 'request', 'index.js'),
         ) ||
         requiredModuleRelativePath.endsWith(
-          path.join('node_modules', 'request', 'request.js')
+          path.join('node_modules', 'request', 'request.js'),
         ) ||
         requiredModuleRelativePath.endsWith(
-          path.join('node_modules', 'superstring', 'index.js')
+          path.join('node_modules', 'superstring', 'index.js'),
         ) ||
         requiredModuleRelativePath.endsWith(
-          path.join('node_modules', 'temp', 'lib', 'temp.js')
+          path.join('node_modules', 'temp', 'lib', 'temp.js'),
         ) ||
         requiredModuleRelativePath.endsWith(
-          path.join('node_modules', 'parse5', 'lib', 'index.js')
+          path.join('node_modules', 'parse5', 'lib', 'index.js'),
         ) ||
         requiredModuleRelativePath === path.join('..', 'exports', 'atom.js') ||
         requiredModuleRelativePath ===
@@ -105,7 +105,7 @@ module.exports = function(packagedAppPath) {
             'node_modules',
             'atom-keymap',
             'lib',
-            'command-event.js'
+            'command-event.js',
           ) ||
         requiredModuleRelativePath ===
           path.join('..', 'node_modules', 'babel-core', 'index.js') ||
@@ -128,7 +128,7 @@ module.exports = function(packagedAppPath) {
             'less',
             'lib',
             'less-node',
-            'index.js'
+            'index.js',
           ) ||
         requiredModuleRelativePath ===
           path.join('..', 'node_modules', 'lodash.isequal', 'index.js') ||
@@ -138,7 +138,7 @@ module.exports = function(packagedAppPath) {
             'node_modules',
             'node-fetch',
             'lib',
-            'fetch-error.js'
+            'fetch-error.js',
           ) ||
         requiredModuleRelativePath ===
           path.join('..', 'node_modules', 'oniguruma', 'src', 'oniguruma.js') ||
@@ -153,7 +153,7 @@ module.exports = function(packagedAppPath) {
             'settings-view',
             'node_modules',
             'glob',
-            'glob.js'
+            'glob.js',
           ) ||
         requiredModuleRelativePath ===
           path.join('..', 'node_modules', 'tar', 'tar.js') ||
@@ -164,7 +164,7 @@ module.exports = function(packagedAppPath) {
             'ls-archive',
             'node_modules',
             'tar',
-            'tar.js'
+            'tar.js',
           ) ||
         requiredModuleRelativePath ===
           path.join('..', 'node_modules', 'tmp', 'lib', 'tmp.js') ||
@@ -185,7 +185,7 @@ module.exports = function(packagedAppPath) {
             '@atom',
             'fuzzy-native',
             'lib',
-            'main.js'
+            'main.js',
           ) ||
         requiredModuleRelativePath ===
           path.join(
@@ -193,13 +193,13 @@ module.exports = function(packagedAppPath) {
             'node_modules',
             'vscode-ripgrep',
             'lib',
-            'index.js'
+            'index.js',
           ) ||
         // The startup-time script is used by both the renderer and the main process and having it in the
         // snapshot causes issues.
         requiredModuleRelativePath === path.join('..', 'src', 'startup-time.js')
       );
-    }
+    },
   }).then(({ snapshotScript }) => {
     process.stdout.write('\n');
 
@@ -207,7 +207,7 @@ module.exports = function(packagedAppPath) {
     const minification = terser.minify(snapshotScript, {
       keep_fnames: true,
       keep_classnames: true,
-      compress: { keep_fargs: true, keep_infinity: true }
+      compress: { keep_fargs: true, keep_infinity: true },
     });
     if (minification.error) throw minification.error;
     process.stdout.write('\n');
@@ -217,7 +217,7 @@ module.exports = function(packagedAppPath) {
     const verifySnapshotScriptPath = path.join(
       CONFIG.repositoryRootPath,
       'script',
-      'verify-snapshot-script'
+      'verify-snapshot-script',
     );
     let nodeBundledInElectronPath;
     if (process.platform === 'darwin') {
@@ -225,18 +225,18 @@ module.exports = function(packagedAppPath) {
         packagedAppPath,
         'Contents',
         'MacOS',
-        CONFIG.executableName
+        CONFIG.executableName,
       );
     } else {
       nodeBundledInElectronPath = path.join(
         packagedAppPath,
-        CONFIG.executableName
+        CONFIG.executableName,
       );
     }
     childProcess.execFileSync(
       nodeBundledInElectronPath,
       [verifySnapshotScriptPath, snapshotScriptPath],
-      { env: Object.assign({}, process.env, { ELECTRON_RUN_AS_NODE: 1 }) }
+      { env: Object.assign({}, process.env, { ELECTRON_RUN_AS_NODE: 1 }) },
     );
 
     console.log('Generating startup blob with mksnapshot');
@@ -246,11 +246,11 @@ module.exports = function(packagedAppPath) {
         'script',
         'node_modules',
         'electron-mksnapshot',
-        'mksnapshot.js'
+        'mksnapshot.js',
       ),
       snapshotScriptPath,
       '--output_dir',
-      CONFIG.buildOutputPath
+      CONFIG.buildOutputPath,
     ]);
 
     let startupBlobDestinationPath;
@@ -261,10 +261,10 @@ module.exports = function(packagedAppPath) {
     }
 
     const snapshotBinaries = ['v8_context_snapshot.bin', 'snapshot_blob.bin'];
-    for (let snapshotBinary of snapshotBinaries) {
+    for (const snapshotBinary of snapshotBinaries) {
       let destinationPath = path.join(
         startupBlobDestinationPath,
-        snapshotBinary
+        snapshotBinary,
       );
       if (
         process.platform === 'darwin' &&
@@ -273,7 +273,7 @@ module.exports = function(packagedAppPath) {
         // TODO: check if we're building for arm64 and use the arm64 version of the binary
         destinationPath = path.join(
           startupBlobDestinationPath,
-          'v8_context_snapshot.x86_64.bin'
+          'v8_context_snapshot.x86_64.bin',
         );
       }
       console.log(`Moving generated startup blob into "${destinationPath}"`);
@@ -287,7 +287,7 @@ module.exports = function(packagedAppPath) {
       }
       fs.renameSync(
         path.join(CONFIG.buildOutputPath, snapshotBinary),
-        destinationPath
+        destinationPath,
       );
     }
   });

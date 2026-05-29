@@ -1,4 +1,4 @@
-(function() {
+(function () {
   // Define the window start time before the requires so we get a more accurate
   // window:start marker.
   const startWindowTime = Date.now();
@@ -13,23 +13,24 @@
   let blobStore = null;
   let useSnapshot = false;
 
-  const startupMarkers = require('@electron/remote').getCurrentWindow().startupMarkers;
+  const startupMarkers =
+    require('@electron/remote').getCurrentWindow().startupMarkers;
 
   if (startupMarkers) {
     StartupTime.importData(startupMarkers);
   }
   StartupTime.addMarker('window:start', startWindowTime);
 
-  window.onload = function() {
+  window.onload = function () {
     try {
       StartupTime.addMarker('window:onload:start');
       const startTime = Date.now();
 
-      process.on('unhandledRejection', function(error, promise) {
+      process.on('unhandledRejection', function (error, promise) {
         console.error(
           'Unhandled promise rejection %o with error: %o',
           promise,
-          error
+          error,
         );
       });
 
@@ -40,7 +41,7 @@
       const devMode =
         getWindowLoadSettings().devMode ||
         !getWindowLoadSettings().resourcePath.startsWith(
-          process.resourcesPath + path.sep
+          process.resourcesPath + path.sep,
         );
       useSnapshot = !devMode && typeof snapshotResult !== 'undefined';
 
@@ -52,16 +53,16 @@
           } catch (requireError) {
             console.error(
               'Failed to setup deprecated packages list',
-              requireError.stack
+              requireError.stack,
             );
           }
         }
       } else if (useSnapshot) {
-        Module.prototype.require = function(module) {
+        Module.prototype.require = function (module) {
           const absoluteFilePath = Module._resolveFilename(module, this, false);
           let relativeFilePath = path.relative(
             entryPointDirPath,
-            absoluteFilePath
+            absoluteFilePath,
           );
           if (process.platform === 'win32') {
             relativeFilePath = relativeFilePath.replace(/\\/g, '/');
@@ -81,7 +82,7 @@
           window,
           document,
           console,
-          require
+          require,
         );
       }
 
@@ -89,7 +90,7 @@
         ? snapshotResult.customRequire('../src/file-system-blob-store.js')
         : require('../src/file-system-blob-store');
       blobStore = FileSystemBlobStore.load(
-        path.join(process.env.ATOM_HOME, 'blob-store')
+        path.join(process.env.ATOM_HOME, 'blob-store'),
       );
 
       const NativeCompileCache = useSnapshot
@@ -147,7 +148,7 @@
 
     useSnapshot
       ? snapshotResult.customRequire(
-          '../node_modules/document-register-element/build/document-register-element.node.js'
+          '../node_modules/document-register-element/build/document-register-element.node.js',
         )
       : require('document-register-element');
 
@@ -158,7 +159,7 @@
 
     document.registerElement = (type, options) => {
       Grim.deprecate(
-        'Use `customElements.define` instead of `document.registerElement` see https://javascript.info/custom-elements'
+        'Use `customElements.define` instead of `document.registerElement` see https://javascript.info/custom-elements',
       );
 
       return documentRegisterElement(type, options);
@@ -173,7 +174,7 @@
 
     startCrashReporter({
       uploadToServer,
-      releaseChannel
+      releaseChannel,
     });
 
     const CSON = useSnapshot
@@ -183,7 +184,7 @@
 
     const initScriptPath = path.relative(
       entryPointDirPath,
-      getWindowLoadSettings().windowInitializationScript
+      getWindowLoadSettings().windowInitializationScript,
     );
     const initialize = useSnapshot
       ? snapshotResult.customRequire(initScriptPath)
@@ -191,7 +192,7 @@
 
     StartupTime.addMarker('window:initialize:start');
 
-    return initialize({ blobStore: blobStore }).then(function() {
+    return initialize({ blobStore }).then(function () {
       StartupTime.addMarker('window:initialize:end');
       electron.ipcRenderer.send('window-command', 'window:loaded');
     });
@@ -201,16 +202,17 @@
     function profile() {
       console.profile('startup');
       const startTime = Date.now();
-      setupWindow().then(function() {
+      setupWindow().then(function () {
         setLoadTime(Date.now() - startTime + initialTime);
         console.profileEnd('startup');
         console.log(
-          'Switch to the Profiles tab to view the created startup profile'
+          'Switch to the Profiles tab to view the created startup profile',
         );
       });
     }
 
-    const webContents = require('@electron/remote').getCurrentWindow().webContents;
+    const webContents =
+      require('@electron/remote').getCurrentWindow().webContents;
     if (webContents.devToolsWebContents) {
       profile();
     } else {

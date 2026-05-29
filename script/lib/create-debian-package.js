@@ -8,7 +8,7 @@ const template = require('lodash.template');
 
 const CONFIG = require('../config');
 
-module.exports = function(packagedAppPath) {
+module.exports = function (packagedAppPath) {
   console.log(`Creating Debian package for "${packagedAppPath}"`);
   const atomExecutableName =
     CONFIG.channel === 'stable' ? 'atom' : `atom-${CONFIG.channel}`;
@@ -29,58 +29,58 @@ module.exports = function(packagedAppPath) {
 
   const outputDebianPackageFilePath = path.join(
     CONFIG.buildOutputPath,
-    `atom-${arch}.deb`
+    `atom-${arch}.deb`,
   );
   const debianPackageDirPath = path.join(
     os.tmpdir(),
-    path.basename(packagedAppPath)
+    path.basename(packagedAppPath),
   );
   const debianPackageConfigPath = path.join(debianPackageDirPath, 'DEBIAN');
   const debianPackageInstallDirPath = path.join(debianPackageDirPath, 'usr');
   const debianPackageBinDirPath = path.join(debianPackageInstallDirPath, 'bin');
   const debianPackageShareDirPath = path.join(
     debianPackageInstallDirPath,
-    'share'
+    'share',
   );
   const debianPackageAtomDirPath = path.join(
     debianPackageShareDirPath,
-    atomExecutableName
+    atomExecutableName,
   );
   const debianPackageApplicationsDirPath = path.join(
     debianPackageShareDirPath,
-    'applications'
+    'applications',
   );
   const debianPackageIconsDirPath = path.join(
     debianPackageShareDirPath,
-    'pixmaps'
+    'pixmaps',
   );
   const debianPackageDocsDirPath = path.join(
     debianPackageShareDirPath,
     'doc',
-    atomExecutableName
+    atomExecutableName,
   );
 
   if (fs.existsSync(debianPackageDirPath)) {
     console.log(
-      `Deleting existing build dir for Debian package at "${debianPackageDirPath}"`
+      `Deleting existing build dir for Debian package at "${debianPackageDirPath}"`,
     );
     fs.removeSync(debianPackageDirPath);
   }
   if (fs.existsSync(`${debianPackageDirPath}.deb`)) {
     console.log(
-      `Deleting existing Debian package at "${debianPackageDirPath}.deb"`
+      `Deleting existing Debian package at "${debianPackageDirPath}.deb"`,
     );
     fs.removeSync(`${debianPackageDirPath}.deb`);
   }
   if (fs.existsSync(debianPackageDirPath)) {
     console.log(
-      `Deleting existing Debian package at "${outputDebianPackageFilePath}"`
+      `Deleting existing Debian package at "${outputDebianPackageFilePath}"`,
     );
     fs.removeSync(debianPackageDirPath);
   }
 
   console.log(
-    `Creating Debian package directory structure at "${debianPackageDirPath}"`
+    `Creating Debian package directory structure at "${debianPackageDirPath}"`,
   );
   fs.mkdirpSync(debianPackageDirPath);
   fs.mkdirpSync(debianPackageConfigPath);
@@ -98,7 +98,7 @@ module.exports = function(packagedAppPath) {
   console.log(`Copying binaries into "${debianPackageBinDirPath}"`);
   fs.copySync(
     path.join(CONFIG.repositoryRootPath, 'atom.sh'),
-    path.join(debianPackageBinDirPath, atomExecutableName)
+    path.join(debianPackageBinDirPath, atomExecutableName),
   );
   fs.symlinkSync(
     path.join(
@@ -110,9 +110,9 @@ module.exports = function(packagedAppPath) {
       'apm',
       'node_modules',
       '.bin',
-      'apm'
+      'apm',
     ),
-    path.join(debianPackageBinDirPath, apmExecutableName)
+    path.join(debianPackageBinDirPath, apmExecutableName),
   );
 
   fs.chmodSync(path.join(debianPackageAtomDirPath, 'chrome-sandbox'), '4755');
@@ -127,45 +127,45 @@ module.exports = function(packagedAppPath) {
       'resources',
       'linux',
       'debian',
-      'control.in'
-    )
+      'control.in',
+    ),
   );
   const controlFileContents = template(controlFileTemplate)({
     appFileName: atomExecutableName,
     version: appVersion,
-    arch: arch,
+    arch,
     installedSize: packageSizeInKilobytes,
-    description: appDescription
+    description: appDescription,
   });
   fs.writeFileSync(
     path.join(debianPackageConfigPath, 'control'),
-    controlFileContents
+    controlFileContents,
   );
 
   console.log(
-    `Writing desktop entry file into "${debianPackageApplicationsDirPath}"`
+    `Writing desktop entry file into "${debianPackageApplicationsDirPath}"`,
   );
   const desktopEntryTemplate = fs.readFileSync(
     path.join(
       CONFIG.repositoryRootPath,
       'resources',
       'linux',
-      'atom.desktop.in'
-    )
+      'atom.desktop.in',
+    ),
   );
   const desktopEntryContents = template(desktopEntryTemplate)({
     appName: CONFIG.appName,
     appFileName: atomExecutableName,
     description: appDescription,
     installDir: '/usr',
-    iconPath: atomExecutableName
+    iconPath: atomExecutableName,
   });
   fs.writeFileSync(
     path.join(
       debianPackageApplicationsDirPath,
-      `${atomExecutableName}.desktop`
+      `${atomExecutableName}.desktop`,
     ),
-    desktopEntryContents
+    desktopEntryContents,
   );
 
   console.log(`Copying icon into "${debianPackageIconsDirPath}"`);
@@ -175,19 +175,19 @@ module.exports = function(packagedAppPath) {
       'resources',
       'app.asar.unpacked',
       'resources',
-      'atom.png'
+      'atom.png',
     ),
-    path.join(debianPackageIconsDirPath, `${atomExecutableName}.png`)
+    path.join(debianPackageIconsDirPath, `${atomExecutableName}.png`),
   );
 
   console.log(`Copying license into "${debianPackageDocsDirPath}"`);
   fs.copySync(
     path.join(packagedAppPath, 'resources', 'LICENSE.md'),
-    path.join(debianPackageDocsDirPath, 'copyright')
+    path.join(debianPackageDocsDirPath, 'copyright'),
   );
 
   console.log(
-    `Copying polkit configuration into "${debianPackageShareDirPath}"`
+    `Copying polkit configuration into "${debianPackageShareDirPath}"`,
   );
   fs.copySync(
     path.join(CONFIG.repositoryRootPath, 'resources', 'linux', 'atom.policy'),
@@ -195,17 +195,17 @@ module.exports = function(packagedAppPath) {
       debianPackageShareDirPath,
       'polkit-1',
       'actions',
-      `atom-${CONFIG.channel}.policy`
-    )
+      `atom-${CONFIG.channel}.policy`,
+    ),
   );
 
   console.log(`Generating .deb file from ${debianPackageDirPath}`);
   spawnSync('fakeroot', ['dpkg-deb', '-b', debianPackageDirPath], {
-    stdio: 'inherit'
+    stdio: 'inherit',
   });
 
   console.log(
-    `Copying generated package into "${outputDebianPackageFilePath}"`
+    `Copying generated package into "${outputDebianPackageFilePath}"`,
   );
   fs.copySync(`${debianPackageDirPath}.deb`, outputDebianPackageFilePath);
 };

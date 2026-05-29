@@ -5,7 +5,7 @@ const path = require('path');
 
 module.exports = class FileSystemBlobStore {
   static load(directory) {
-    let instance = new FileSystemBlobStore(directory);
+    const instance = new FileSystemBlobStore(directory);
     instance.load();
     return instance;
   }
@@ -41,9 +41,9 @@ module.exports = class FileSystemBlobStore {
   }
 
   save() {
-    let dump = this.getDump();
-    let blobToStore = Buffer.concat(dump[0]);
-    let mapToStore = JSON.stringify(dump[1]);
+    const dump = this.getDump();
+    const blobToStore = Buffer.concat(dump[0]);
+    const mapToStore = JSON.stringify(dump[1]);
 
     let acquiredLock = false;
     try {
@@ -66,7 +66,8 @@ module.exports = class FileSystemBlobStore {
 
   has(key) {
     return (
-      this.inMemoryBlobs.has(key) || this.storedBlobMap.hasOwnProperty(key)
+      this.inMemoryBlobs.has(key) ||
+      Object.prototype.hasOwnProperty.call(this.storedBlobMap, key)
     );
   }
 
@@ -98,29 +99,29 @@ module.exports = class FileSystemBlobStore {
 
     return this.storedBlob.slice.apply(
       this.storedBlob,
-      this.storedBlobMap[key]
+      this.storedBlobMap[key],
     );
   }
 
   getDump() {
-    let buffers = [];
-    let blobMap = {};
+    const buffers = [];
+    const blobMap = {};
     let currentBufferStart = 0;
 
     function dump(key, getBufferByKey) {
-      let buffer = getBufferByKey(key);
+      const buffer = getBufferByKey(key);
       buffers.push(buffer);
       blobMap[key] = [currentBufferStart, currentBufferStart + buffer.length];
       currentBufferStart += buffer.length;
     }
 
-    for (let key of this.inMemoryBlobs.keys()) {
+    for (const key of this.inMemoryBlobs.keys()) {
       if (this.usedKeys.has(key)) {
         dump(key, this.getFromMemory.bind(this));
       }
     }
 
-    for (let key of Object.keys(this.storedBlobMap)) {
+    for (const key of Object.keys(this.storedBlobMap)) {
       if (!blobMap[key] && this.usedKeys.has(key)) {
         dump(key, this.getFromStorage.bind(this));
       }

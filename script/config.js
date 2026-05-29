@@ -21,7 +21,7 @@ const atomHomeDirPath =
 const appMetadata = require(path.join(repositoryRootPath, 'package.json'));
 const apmMetadata = require(path.join(apmRootPath, 'package.json'));
 const computedAppVersion = computeAppVersion(
-  process.env.ATOM_RELEASE_VERSION || appMetadata.version
+  process.env.ATOM_RELEASE_VERSION || appMetadata.version,
 );
 const channel = getChannel(computedAppVersion);
 const appName = getAppName(channel);
@@ -55,7 +55,7 @@ module.exports = {
   getApmBinPath,
   getNpmBinPath,
   getLocalNpmBinPath,
-  snapshotAuxiliaryData: {}
+  snapshotAuxiliaryData: {},
 };
 
 function getChannelName(channel) {
@@ -76,8 +76,10 @@ function getChannel(version) {
 function getAppName(channel) {
   return channel === 'stable'
     ? 'Atom'
-    : `Atom ${process.env.ATOM_CHANNEL_DISPLAY_NAME ||
-        channel.charAt(0).toUpperCase() + channel.slice(1)}`;
+    : `Atom ${
+        process.env.ATOM_CHANNEL_DISPLAY_NAME ||
+        channel.charAt(0).toUpperCase() + channel.slice(1)
+      }`;
 }
 
 function getExecutableName(channel, appName) {
@@ -93,7 +95,7 @@ function getExecutableName(channel, appName) {
 function computeAppVersion(version) {
   if (version.match(/-dev$/)) {
     const result = spawnSync('git', ['rev-parse', '--short', 'HEAD'], {
-      cwd: repositoryRootPath
+      cwd: repositoryRootPath,
     });
     const commitHash = result.stdout.toString().trim();
     version += '-' + commitHash;
@@ -108,7 +110,7 @@ function getApmBinPath() {
     'node_modules',
     'atom-package-manager',
     'bin',
-    apmBinName
+    apmBinName,
   );
 }
 
@@ -123,7 +125,7 @@ function getLocalNpmBinPath() {
     'script',
     'node_modules',
     '.bin',
-    npmBinName
+    npmBinName,
   );
   return localNpmBinPath;
 }

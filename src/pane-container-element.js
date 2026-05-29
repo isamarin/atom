@@ -11,7 +11,7 @@ class PaneContainerElement extends HTMLElement {
     this.views = views;
     if (this.views == null) {
       throw new Error(
-        'Must pass a views parameter when initializing PaneContainerElements'
+        'Must pass a views parameter when initializing PaneContainerElements',
       );
     }
     this.subscriptions.add(this.model.observeRoot(this.rootChanged.bind(this)));
@@ -50,5 +50,5 @@ function createPaneContainerElement() {
 }
 
 module.exports = {
-  createPaneContainerElement
+  createPaneContainerElement,
 };

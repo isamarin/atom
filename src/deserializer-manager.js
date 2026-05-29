@@ -36,13 +36,13 @@ module.exports = class DeserializerManager {
   //   wish to avoid referencing the `atom` global.
   add(...deserializers) {
     for (let i = 0; i < deserializers.length; i++) {
-      let deserializer = deserializers[i];
+      const deserializer = deserializers[i];
       this.deserializers[deserializer.name] = deserializer;
     }
 
     return new Disposable(() => {
       for (let j = 0; j < deserializers.length; j++) {
-        let deserializer = deserializers[j];
+        const deserializer = deserializers[j];
         delete this.deserializers[deserializer.name];
       }
     });
@@ -62,7 +62,7 @@ module.exports = class DeserializerManager {
 
     const deserializer = this.get(state);
     if (deserializer) {
-      let stateVersion =
+      const stateVersion =
         (typeof state.get === 'function' && state.get('version')) ||
         state.version;
 
@@ -86,7 +86,7 @@ module.exports = class DeserializerManager {
       return;
     }
 
-    let stateDeserializer =
+    const stateDeserializer =
       (typeof state.get === 'function' && state.get('deserializer')) ||
       state.deserializer;
 

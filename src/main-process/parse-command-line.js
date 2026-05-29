@@ -8,7 +8,7 @@ module.exports = function parseCommandLine(processArgs) {
   // macOS Gatekeeper adds a flag ("-psn_0_[six or seven digits here]") when it intercepts Atom launches.
   // (This happens for fresh downloads, new installs, or first launches after upgrading).
   // We don't need this flag, and yargs interprets it as many short flags. So, we filter it out.
-  const filteredArgs = processArgs.filter(arg => !arg.startsWith('-psn_'));
+  const filteredArgs = processArgs.filter((arg) => !arg.startsWith('-psn_'));
 
   const options = yargs(filteredArgs).wrap(yargs.terminalWidth());
   const version = app.getVersion();
@@ -36,7 +36,7 @@ module.exports = function parseCommandLine(processArgs) {
                               Defaults to \`~/github/atom\`.
 
       ATOM_HOME               The root path for all configuration files and folders.
-                              Defaults to \`~/.atom\`.`
+                              Defaults to \`~/.atom\`.`,
   );
   // Deprecated 1.0 API preview flag
   options
@@ -47,7 +47,7 @@ module.exports = function parseCommandLine(processArgs) {
     .boolean('include-deprecated-apis')
     .describe(
       'include-deprecated-apis',
-      'This option is not currently supported.'
+      'This option is not currently supported.',
     );
   options
     .alias('d', 'dev')
@@ -70,39 +70,39 @@ module.exports = function parseCommandLine(processArgs) {
     .boolean('profile-startup')
     .describe(
       'profile-startup',
-      'Create a profile of the startup execution time.'
+      'Create a profile of the startup execution time.',
     );
   options
     .alias('r', 'resource-path')
     .string('r')
     .describe(
       'r',
-      'Set the path to the Atom source directory and enable dev-mode.'
+      'Set the path to the Atom source directory and enable dev-mode.',
     );
   options
     .boolean('safe')
     .describe(
       'safe',
-      'Do not load packages from ~/.atom/packages or ~/.atom/dev/packages.'
+      'Do not load packages from ~/.atom/packages or ~/.atom/dev/packages.',
     );
   options
     .boolean('benchmark')
     .describe(
       'benchmark',
-      'Open a new window that runs the specified benchmarks.'
+      'Open a new window that runs the specified benchmarks.',
     );
   options
     .boolean('benchmark-test')
     .describe(
       'benchmark-test',
-      'Run a faster version of the benchmarks in headless mode.'
+      'Run a faster version of the benchmarks in headless mode.',
     );
   options
     .alias('t', 'test')
     .boolean('t')
     .describe(
       't',
-      'Run the specified specs and exit with error code on failures.'
+      'Run the specified specs and exit with error code on failures.',
     );
   options
     .alias('m', 'main-process')
@@ -112,7 +112,7 @@ module.exports = function parseCommandLine(processArgs) {
     .string('timeout')
     .describe(
       'timeout',
-      'When in test mode, waits until the specified time (in minutes) and kills the process (exit code: 130).'
+      'When in test mode, waits until the specified time (in minutes) and kills the process (exit code: 130).',
     );
   options
     .alias('w', 'wait')
@@ -130,7 +130,7 @@ module.exports = function parseCommandLine(processArgs) {
     .boolean('enable-electron-logging')
     .describe(
       'enable-electron-logging',
-      'Enable low-level logging messages from Electron.'
+      'Enable low-level logging messages from Electron.',
     );
   options.boolean('uri-handler');
   options
@@ -138,7 +138,7 @@ module.exports = function parseCommandLine(processArgs) {
       dedent`Atom    : ${version}
              Electron: ${process.versions.electron}
              Chrome  : ${process.versions.chrome}
-             Node    : ${process.versions.node}`
+             Node    : ${process.versions.node}`,
     )
     .alias('v', 'version');
 
@@ -150,17 +150,17 @@ module.exports = function parseCommandLine(processArgs) {
     args = {
       uriHandler: true,
       'uri-handler': true,
-      _: args._.filter(str => str.startsWith('atom://')).slice(0, 1)
+      _: args._.filter((str) => str.startsWith('atom://')).slice(0, 1),
     };
   }
 
-  const addToLastWindow = args['add'];
-  const safeMode = args['safe'];
-  const benchmark = args['benchmark'];
+  const addToLastWindow = args.add;
+  const safeMode = args.safe;
+  const benchmark = args.benchmark;
   const benchmarkTest = args['benchmark-test'];
-  const test = args['test'];
+  const test = args.test;
   const mainProcess = args['main-process'];
-  const timeout = args['timeout'];
+  const timeout = args.timeout;
   const newWindow = args['new-window'];
   let executedFrom = null;
   if (args['executed-from'] && args['executed-from'].toString()) {
@@ -171,7 +171,7 @@ module.exports = function parseCommandLine(processArgs) {
 
   if (newWindow && addToLastWindow) {
     process.stderr.write(
-      `Only one of the --add and --new-window options may be specified at the same time.\n\n${options.help()}`
+      `Only one of the --add and --new-window options may be specified at the same time.\n\n${options.help()}`,
     );
 
     // Exiting the main process with a nonzero exit code on MacOS causes the app open to fail with the mysterious
@@ -180,17 +180,17 @@ module.exports = function parseCommandLine(processArgs) {
   }
 
   let pidToKillWhenClosed = null;
-  if (args['wait']) {
-    pidToKillWhenClosed = args['pid'];
+  if (args.wait) {
+    pidToKillWhenClosed = args.pid;
   }
 
   const logFile = args['log-file'];
   const userDataDir = args['user-data-dir'];
   const profileStartup = args['profile-startup'];
   const clearWindowState = args['clear-window-state'];
-  let pathsToOpen = [];
-  let urlsToOpen = [];
-  let devMode = args['dev'];
+  const pathsToOpen = [];
+  const urlsToOpen = [];
+  let devMode = args.dev;
 
   for (const path of args._) {
     if (typeof path !== 'string') {
@@ -234,6 +234,6 @@ module.exports = function parseCommandLine(processArgs) {
     mainProcess,
     benchmark,
     benchmarkTest,
-    env: process.env
+    env: process.env,
   };
 };

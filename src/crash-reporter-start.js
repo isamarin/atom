@@ -1,4 +1,4 @@
-module.exports = function(params) {
+module.exports = function (params) {
   const { crashReporter } = require('electron');
   const os = require('os');
   const platformRelease = os.release();
@@ -11,6 +11,6 @@ module.exports = function(params) {
     productName: 'Atom',
     submitURL: 'https://atom.io/crash_reports',
     parsedUploadToServer,
-    extra: { platformRelease, arch, releaseChannel }
+    extra: { platformRelease, arch, releaseChannel },
   });
 };

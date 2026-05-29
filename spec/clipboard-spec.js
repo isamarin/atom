@@ -11,27 +11,27 @@ describe('Clipboard', () => {
       expect(atom.clipboard.read()).toBe('next');
       expect(atom.clipboard.readWithMetadata().text).toBe('next');
       expect(atom.clipboard.readWithMetadata().metadata).toEqual({
-        meta: 'data'
+        meta: 'data',
       });
     });
   });
 
   describe('line endings', () => {
-    let originalPlatform = process.platform;
+    const originalPlatform = process.platform;
 
     const eols = new Map([
       ['win32', '\r\n'],
       ['darwin', '\n'],
-      ['linux', '\n']
+      ['linux', '\n'],
     ]);
-    for (let [platform, eol] of eols) {
+    for (const [platform, eol] of eols) {
       it(`converts line endings to the OS's native line endings on ${platform}`, () => {
         Object.defineProperty(process, 'platform', { value: platform });
 
         atom.clipboard.write('next\ndone\r\n\n', { meta: 'data' });
         expect(atom.clipboard.readWithMetadata()).toEqual({
           text: `next${eol}done${eol}${eol}`,
-          metadata: { meta: 'data' }
+          metadata: { meta: 'data' },
         });
 
         Object.defineProperty(process, 'platform', { value: originalPlatform });

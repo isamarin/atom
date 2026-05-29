@@ -9,7 +9,7 @@ describe('AutoUpdateManager (renderer)', () => {
 
   beforeEach(() => {
     autoUpdateManager = new AutoUpdateManager({
-      applicationDelegate: atom.applicationDelegate
+      applicationDelegate: atom.applicationDelegate,
     });
     autoUpdateManager.initialize();
   });
@@ -72,7 +72,7 @@ describe('AutoUpdateManager (renderer)', () => {
       electronAutoUpdater.emit('error', {}, 'an error message');
       waitsFor(() => spy.callCount === 1);
       runs(() =>
-        expect(autoUpdateManager.getErrorMessage()).toBe('an error message')
+        expect(autoUpdateManager.getErrorMessage()).toBe('an error message'),
       );
     });
   });

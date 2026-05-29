@@ -72,12 +72,12 @@ module.exports = class ViewRegistry {
         case 'function':
           provider = {
             createView: modelConstructor,
-            modelConstructor: AnyConstructor
+            modelConstructor: AnyConstructor,
           };
           break;
         case 'object':
           Grim.deprecate(
-            'atom.views.addViewProvider now takes 2 arguments: a model constructor and a createView function. See docs for details.'
+            'atom.views.addViewProvider now takes 2 arguments: a model constructor and a createView function. See docs for details.',
           );
           provider = modelConstructor;
           break;
@@ -90,7 +90,7 @@ module.exports = class ViewRegistry {
 
     this.providers.push(provider);
     return new Disposable(() => {
-      this.providers = this.providers.filter(p => p !== provider);
+      this.providers = this.providers.filter((p) => p !== provider);
     });
   }
 
@@ -157,7 +157,7 @@ module.exports = class ViewRegistry {
       return object[0];
     }
 
-    for (let provider of this.providers) {
+    for (const provider of this.providers) {
       if (provider.modelConstructor === AnyConstructor) {
         element = provider.createView(object, this.atomEnvironment);
         if (element) {
@@ -174,7 +174,7 @@ module.exports = class ViewRegistry {
           return element;
         }
 
-        let ViewConstructor = provider.viewConstructor;
+        const ViewConstructor = provider.viewConstructor;
         if (ViewConstructor) {
           element = new ViewConstructor();
           if (element.initialize) {
@@ -188,7 +188,7 @@ module.exports = class ViewRegistry {
     }
 
     if (object && object.getViewClass) {
-      let ViewConstructor = object.getViewClass();
+      const ViewConstructor = object.getViewClass();
       if (ViewConstructor) {
         const view = new ViewConstructor(object);
         return view[0];
@@ -198,7 +198,7 @@ module.exports = class ViewRegistry {
     throw new Error(
       `Can't create a view for ${
         object.constructor.name
-      } instance. Please register a view provider.`
+      } instance. Please register a view provider.`,
     );
   }
 
@@ -209,7 +209,7 @@ module.exports = class ViewRegistry {
     }
     return new Disposable(() => {
       this.documentWriters = this.documentWriters.filter(
-        writer => writer !== fn
+        (writer) => writer !== fn,
       );
     });
   }
@@ -219,14 +219,14 @@ module.exports = class ViewRegistry {
     this.requestDocumentUpdate();
     return new Disposable(() => {
       this.documentReaders = this.documentReaders.filter(
-        reader => reader !== fn
+        (reader) => reader !== fn,
       );
     });
   }
 
   getNextUpdatePromise() {
     if (this.nextUpdatePromise == null) {
-      this.nextUpdatePromise = new Promise(resolve => {
+      this.nextUpdatePromise = new Promise((resolve) => {
         this.resolveNextUpdatePromise = resolve;
       });
     }
@@ -248,7 +248,7 @@ module.exports = class ViewRegistry {
   requestDocumentUpdate() {
     if (this.animationFrameRequest == null) {
       this.animationFrameRequest = requestAnimationFrame(
-        this.performDocumentUpdate
+        this.performDocumentUpdate,
       );
     }
   }

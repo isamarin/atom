@@ -77,10 +77,10 @@ describe('GoToLine', () => {
       const rowsPerPage = editor.getRowsPerPage();
       const currentRow = editor.getCursorBufferPosition().row;
       expect(editor.getFirstVisibleScreenRow()).toBe(
-        Math.ceil(currentRow - rowsPerPage / 2)
+        Math.ceil(currentRow - rowsPerPage / 2),
       );
       expect(editor.getLastVisibleScreenRow()).toBe(
-        currentRow + Math.floor(rowsPerPage / 2)
+        currentRow + Math.floor(rowsPerPage / 2),
       );
     });
   });

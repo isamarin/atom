@@ -125,7 +125,7 @@ module.exports = class Cursor extends Model {
   // Public: Returns whether the cursor is on the line return character.
   isAtEndOfLine() {
     return this.getBufferPosition().isEqual(
-      this.getCurrentLineBufferRange().end
+      this.getCurrentLineBufferRange().end,
     );
   }
 
@@ -147,7 +147,10 @@ module.exports = class Cursor extends Model {
   // Returns a {Boolean}.
   isSurroundedByWhitespace() {
     const { row, column } = this.getBufferPosition();
-    const range = [[row, column - 1], [row, column + 1]];
+    const range = [
+      [row, column - 1],
+      [row, column + 1],
+    ];
     return /^\s+$/.test(this.editor.getTextInBufferRange(range));
   }
 
@@ -163,7 +166,10 @@ module.exports = class Cursor extends Model {
     if (this.isAtBeginningOfLine() || this.isAtEndOfLine()) return false;
 
     const { row, column } = this.getBufferPosition();
-    const range = [[row, column - 1], [row, column + 1]];
+    const range = [
+      [row, column - 1],
+      [row, column + 1],
+    ];
     const text = this.editor.getTextInBufferRange(range);
     if (/\s/.test(text[0]) || /\s/.test(text[1])) return false;
 
@@ -183,7 +189,10 @@ module.exports = class Cursor extends Model {
   // Returns a {Boolean}
   isInsideWord(options) {
     const { row, column } = this.getBufferPosition();
-    const range = [[row, column], [row, Infinity]];
+    const range = [
+      [row, column],
+      [row, Infinity],
+    ];
     const text = this.editor.getTextInBufferRange(range);
     return (
       text.search((options && options.wordRegex) || this.wordRegExp()) === 0
@@ -204,7 +213,7 @@ module.exports = class Cursor extends Model {
   // Returns a {ScopeDescriptor}
   getScopeDescriptor() {
     return this.editor.scopeDescriptorForBufferPosition(
-      this.getBufferPosition()
+      this.getBufferPosition(),
     );
   }
 
@@ -213,7 +222,7 @@ module.exports = class Cursor extends Model {
   // Returns a {ScopeDescriptor}
   getSyntaxTreeScopeDescriptor() {
     return this.editor.syntaxTreeScopeDescriptorForBufferPosition(
-      this.getBufferPosition()
+      this.getBufferPosition(),
     );
   }
 
@@ -262,7 +271,7 @@ module.exports = class Cursor extends Model {
     if (this.goalColumn != null) column = this.goalColumn;
     this.setScreenPosition(
       { row: row - rowCount, column },
-      { skipSoftWrapIndentation: true }
+      { skipSoftWrapIndentation: true },
     );
     this.goalColumn = column;
   }
@@ -285,7 +294,7 @@ module.exports = class Cursor extends Model {
     if (this.goalColumn != null) column = this.goalColumn;
     this.setScreenPosition(
       { row: row + rowCount, column },
-      { skipSoftWrapIndentation: true }
+      { skipSoftWrapIndentation: true },
     );
     this.goalColumn = column;
   }
@@ -372,12 +381,12 @@ module.exports = class Cursor extends Model {
     let targetBufferColumn;
     const screenRow = this.getScreenRow();
     const screenLineStart = this.editor.clipScreenPosition([screenRow, 0], {
-      skipSoftWrapIndentation: true
+      skipSoftWrapIndentation: true,
     });
     const screenLineEnd = [screenRow, Infinity];
     const screenLineBufferRange = this.editor.bufferRangeForScreenRange([
       screenLineStart,
-      screenLineEnd
+      screenLineEnd,
     ]);
 
     let firstCharacterColumn = null;
@@ -387,7 +396,7 @@ module.exports = class Cursor extends Model {
       ({ range, stop }) => {
         firstCharacterColumn = range.start.column;
         stop();
-      }
+      },
     );
 
     if (
@@ -401,7 +410,7 @@ module.exports = class Cursor extends Model {
 
     this.setBufferPosition([
       screenLineBufferRange.start.row,
-      targetBufferColumn
+      targetBufferColumn,
     ]);
   }
 
@@ -497,16 +506,16 @@ module.exports = class Cursor extends Model {
   getPreviousWordBoundaryBufferPosition(options = {}) {
     const currentBufferPosition = this.getBufferPosition();
     const previousNonBlankRow = this.editor.buffer.previousNonBlankRow(
-      currentBufferPosition.row
+      currentBufferPosition.row,
     );
     const scanRange = Range(
       Point(previousNonBlankRow || 0, 0),
-      currentBufferPosition
+      currentBufferPosition,
     );
 
     const ranges = this.editor.buffer.findAllInRangeSync(
       options.wordRegex || this.wordRegExp(),
-      scanRange
+      scanRange,
     );
 
     const range = ranges[ranges.length - 1];
@@ -536,12 +545,12 @@ module.exports = class Cursor extends Model {
     const currentBufferPosition = this.getBufferPosition();
     const scanRange = Range(
       currentBufferPosition,
-      this.editor.getEofBufferPosition()
+      this.editor.getEofBufferPosition(),
     );
 
     const range = this.editor.buffer.findInRangeSync(
       options.wordRegex || this.wordRegExp(),
-      scanRange
+      scanRange,
     );
 
     if (range) {
@@ -579,11 +588,11 @@ module.exports = class Cursor extends Model {
 
     const ranges = this.editor.buffer.findAllInRangeSync(
       options.wordRegex || this.wordRegExp(options),
-      scanRange
+      scanRange,
     );
 
     let result;
-    for (let range of ranges) {
+    for (const range of ranges) {
       if (position.isLessThanOrEqual(range.start)) break;
       if (allowPrevious || position.isLessThanOrEqual(range.end))
         result = Point.fromObject(range.start);
@@ -612,10 +621,10 @@ module.exports = class Cursor extends Model {
 
     const ranges = this.editor.buffer.findAllInRangeSync(
       options.wordRegex || this.wordRegExp(options),
-      scanRange
+      scanRange,
     );
 
-    for (let range of ranges) {
+    for (const range of ranges) {
       if (position.isLessThan(range.start) && !allowNext) break;
       if (position.isLessThan(range.end)) return Point.fromObject(range.end);
     }
@@ -644,7 +653,7 @@ module.exports = class Cursor extends Model {
       ({ range, stop }) => {
         beginningOfNextWordPosition = range.start;
         stop();
-      }
+      },
     );
 
     return beginningOfNextWordPosition || currentBufferPosition;
@@ -659,12 +668,12 @@ module.exports = class Cursor extends Model {
     const position = this.getBufferPosition();
     const ranges = this.editor.buffer.findAllInRangeSync(
       options.wordRegex || this.wordRegExp(options),
-      new Range(new Point(position.row, 0), new Point(position.row, Infinity))
+      new Range(new Point(position.row, 0), new Point(position.row, Infinity)),
     );
     const range = ranges.find(
-      range =>
+      (range) =>
         range.end.column >= position.column &&
-        range.start.column <= position.column
+        range.start.column <= position.column,
     );
     return range ? Range.fromObject(range) : new Range(position, position);
   }
@@ -691,7 +700,7 @@ module.exports = class Cursor extends Model {
   getCurrentWordPrefix() {
     return this.editor.getTextInBufferRange([
       this.getBeginningOfCurrentWordBufferPosition(),
-      this.getBufferPosition()
+      this.getBufferPosition(),
     ]);
   }
 
@@ -753,7 +762,7 @@ module.exports = class Cursor extends Model {
       '^[\t ]+',
       '[\t ]+$',
       `[${uppercaseLetters}]+(?![${lowercaseLetters}])`,
-      '\\d+'
+      '\\d+',
     ];
     if (options.backwards) {
       segments.push(`${snakeCamelSegment}_*`);
@@ -809,7 +818,7 @@ module.exports = class Cursor extends Model {
       ({ range, stop }) => {
         position = range.start.traverse(Point(1, 0));
         if (!position.isEqual(start)) stop();
-      }
+      },
     );
     return position;
   }
@@ -818,7 +827,10 @@ module.exports = class Cursor extends Model {
     const start = this.getBufferPosition();
 
     const { row, column } = start;
-    const scanRange = [[row - 1, column], [0, 0]];
+    const scanRange = [
+      [row - 1, column],
+      [0, 0],
+    ];
     let position = new Point(0, 0);
     this.editor.backwardsScanInBufferRange(
       EmptyLineRegExp,
@@ -826,7 +838,7 @@ module.exports = class Cursor extends Model {
       ({ range, stop }) => {
         position = range.start.traverse(Point(1, 0));
         if (!position.isEqual(start)) stop();
-      }
+      },
     );
     return position;
   }

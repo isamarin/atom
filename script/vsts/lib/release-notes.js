@@ -3,31 +3,31 @@ const octokit = require('@octokit/rest')();
 const changelog = require('pr-changelog');
 const childProcess = require('child_process');
 
-module.exports.getRelease = async function(releaseVersion, githubToken) {
+module.exports.getRelease = async function (releaseVersion, githubToken) {
   if (githubToken) {
     octokit.authenticate({
       type: 'token',
-      token: githubToken
+      token: githubToken,
     });
   }
 
   const releases = await octokit.repos.getReleases({
     owner: 'atom',
-    repo: 'atom'
+    repo: 'atom',
   });
-  const release = releases.data.find(r => semver.eq(r.name, releaseVersion));
+  const release = releases.data.find((r) => semver.eq(r.name, releaseVersion));
 
   return {
     exists: release !== undefined,
     isDraft: release && release.draft,
-    releaseNotes: release ? release.body : undefined
+    releaseNotes: release ? release.body : undefined,
   };
 };
 
-module.exports.generateForVersion = async function(
+module.exports.generateForVersion = async function (
   releaseVersion,
   githubToken,
-  oldReleaseNotes
+  oldReleaseNotes,
 ) {
   let oldVersion = null;
   let oldVersionName = null;
@@ -38,7 +38,7 @@ module.exports.generateForVersion = async function(
     changelog.setGithubAccessToken(githubToken);
     octokit.authenticate({
       type: 'token',
-      token: githubToken
+      token: githubToken,
     });
   }
 
@@ -48,9 +48,9 @@ module.exports.generateForVersion = async function(
     oldVersion = `${parsedVersion.major}.${parsedVersion.minor - 1}-releases`;
     oldVersionName = `v${parsedVersion.major}.${parsedVersion.minor - 1}.0`;
   } else {
-    let releases = await octokit.repos.getReleases({
+    const releases = await octokit.repos.getReleases({
       owner: 'atom',
-      repo: 'atom'
+      repo: 'atom',
     });
     oldVersion = 'v' + getPreviousRelease(releaseVersion, releases.data).name;
     oldVersionName = oldVersion;
@@ -62,14 +62,14 @@ module.exports.generateForVersion = async function(
     fromTag: oldVersion,
     toTag: newVersionBranch,
     dependencyKey: 'packageDependencies',
-    changelogFormatter: function({
+    changelogFormatter: function ({
       pullRequests,
       owner,
       repo,
       fromTag,
-      toTag
+      toTag,
     }) {
-      let prString = changelog.pullRequestsToString(pullRequests);
+      const prString = changelog.pullRequestsToString(pullRequests);
       let title = repo;
       if (repo === 'atom') {
         title = 'Atom Core';
@@ -77,7 +77,7 @@ module.exports.generateForVersion = async function(
         toTag = releaseVersion;
       }
       return `### [${title}](https://github.com/${owner}/${repo})\n\n${fromTag}...${toTag}\n\n${prString}`;
-    }
+    },
   });
 
   const writtenReleaseNotes =
@@ -93,14 +93,14 @@ ${allChangesText}
 `;
 };
 
-module.exports.generateForNightly = async function(
+module.exports.generateForNightly = async function (
   releaseVersion,
-  githubToken
+  githubToken,
 ) {
   const latestCommitResult = childProcess.spawnSync('git', [
     'rev-parse',
     '--short',
-    'HEAD'
+    'HEAD',
   ]);
   if (!latestCommitResult) {
     console.log("Couldn't get the current commmit from git.");
@@ -110,13 +110,13 @@ module.exports.generateForNightly = async function(
 
   const latestCommit = latestCommitResult.stdout.toString().trim();
   const output = [
-    `### This nightly release is based on https://github.com/atom/atom/commit/${latestCommit} :atom: :night_with_stars:`
+    `### This nightly release is based on https://github.com/atom/atom/commit/${latestCommit} :atom: :night_with_stars:`,
   ];
 
   try {
     const releases = await octokit.repos.getReleases({
       owner: 'atom',
-      repo: 'atom-nightly-releases'
+      repo: 'atom-nightly-releases',
     });
 
     const previousRelease = getPreviousRelease(releaseVersion, releases.data);
@@ -124,7 +124,7 @@ module.exports.generateForNightly = async function(
 
     if (oldReleaseNotes) {
       const extractMatch = oldReleaseNotes.match(
-        /atom\/atom\/commit\/([0-9a-f]{5,40})/
+        /atom\/atom\/commit\/([0-9a-f]{5,40})/,
       );
       if (extractMatch.length > 1 && extractMatch[1]) {
         output.push('', '---', '');
@@ -139,14 +139,14 @@ module.exports.generateForNightly = async function(
           output.push('No changes have been included in this release');
         } else {
           output.push(
-            `Click [here](https://github.com/atom/atom/compare/${previousCommit}...${latestCommit}) to see the changes included with this release!`
+            `Click [here](https://github.com/atom/atom/compare/${previousCommit}...${latestCommit}) to see the changes included with this release!`,
           );
         }
       }
     }
   } catch (e) {
     console.log(
-      'Error when trying to find the previous nightly release: ' + e.message
+      'Error when trying to find the previous nightly release: ' + e.message,
     );
   }
 
@@ -156,7 +156,7 @@ module.exports.generateForNightly = async function(
 function extractWrittenReleaseNotes(oldReleaseNotes) {
   if (oldReleaseNotes) {
     const extractMatch = oldReleaseNotes.match(
-      /^## Notable Changes\r\n([\s\S]*)<details>/
+      /^## Notable Changes\r\n([\s\S]*)<details>/,
     );
     if (extractMatch && extractMatch[1]) {
       return extractMatch[1].trim();
@@ -172,7 +172,7 @@ function getPreviousRelease(version, allReleases) {
   // Make sure versions are sorted before using them
   allReleases.sort((v1, v2) => semver.rcompare(v1.name, v2.name));
 
-  for (let release of allReleases) {
+  for (const release of allReleases) {
     if (versionIsStable && semver.prerelease(release.name)) {
       continue;
     }

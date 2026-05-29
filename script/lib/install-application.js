@@ -12,13 +12,13 @@ const CONFIG = require('../config');
 function install(installationDirPath, packagedAppFileName, packagedAppPath) {
   if (fs.existsSync(installationDirPath)) {
     console.log(
-      `Removing previously installed "${packagedAppFileName}" at "${installationDirPath}"`
+      `Removing previously installed "${packagedAppFileName}" at "${installationDirPath}"`,
     );
     fs.removeSync(installationDirPath);
   }
 
   console.log(
-    `Installing "${packagedAppFileName}" at "${installationDirPath}"`
+    `Installing "${packagedAppFileName}" at "${installationDirPath}"`,
   );
   fs.copySync(packagedAppPath, installationDirPath);
 }
@@ -45,7 +45,7 @@ function findBaseIconThemeDirPath() {
   }
 }
 
-module.exports = function(packagedAppPath, installDir) {
+module.exports = function (packagedAppPath, installDir) {
   const packagedAppFileName = path.basename(packagedAppPath);
   if (process.platform === 'darwin') {
     const installPrefix =
@@ -60,17 +60,17 @@ module.exports = function(packagedAppPath, installDir) {
     const installationDirPath = path.join(
       installPrefix,
       packagedAppFileName,
-      'app-dev'
+      'app-dev',
     );
     try {
       install(installationDirPath, packagedAppFileName, packagedAppPath);
     } catch (e) {
       console.log(
-        `Administrator elevation required to install into "${installationDirPath}"`
+        `Administrator elevation required to install into "${installationDirPath}"`,
       );
       const fsAdmin = require('fs-admin');
       return new Promise((resolve, reject) => {
-        fsAdmin.recursiveCopy(packagedAppPath, installationDirPath, error => {
+        fsAdmin.recursiveCopy(packagedAppPath, installationDirPath, (error) => {
           error ? reject(error) : resolve();
         });
       });
@@ -104,17 +104,17 @@ module.exports = function(packagedAppPath, installDir) {
       const fullIconName = atomExecutableName + '.png';
 
       let existingIconsFound = false;
-      fs.readdirSync(baseIconThemeDirPath).forEach(size => {
+      fs.readdirSync(baseIconThemeDirPath).forEach((size) => {
         const iconPath = path.join(
           baseIconThemeDirPath,
           size,
           'apps',
-          fullIconName
+          fullIconName,
         );
         if (fs.existsSync(iconPath)) {
           if (!existingIconsFound) {
             console.log(
-              `Removing existing icons from "${baseIconThemeDirPath}"`
+              `Removing existing icons from "${baseIconThemeDirPath}"`,
             );
           }
           existingIconsFound = true;
@@ -128,9 +128,9 @@ module.exports = function(packagedAppPath, installDir) {
         'resources',
         'app-icons',
         CONFIG.channel,
-        'png'
+        'png',
       );
-      fs.readdirSync(appIconsPath).forEach(imageName => {
+      fs.readdirSync(appIconsPath).forEach((imageName) => {
         if (/\.png$/.test(imageName)) {
           const size = path.basename(imageName, '.png');
           const iconPath = path.join(appIconsPath, imageName);
@@ -140,8 +140,8 @@ module.exports = function(packagedAppPath, installDir) {
               baseIconThemeDirPath,
               `${size}x${size}`,
               'apps',
-              fullIconName
-            )
+              fullIconName,
+            ),
           );
         }
       });
@@ -156,11 +156,11 @@ module.exports = function(packagedAppPath, installDir) {
       // Install xdg desktop file
       const desktopEntryPath = path.join(
         applicationsDirPath,
-        `${atomExecutableName}.desktop`
+        `${atomExecutableName}.desktop`,
       );
       if (fs.existsSync(desktopEntryPath)) {
         console.log(
-          `Removing existing desktop entry file at "${desktopEntryPath}"`
+          `Removing existing desktop entry file at "${desktopEntryPath}"`,
         );
         fs.removeSync(desktopEntryPath);
       }
@@ -170,15 +170,15 @@ module.exports = function(packagedAppPath, installDir) {
           CONFIG.repositoryRootPath,
           'resources',
           'linux',
-          'atom.desktop.in'
-        )
+          'atom.desktop.in',
+        ),
       );
       const desktopEntryContents = template(desktopEntryTemplate)({
         appName,
         appFileName: atomExecutableName,
         description: appDescription,
         installDir: prefixDirPath,
-        iconPath: atomExecutableName
+        iconPath: atomExecutableName,
       });
       fs.writeFileSync(desktopEntryPath, desktopEntryContents);
     }
@@ -188,14 +188,14 @@ module.exports = function(packagedAppPath, installDir) {
       const atomBinDestinationPath = path.join(binDirPath, atomExecutableName);
       if (fs.existsSync(atomBinDestinationPath)) {
         console.log(
-          `Removing existing executable at "${atomBinDestinationPath}"`
+          `Removing existing executable at "${atomBinDestinationPath}"`,
         );
         fs.removeSync(atomBinDestinationPath);
       }
       console.log(`Copying atom.sh to "${atomBinDestinationPath}"`);
       fs.copySync(
         path.join(CONFIG.repositoryRootPath, 'atom.sh'),
-        atomBinDestinationPath
+        atomBinDestinationPath,
       );
     }
 
@@ -205,7 +205,7 @@ module.exports = function(packagedAppPath, installDir) {
       try {
         fs.lstatSync(apmBinDestinationPath);
         console.log(
-          `Removing existing executable at "${apmBinDestinationPath}"`
+          `Removing existing executable at "${apmBinDestinationPath}"`,
         );
         fs.removeSync(apmBinDestinationPath);
       } catch (e) {}
@@ -220,9 +220,9 @@ module.exports = function(packagedAppPath, installDir) {
           'apm',
           'node_modules',
           '.bin',
-          'apm'
+          'apm',
         ),
-        apmBinDestinationPath
+        apmBinDestinationPath,
       );
     }
 

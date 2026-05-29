@@ -14,7 +14,7 @@ const originalCompiler = {
 
   shouldCompile: (sourceCode, filePath) => {
     return path.extname(filePath) === '.js';
-  }
+  },
 };
 
 describe('PackageTranspilationRegistry', () => {
@@ -52,23 +52,23 @@ describe('PackageTranspilationRegistry', () => {
     const jsSpec = {
       glob: 'lib/**/*.js',
       transpiler: './transpiler-js',
-      options: { type: 'js' }
+      options: { type: 'js' },
     };
     const coffeeSpec = {
       glob: '*.coffee',
       transpiler: './transpiler-coffee',
-      options: { type: 'coffee' }
+      options: { type: 'coffee' },
     };
     const omgSpec = {
       glob: '*.omgwhatisthis',
       transpiler: './transpiler-omg',
-      options: { type: 'omg' }
+      options: { type: 'omg' },
     };
 
     const expectedMeta = {
       name: 'my-package',
       path: path.join('/path/to'),
-      meta: { some: 'metadata' }
+      meta: { some: 'metadata' },
     };
 
     const jsTranspiler = {
@@ -78,7 +78,7 @@ describe('PackageTranspilationRegistry', () => {
 
       getCacheKeyData: (sourceCode, filePath, options) => {
         return 'js-transpiler-cache-data';
-      }
+      },
     };
 
     const coffeeTranspiler = {
@@ -88,7 +88,7 @@ describe('PackageTranspilationRegistry', () => {
 
       getCacheKeyData: (sourceCode, filePath, options) => {
         return 'coffee-transpiler-cache-data';
-      }
+      },
     };
 
     const omgTranspiler = {
@@ -98,7 +98,7 @@ describe('PackageTranspilationRegistry', () => {
 
       getCacheKeyData: (sourceCode, filePath, options) => {
         return 'omg-transpiler-cache-data';
-      }
+      },
     };
 
     beforeEach(() => {
@@ -106,7 +106,7 @@ describe('PackageTranspilationRegistry', () => {
       coffeeSpec._transpilerSource = 'coffee-transpiler-source';
       omgTranspiler._transpilerSource = 'omg-transpiler-source';
 
-      spyOn(registry, 'getTranspiler').andCallFake(spec => {
+      spyOn(registry, 'getTranspiler').andCallFake((spec) => {
         if (spec.transpiler === './transpiler-js') return jsTranspiler;
         if (spec.transpiler === './transpiler-coffee') return coffeeTranspiler;
         if (spec.transpiler === './transpiler-omg') return omgTranspiler;
@@ -117,7 +117,7 @@ describe('PackageTranspilationRegistry', () => {
         path.join('/path/to'),
         'my-package',
         { some: 'metadata' },
-        [jsSpec, coffeeSpec, omgSpec]
+        [jsSpec, coffeeSpec, omgSpec],
       );
     });
 
@@ -126,17 +126,17 @@ describe('PackageTranspilationRegistry', () => {
       expect(wrappedCompiler.shouldCompile('source', hitPath)).toBe(true);
       expect(wrappedCompiler.shouldCompile('source', hitPathCoffee)).toBe(true);
       expect(wrappedCompiler.shouldCompile('source', hitNonStandardExt)).toBe(
-        true
+        true,
       );
       expect(wrappedCompiler.shouldCompile('source', hitPathMissExt)).toBe(
-        false
+        false,
       );
       expect(wrappedCompiler.shouldCompile('source', hitPathMissSubdir)).toBe(
-        false
+        false,
       );
       expect(wrappedCompiler.shouldCompile('source', missPath)).toBe(false);
       expect(wrappedCompiler.shouldCompile('source', nodeModulesFolder)).toBe(
-        false
+        false,
       );
     });
 
@@ -149,14 +149,14 @@ describe('PackageTranspilationRegistry', () => {
         'source',
         missPath,
         jsSpec.options,
-        expectedMeta
+        expectedMeta,
       );
       wrappedCompiler.getCachePath('source', hitPath, jsSpec);
       expect(jsTranspiler.getCacheKeyData).toHaveBeenCalledWith(
         'source',
         hitPath,
         jsSpec.options,
-        expectedMeta
+        expectedMeta,
       );
     });
 
@@ -166,44 +166,44 @@ describe('PackageTranspilationRegistry', () => {
       spyOn(omgTranspiler, 'transpile').andCallThrough();
 
       expect(wrappedCompiler.compile('source', hitPath)).toEqual(
-        'source-transpiler-js'
+        'source-transpiler-js',
       );
       expect(jsTranspiler.transpile).toHaveBeenCalledWith(
         'source',
         hitPath,
         jsSpec.options,
-        expectedMeta
+        expectedMeta,
       );
       expect(wrappedCompiler.compile('source', hitPathCoffee)).toEqual(
-        'source-transpiler-coffee'
+        'source-transpiler-coffee',
       );
       expect(coffeeTranspiler.transpile).toHaveBeenCalledWith(
         'source',
         hitPathCoffee,
         coffeeSpec.options,
-        expectedMeta
+        expectedMeta,
       );
       expect(wrappedCompiler.compile('source', hitNonStandardExt)).toEqual(
-        'source-transpiler-omg'
+        'source-transpiler-omg',
       );
       expect(omgTranspiler.transpile).toHaveBeenCalledWith(
         'source',
         hitNonStandardExt,
         omgSpec.options,
-        expectedMeta
+        expectedMeta,
       );
 
       expect(wrappedCompiler.compile('source', missPath)).toEqual(
-        'source-original-compiler'
+        'source-original-compiler',
       );
       expect(wrappedCompiler.compile('source', hitPathMissExt)).toEqual(
-        'source-original-compiler'
+        'source-original-compiler',
       );
       expect(wrappedCompiler.compile('source', hitPathMissSubdir)).toEqual(
-        'source-original-compiler'
+        'source-original-compiler',
       );
       expect(wrappedCompiler.compile('source', nodeModulesFolder)).toEqual(
-        'source-original-compiler'
+        'source-original-compiler',
       );
     });
 
@@ -213,7 +213,7 @@ describe('PackageTranspilationRegistry', () => {
           path.join('/path/with/node_modules/in/root'),
           'my-other-package',
           { some: 'metadata' },
-          [jsSpec]
+          [jsSpec],
         );
       });
 
@@ -222,14 +222,14 @@ describe('PackageTranspilationRegistry', () => {
         expect(
           wrappedCompiler.shouldCompile(
             'source',
-            '/path/with/node_modules/in/root/lib/test.js'
-          )
+            '/path/with/node_modules/in/root/lib/test.js',
+          ),
         ).toBe(true);
         expect(
           wrappedCompiler.shouldCompile(
             'source',
-            '/path/with/node_modules/in/root/lib/node_modules/test.js'
-          )
+            '/path/with/node_modules/in/root/lib/node_modules/test.js',
+          ),
         ).toBe(false);
       });
     });

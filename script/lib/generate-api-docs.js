@@ -9,7 +9,7 @@ const path = require('path');
 
 const CONFIG = require('../config');
 
-module.exports = function() {
+module.exports = function () {
   const generatedJSONPath = path.join(CONFIG.docsOutputPath, 'atom-api.json');
   console.log(`Generating API docs at ${generatedJSONPath}`);
 
@@ -25,7 +25,7 @@ module.exports = function() {
   const metadata = {
     repository: coffeeMetadata.repository,
     version: coffeeMetadata.version,
-    files: Object.assign(coffeeMetadata.files, jsMetadata.files)
+    files: Object.assign(coffeeMetadata.files, jsMetadata.files),
   };
 
   const api = tello.digest([metadata]);
@@ -38,8 +38,8 @@ module.exports = function() {
 
 function getAPIDocsForDependencies() {
   const classes = {};
-  for (let apiJSONPath of glob.sync(
-    `${CONFIG.repositoryRootPath}/node_modules/*/api.json`
+  for (const apiJSONPath of glob.sync(
+    `${CONFIG.repositoryRootPath}/node_modules/*/api.json`,
   )) {
     Object.assign(classes, require(apiJSONPath).classes);
   }
@@ -48,7 +48,7 @@ function getAPIDocsForDependencies() {
 
 function sortObjectByKey(object) {
   const sortedObject = {};
-  for (let keyName of Object.keys(object).sort()) {
+  for (const keyName of Object.keys(object).sort()) {
     sortedObject[keyName] = object[keyName];
   }
   return sortedObject;

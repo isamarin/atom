@@ -16,7 +16,7 @@ module.exports = class PaneContainer {
       notificationManager,
       deserializerManager,
       viewRegistry: this.viewRegistry,
-      location: this.location
+      location: this.location,
     } = params);
     this.emitter = new Emitter();
     this.subscriptions = new CompositeDisposable();
@@ -31,8 +31,8 @@ module.exports = class PaneContainer {
         applicationDelegate,
         notificationManager,
         deserializerManager,
-        viewRegistry: this.viewRegistry
-      })
+        viewRegistry: this.viewRegistry,
+      }),
     );
     this.didActivatePane(this.getRoot());
   }
@@ -45,13 +45,13 @@ module.exports = class PaneContainer {
     return this.element != null
       ? this.element
       : (this.element = createPaneContainerElement().initialize(this, {
-          views: this.viewRegistry
+          views: this.viewRegistry,
         }));
   }
 
   destroy() {
     this.alive = false;
-    for (let pane of this.getRoot().getPanes()) {
+    for (const pane of this.getRoot().getPanes()) {
       pane.destroy();
     }
     this.cancelStoppedChangingActivePaneItemTimeout();
@@ -72,7 +72,7 @@ module.exports = class PaneContainer {
       deserializer: 'PaneContainer',
       version: SERIALIZATION_VERSION,
       root: this.root ? this.root.serialize() : null,
-      activePaneId: this.activePane.id
+      activePaneId: this.activePane.id,
     };
   }
 
@@ -81,8 +81,10 @@ module.exports = class PaneContainer {
     this.itemRegistry = new ItemRegistry();
     this.setRoot(deserializerManager.deserialize(state.root));
     this.activePane =
-      find(this.getRoot().getPanes(), pane => pane.id === state.activePaneId) ||
-      this.getPanes()[0];
+      find(
+        this.getRoot().getPanes(),
+        (pane) => pane.id === state.activePaneId,
+      ) || this.getPanes()[0];
     if (this.config.get('core.destroyEmptyPanes')) this.destroyEmptyPanes();
   }
 
@@ -100,7 +102,7 @@ module.exports = class PaneContainer {
   }
 
   observePanes(fn) {
-    for (let pane of this.getPanes()) {
+    for (const pane of this.getPanes()) {
       fn(pane);
     }
     return this.onDidAddPane(({ pane }) => fn(pane));
@@ -132,7 +134,7 @@ module.exports = class PaneContainer {
   }
 
   observePaneItems(fn) {
-    for (let item of this.getPaneItems()) {
+    for (const item of this.getPaneItems()) {
       fn(item);
     }
     return this.onDidAddPaneItem(({ item }) => fn(item));
@@ -201,15 +203,15 @@ module.exports = class PaneContainer {
   }
 
   paneForURI(uri) {
-    return find(this.getPanes(), pane => pane.itemForURI(uri) != null);
+    return find(this.getPanes(), (pane) => pane.itemForURI(uri) != null);
   }
 
   paneForItem(item) {
-    return find(this.getPanes(), pane => pane.getItems().includes(item));
+    return find(this.getPanes(), (pane) => pane.getItems().includes(item));
   }
 
   saveAll() {
-    for (let pane of this.getPanes()) {
+    for (const pane of this.getPanes()) {
       pane.saveItems();
     }
   }
@@ -221,7 +223,7 @@ module.exports = class PaneContainer {
         promises.push(pane.promptToSaveItem(item, options));
       }
     }
-    return Promise.all(promises).then(results => !results.includes(false));
+    return Promise.all(promises).then((results) => !results.includes(false));
   }
 
   activateNextPane() {
@@ -271,7 +273,7 @@ module.exports = class PaneContainer {
   }
 
   destroyEmptyPanes() {
-    for (let pane of this.getPanes()) {
+    for (const pane of this.getPanes()) {
       if (pane.items.length === 0) {
         pane.destroy();
       }
@@ -299,7 +301,7 @@ module.exports = class PaneContainer {
     if (activePane !== this.activePane) {
       if (!this.getPanes().includes(activePane)) {
         throw new Error(
-          'Setting active pane that is not present in pane container'
+          'Setting active pane that is not present in pane container',
         );
       }
 
@@ -307,7 +309,7 @@ module.exports = class PaneContainer {
       this.emitter.emit('did-change-active-pane', this.activePane);
       this.didChangeActiveItemOnPane(
         this.activePane,
-        this.activePane.getActiveItem()
+        this.activePane.getActiveItem(),
       );
     }
     this.emitter.emit('did-activate-pane', this.activePane);

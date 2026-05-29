@@ -38,7 +38,7 @@ module.exports = class PackageManager {
       grammarRegistry: this.grammarRegistry,
       deserializerManager: this.deserializerManager,
       viewRegistry: this.viewRegistry,
-      uriHandlerRegistry: this.uriHandlerRegistry
+      uriHandlerRegistry: this.uriHandlerRegistry,
     } = params);
 
     this.emitter = new Emitter();
@@ -73,7 +73,7 @@ module.exports = class PackageManager {
     if (params.configDirPath != null && !params.safeMode) {
       if (this.devMode) {
         this.packageDirPaths.push(
-          path.join(params.configDirPath, 'dev', 'packages')
+          path.join(params.configDirPath, 'dev', 'packages'),
         );
         this.packageDirPaths.push(path.join(this.resourcePath, 'packages'));
       }
@@ -203,7 +203,7 @@ module.exports = class PackageManager {
         'node_modules',
         'atom-package-manager',
         'bin',
-        commandName
+        commandName,
       );
     }
     return this.apmPath;
@@ -249,7 +249,10 @@ module.exports = class PackageManager {
   //
   // Returns a {Boolean}.
   isBundledPackage(name) {
-    return this.getPackageDependencies().hasOwnProperty(name);
+    return Object.prototype.hasOwnProperty.call(
+      this.getPackageDependencies(),
+      name,
+    );
   }
 
   isDeprecatedPackage(name, version) {
@@ -359,7 +362,7 @@ module.exports = class PackageManager {
   //
   // * `types` an {Array} of {String}s like ['atom', 'textmate'].
   getLoadedPackagesForTypes(types) {
-    return this.getLoadedPackages().filter(p => types.includes(p.getType()));
+    return this.getLoadedPackages().filter((p) => types.includes(p.getType()));
   }
 
   // Public: Get the loaded {Package} with the given name.
@@ -391,12 +394,12 @@ module.exports = class PackageManager {
 
   // Public: Returns an {Array} of {String}s of all the available package paths.
   getAvailablePackagePaths() {
-    return this.getAvailablePackages().map(a => a.path);
+    return this.getAvailablePackages().map((a) => a.path);
   }
 
   // Public: Returns an {Array} of {String}s of all the available package names.
   getAvailablePackageNames() {
-    return this.getAvailablePackages().map(a => a.name);
+    return this.getAvailablePackages().map((a) => a.name);
   }
 
   // Public: Returns an {Array} of {String}s of all the available package metadata.
@@ -424,12 +427,12 @@ module.exports = class PackageManager {
         const packageNames = fs
           .readdirSync(packageDirPath, { withFileTypes: true })
           .filter(
-            dirent =>
+            (dirent) =>
               dirent.isDirectory() ||
               (dirent.isSymbolicLink() &&
-                fs.isDirectorySync(path.join(packageDirPath, dirent.name)))
+                fs.isDirectorySync(path.join(packageDirPath, dirent.name))),
           )
-          .map(dirent => dirent.name);
+          .map((dirent) => dirent.name);
 
         for (const packageName of packageNames) {
           if (
@@ -440,7 +443,7 @@ module.exports = class PackageManager {
             packages.push({
               name: packageName,
               path: packagePath,
-              isBundled: false
+              isBundled: false,
             });
             packagesByName.add(packageName);
           }
@@ -453,7 +456,7 @@ module.exports = class PackageManager {
         packages.push({
           name: packageName,
           path: path.join(this.resourcePath, 'node_modules', packageName),
-          isBundled: true
+          isBundled: true,
         });
       }
     }
@@ -503,12 +506,12 @@ module.exports = class PackageManager {
       ({ newValue, oldValue }) => {
         const packagesToEnable = _.difference(oldValue, newValue);
         const packagesToDisable = _.difference(newValue, oldValue);
-        packagesToDisable.forEach(name => {
+        packagesToDisable.forEach((name) => {
           if (this.getActivePackage(name)) this.deactivatePackage(name);
         });
-        packagesToEnable.forEach(name => this.activatePackage(name));
+        packagesToEnable.forEach((name) => this.activatePackage(name));
         return null;
-      }
+      },
     );
   }
 
@@ -527,7 +530,7 @@ module.exports = class PackageManager {
     const performOnLoadedActivePackages = (
       packageNames,
       disabledPackageNames,
-      action
+      action,
     ) => {
       for (const packageName of packageNames) {
         if (!disabledPackageNames.has(packageName)) {
@@ -546,20 +549,20 @@ module.exports = class PackageManager {
         const keymapsToDisable = _.difference(newValue, oldValue);
 
         const disabledPackageNames = new Set(
-          this.config.get('core.disabledPackages')
+          this.config.get('core.disabledPackages'),
         );
         performOnLoadedActivePackages(
           keymapsToDisable,
           disabledPackageNames,
-          p => p.deactivateKeymaps()
+          (p) => p.deactivateKeymaps(),
         );
         performOnLoadedActivePackages(
           keymapsToEnable,
           disabledPackageNames,
-          p => p.activateKeymaps()
+          (p) => p.activateKeymaps(),
         );
         return null;
-      }
+      },
     );
   }
 
@@ -567,7 +570,7 @@ module.exports = class PackageManager {
     const result = [];
     for (const packageName in this.packagesCache) {
       result.push(
-        this.preloadPackage(packageName, this.packagesCache[packageName])
+        this.preloadPackage(packageName, this.packagesCache[packageName]),
       );
     }
     return result;
@@ -586,7 +589,7 @@ module.exports = class PackageManager {
     ) {
       metadata.repository.url = metadata.repository.url.replace(
         /(^git\+)|(\.git$)/g,
-        ''
+        '',
       );
     }
 
@@ -607,7 +610,7 @@ module.exports = class PackageManager {
       menuManager: this.menuManager,
       contextMenuManager: this.contextMenuManager,
       deserializerManager: this.deserializerManager,
-      viewRegistry: this.viewRegistry
+      viewRegistry: this.viewRegistry,
     };
 
     pack = metadata.theme ? new ThemePackage(options) : new Package(options);
@@ -622,7 +625,7 @@ module.exports = class PackageManager {
     require('../exports/atom');
 
     const disabledPackageNames = new Set(
-      this.config.get('core.disabledPackages')
+      this.config.get('core.disabledPackages'),
     );
     this.config.transact(() => {
       for (const pack of this.getAvailablePackages()) {
@@ -650,7 +653,7 @@ module.exports = class PackageManager {
       return this.loadAvailablePackage({
         name,
         path: packagePath,
-        isBundled: this.isBundledPackagePath(packagePath)
+        isBundled: this.isBundledPackagePath(packagePath),
       });
     }
 
@@ -703,7 +706,7 @@ module.exports = class PackageManager {
       console.warn(
         `Could not load ${metadata.name}@${
           metadata.version
-        } because it uses deprecated APIs that have been removed.`
+        } because it uses deprecated APIs that have been removed.`,
       );
       return null;
     }
@@ -724,7 +727,7 @@ module.exports = class PackageManager {
       menuManager: this.menuManager,
       contextMenuManager: this.contextMenuManager,
       deserializerManager: this.deserializerManager,
-      viewRegistry: this.viewRegistry
+      viewRegistry: this.viewRegistry,
     };
 
     const pack = metadata.theme
@@ -737,7 +740,7 @@ module.exports = class PackageManager {
   }
 
   unloadPackages() {
-    _.keys(this.loadedPackages).forEach(name => this.unloadPackage(name));
+    _.keys(this.loadedPackages).forEach((name) => this.unloadPackage(name));
   }
 
   unloadPackage(name) {
@@ -757,7 +760,7 @@ module.exports = class PackageManager {
   // Activate all the packages that should be activated.
   activate() {
     let promises = [];
-    for (let [activator, types] of this.packageActivators) {
+    for (const [activator, types] of this.packageActivators) {
       const packages = this.getLoadedPackagesForTypes(types);
       promises = promises.concat(activator.activatePackages(packages));
     }
@@ -835,8 +838,8 @@ module.exports = class PackageManager {
     });
 
     if (this.deferredActivationHooks == null) {
-      this.triggeredActivationHooks.forEach(hook =>
-        this.activationHookEmitter.emit(hook)
+      this.triggeredActivationHooks.forEach((hook) =>
+        this.activationHookEmitter.emit(hook),
       );
     }
 
@@ -892,10 +895,10 @@ module.exports = class PackageManager {
   async deactivatePackages() {
     await this.config.transactAsync(() =>
       Promise.all(
-        this.getLoadedPackages().map(pack =>
-          this.deactivatePackage(pack.name, true)
-        )
-      )
+        this.getLoadedPackages().map((pack) =>
+          this.deactivatePackage(pack.name, true),
+        ),
+      ),
     );
     this.unobserveDisabledPackages();
     this.unobservePackagesWithKeymapsDisabled();
@@ -931,22 +934,22 @@ module.exports = class PackageManager {
       stack,
       detail,
       packageName: path.basename(packagePath),
-      dismissable: true
+      dismissable: true,
     });
   }
 
   uninstallDirectory(directory) {
-    const symlinkPromise = new Promise(resolve =>
-      fs.isSymbolicLink(directory, isSymLink => resolve(isSymLink))
+    const symlinkPromise = new Promise((resolve) =>
+      fs.isSymbolicLink(directory, (isSymLink) => resolve(isSymLink)),
     );
-    const dirPromise = new Promise(resolve =>
-      fs.isDirectory(directory, isDir => resolve(isDir))
+    const dirPromise = new Promise((resolve) =>
+      fs.isDirectory(directory, (isDir) => resolve(isDir)),
     );
 
-    return Promise.all([symlinkPromise, dirPromise]).then(values => {
+    return Promise.all([symlinkPromise, dirPromise]).then((values) => {
       const [isSymLink, isDir] = values;
       if (!isSymLink && isDir) {
-        return fs.remove(directory, function() {});
+        return fs.remove(directory, function () {});
       }
     });
   }
@@ -1027,7 +1030,7 @@ module.exports = class PackageManager {
     ) {
       metadata.repository.url = metadata.repository.url.replace(
         /(^git\+)|(\.git$)/g,
-        ''
+        '',
       );
     }
 
@@ -1046,5 +1049,5 @@ module.exports = class PackageManager {
 const NullVersionRange = {
   test() {
     return false;
-  }
+  },
 };

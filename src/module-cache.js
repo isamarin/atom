@@ -35,35 +35,36 @@ const cache = {
   ranges: {},
   registered: false,
   resourcePath: null,
-  resourcePathWithTrailingSlash: null
+  resourcePathWithTrailingSlash: null,
 };
 
 // isAbsolute is inlined from fs-plus so that fs-plus itself can be required
 // from this cache.
 let isAbsolute;
 if (process.platform === 'win32') {
-  isAbsolute = pathToCheck =>
+  isAbsolute = (pathToCheck) =>
     pathToCheck &&
     (pathToCheck[1] === ':' ||
       (pathToCheck[0] === '\\' && pathToCheck[1] === '\\'));
 } else {
-  isAbsolute = pathToCheck => pathToCheck && pathToCheck[0] === '/';
+  isAbsolute = (pathToCheck) => pathToCheck && pathToCheck[0] === '/';
 }
 
-const isCorePath = pathToCheck =>
+const isCorePath = (pathToCheck) =>
   pathToCheck.startsWith(cache.resourcePathWithTrailingSlash);
 
 function loadDependencies(modulePath, rootPath, rootMetadata, moduleCache) {
   const fs = require('fs-plus');
 
-  for (let childPath of fs.listSync(path.join(modulePath, 'node_modules'))) {
+  for (const childPath of fs.listSync(path.join(modulePath, 'node_modules'))) {
     if (path.basename(childPath) === '.bin') continue;
     if (
       rootPath === modulePath &&
-      (rootMetadata.packageDependencies &&
-        rootMetadata.packageDependencies.hasOwnProperty(
-          path.basename(childPath)
-        ))
+      rootMetadata.packageDependencies &&
+      Object.prototype.hasOwnProperty.call(
+        rootMetadata.packageDependencies,
+        path.basename(childPath),
+      )
     ) {
       continue;
     }
@@ -84,7 +85,7 @@ function loadDependencies(modulePath, rootPath, rootMetadata, moduleCache) {
         moduleCache.dependencies.push({
           name: childMetadata.name,
           version: childMetadata.version,
-          path: path.relative(rootPath, mainPath)
+          path: path.relative(rootPath, mainPath),
         });
       }
 
@@ -97,7 +98,7 @@ function loadFolderCompatibility(
   modulePath,
   rootPath,
   rootMetadata,
-  moduleCache
+  moduleCache,
 ) {
   const fs = require('fs-plus');
 
@@ -107,13 +108,14 @@ function loadFolderCompatibility(
   const metadata = JSON.parse(fs.readFileSync(metadataPath));
   const dependencies = metadata.dependencies || {};
 
-  for (let name in dependencies) {
+  for (const name in dependencies) {
     if (!semver.validRange(dependencies[name])) {
       delete dependencies[name];
     }
   }
 
-  const onDirectory = childPath => path.basename(childPath) !== 'node_modules';
+  const onDirectory = (childPath) =>
+    path.basename(childPath) !== 'node_modules';
 
   const extensions = ['.js', '.coffee', '.json', '.node'];
   let paths = {};
@@ -131,14 +133,15 @@ function loadFolderCompatibility(
     moduleCache.folders.push({ paths, dependencies });
   }
 
-  for (let childPath of fs.listSync(path.join(modulePath, 'node_modules'))) {
+  for (const childPath of fs.listSync(path.join(modulePath, 'node_modules'))) {
     if (path.basename(childPath) === '.bin') continue;
     if (
       rootPath === modulePath &&
-      (rootMetadata.packageDependencies &&
-        rootMetadata.packageDependencies.hasOwnProperty(
-          path.basename(childPath)
-        ))
+      rootMetadata.packageDependencies &&
+      Object.prototype.hasOwnProperty.call(
+        rootMetadata.packageDependencies,
+        path.basename(childPath),
+      )
     ) {
       continue;
     }
@@ -161,7 +164,7 @@ function loadExtensions(modulePath, rootPath, rootMetadata, moduleCache) {
     if (
       segments.length > 1 &&
       !['exports', 'lib', 'node_modules', 'src', 'static', 'vendor'].includes(
-        segments[0]
+        segments[0],
       )
     )
       return;
@@ -184,7 +187,10 @@ function loadExtensions(modulePath, rootPath, rootMetadata, moduleCache) {
         const packageName = path.basename(childPath);
         if (
           rootMetadata.packageDependencies &&
-          rootMetadata.packageDependencies.hasOwnProperty(packageName)
+          Object.prototype.hasOwnProperty.call(
+            rootMetadata.packageDependencies,
+            packageName,
+          )
         )
           return false;
       }
@@ -212,7 +218,7 @@ function resolveFilePath(relativePath, parentModule) {
 
   const resolvedPath = path.resolve(
     path.dirname(parentModule.filename),
-    relativePath
+    relativePath,
   );
   if (!isCorePath(resolvedPath)) return;
 
@@ -239,7 +245,7 @@ function resolveModulePath(relativePath, parentModule) {
   if (!(parentModule && parentModule.filename)) return;
 
   if (!nativeModules) nativeModules = process.binding('natives');
-  if (nativeModules.hasOwnProperty(relativePath)) return;
+  if (Object.prototype.hasOwnProperty.call(nativeModules, relativePath)) return;
   if (relativePath[0] === '.') return;
   if (isAbsolute(relativePath)) return;
 
@@ -259,7 +265,7 @@ function resolveModulePath(relativePath, parentModule) {
   const candidates = cache.dependencies[relativePath];
   if (candidates == null) return;
 
-  for (let version in candidates) {
+  for (const version in candidates) {
     const resolvedPath = candidates[version];
     if (Module._cache[resolvedPath] || isCorePath(resolvedPath)) {
       if (satisfies(version, range)) return resolvedPath;
@@ -283,7 +289,7 @@ function registerBuiltins(devMode) {
   }
 }
 
-exports.create = function(modulePath) {
+exports.create = function (modulePath) {
   const fs = require('fs-plus');
 
   modulePath = fs.realpathSync(modulePath);
@@ -294,7 +300,7 @@ exports.create = function(modulePath) {
     version: 1,
     dependencies: [],
     extensions: {},
-    folders: []
+    folders: [],
   };
 
   loadDependencies(modulePath, modulePath, metadata, moduleCache);
@@ -305,11 +311,11 @@ exports.create = function(modulePath) {
   fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
 };
 
-exports.register = function({ resourcePath, devMode } = {}) {
+exports.register = function ({ resourcePath, devMode } = {}) {
   if (cache.registered) return;
 
   const originalResolveFilename = Module._resolveFilename;
-  Module._resolveFilename = function(relativePath, parentModule) {
+  Module._resolveFilename = function (relativePath, parentModule) {
     let resolvedPath = resolveModulePath(relativePath, parentModule);
     if (!resolvedPath) {
       resolvedPath = resolveFilePath(relativePath, parentModule);
@@ -323,7 +329,7 @@ exports.register = function({ resourcePath, devMode } = {}) {
   registerBuiltins(devMode);
 };
 
-exports.add = function(directoryPath, metadata) {
+exports.add = function (directoryPath, metadata) {
   // path.join isn't used in this function for speed since path.join calls
   // path.normalize and all the paths are already normalized here.
 
@@ -343,9 +349,8 @@ exports.add = function(directoryPath, metadata) {
       cache.dependencies[dependency.name] = {};
     }
     if (!cache.dependencies[dependency.name][dependency.version]) {
-      cache.dependencies[dependency.name][
-        dependency.version
-      ] = `${directoryPath}${path.sep}${dependency.path}`;
+      cache.dependencies[dependency.name][dependency.version] =
+        `${directoryPath}${path.sep}${dependency.path}`;
     }
   }
 
@@ -365,7 +370,7 @@ exports.add = function(directoryPath, metadata) {
     if (!cache.extensions[extension]) {
       cache.extensions[extension] = new Set();
     }
-    for (let filePath of paths) {
+    for (const filePath of paths) {
       cache.extensions[extension].add(`${directoryPath}${path.sep}${filePath}`);
     }
   }

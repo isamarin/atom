@@ -16,12 +16,12 @@ if (process.platform === 'win32') {
   appName = CONFIG.channel === 'stable' ? 'atom' : `atom-${CONFIG.channel}`;
 }
 
-module.exports = function() {
+module.exports = function () {
   console.log(
     `Generating metadata for ${path.join(
       CONFIG.intermediateAppPath,
-      'package.json'
-    )}`
+      'package.json',
+    )}`,
   );
   CONFIG.appMetadata._atomPackages = buildBundledPackagesMetadata();
   CONFIG.appMetadata._atomMenu = buildPlatformMenuMetadata();
@@ -33,16 +33,16 @@ module.exports = function() {
   checkDeprecatedPackagesMetadata();
   fs.writeFileSync(
     path.join(CONFIG.intermediateAppPath, 'package.json'),
-    JSON.stringify(CONFIG.appMetadata)
+    JSON.stringify(CONFIG.appMetadata),
   );
 };
 
-module.exports = function() {
+module.exports = function () {
   console.log(
     `Generating metadata for ${path.join(
       CONFIG.intermediateAppPath,
-      'package.json'
-    )}`
+      'package.json',
+    )}`,
   );
   CONFIG.appMetadata._atomPackages = buildBundledPackagesMetadata();
   CONFIG.appMetadata._atomMenu = buildPlatformMenuMetadata();
@@ -52,32 +52,34 @@ module.exports = function() {
   checkDeprecatedPackagesMetadata();
   fs.writeFileSync(
     path.join(CONFIG.intermediateAppPath, 'package.json'),
-    JSON.stringify(CONFIG.appMetadata)
+    JSON.stringify(CONFIG.appMetadata),
   );
 };
 
 function buildBundledPackagesMetadata() {
   const packages = {};
-  for (let packageName of Object.keys(CONFIG.appMetadata.packageDependencies)) {
+  for (const packageName of Object.keys(
+    CONFIG.appMetadata.packageDependencies,
+  )) {
     const packagePath = path.join(
       CONFIG.intermediateAppPath,
       'node_modules',
-      packageName
+      packageName,
     );
     const packageMetadataPath = path.join(packagePath, 'package.json');
     const packageMetadata = JSON.parse(
-      fs.readFileSync(packageMetadataPath, 'utf8')
+      fs.readFileSync(packageMetadataPath, 'utf8'),
     );
     normalizePackageData(
       packageMetadata,
-      msg => {
+      (msg) => {
         if (!msg.match(/No README data$/)) {
           console.warn(
-            `Invalid package metadata. ${packageMetadata.name}: ${msg}`
+            `Invalid package metadata. ${packageMetadata.name}: ${msg}`,
           );
         }
       },
-      true
+      true,
     );
     if (
       packageMetadata.repository &&
@@ -86,24 +88,23 @@ function buildBundledPackagesMetadata() {
     ) {
       packageMetadata.repository.url = packageMetadata.repository.url.replace(
         /^git\+/,
-        ''
+        '',
       );
     }
 
-    delete packageMetadata['_from'];
-    delete packageMetadata['_id'];
-    delete packageMetadata['dist'];
-    delete packageMetadata['readme'];
-    delete packageMetadata['readmeFilename'];
+    delete packageMetadata._from;
+    delete packageMetadata._id;
+    delete packageMetadata.dist;
+    delete packageMetadata.readme;
+    delete packageMetadata.readmeFilename;
 
     const packageModuleCache = packageMetadata._atomModuleCache || {};
     if (
       packageModuleCache.extensions &&
       packageModuleCache.extensions['.json']
     ) {
-      const index = packageModuleCache.extensions['.json'].indexOf(
-        'package.json'
-      );
+      const index =
+        packageModuleCache.extensions['.json'].indexOf('package.json');
       if (index !== -1) {
         packageModuleCache.extensions['.json'].splice(index, 1);
       }
@@ -114,21 +115,21 @@ function buildBundledPackagesMetadata() {
       keymaps: {},
       menus: {},
       grammarPaths: [],
-      settings: {}
+      settings: {},
     };
 
     packageNewMetadata.rootDirPath = path.relative(
       CONFIG.intermediateAppPath,
-      packagePath
+      packagePath,
     );
 
     if (packageMetadata.main) {
       const mainPath = require.resolve(
-        path.resolve(packagePath, packageMetadata.main)
+        path.resolve(packagePath, packageMetadata.main),
       );
       packageNewMetadata.main = path.relative(
         path.join(CONFIG.intermediateAppPath, 'static'),
-        mainPath
+        mainPath,
       );
       // Convert backward slashes to forward slashes in order to allow package
       // main modules to be required from the snapshot. This is because we use
@@ -139,10 +140,10 @@ function buildBundledPackagesMetadata() {
 
     const packageKeymapsPath = path.join(packagePath, 'keymaps');
     if (fs.existsSync(packageKeymapsPath)) {
-      for (let packageKeymapName of fs.readdirSync(packageKeymapsPath)) {
+      for (const packageKeymapName of fs.readdirSync(packageKeymapsPath)) {
         const packageKeymapPath = path.join(
           packageKeymapsPath,
-          packageKeymapName
+          packageKeymapName,
         );
         if (
           packageKeymapPath.endsWith('.cson') ||
@@ -150,18 +151,17 @@ function buildBundledPackagesMetadata() {
         ) {
           const relativePath = path.relative(
             CONFIG.intermediateAppPath,
-            packageKeymapPath
+            packageKeymapPath,
           );
-          packageNewMetadata.keymaps[relativePath] = CSON.readFileSync(
-            packageKeymapPath
-          );
+          packageNewMetadata.keymaps[relativePath] =
+            CSON.readFileSync(packageKeymapPath);
         }
       }
     }
 
     const packageMenusPath = path.join(packagePath, 'menus');
     if (fs.existsSync(packageMenusPath)) {
-      for (let packageMenuName of fs.readdirSync(packageMenusPath)) {
+      for (const packageMenuName of fs.readdirSync(packageMenusPath)) {
         const packageMenuPath = path.join(packageMenusPath, packageMenuName);
         if (
           packageMenuPath.endsWith('.cson') ||
@@ -169,39 +169,37 @@ function buildBundledPackagesMetadata() {
         ) {
           const relativePath = path.relative(
             CONFIG.intermediateAppPath,
-            packageMenuPath
+            packageMenuPath,
           );
-          packageNewMetadata.menus[relativePath] = CSON.readFileSync(
-            packageMenuPath
-          );
+          packageNewMetadata.menus[relativePath] =
+            CSON.readFileSync(packageMenuPath);
         }
       }
     }
 
     const packageGrammarsPath = path.join(packagePath, 'grammars');
-    for (let packageGrammarPath of fs.listSync(packageGrammarsPath, [
+    for (const packageGrammarPath of fs.listSync(packageGrammarsPath, [
       'json',
-      'cson'
+      'cson',
     ])) {
       const relativePath = path.relative(
         CONFIG.intermediateAppPath,
-        packageGrammarPath
+        packageGrammarPath,
       );
       packageNewMetadata.grammarPaths.push(relativePath);
     }
 
     const packageSettingsPath = path.join(packagePath, 'settings');
-    for (let packageSettingPath of fs.listSync(packageSettingsPath, [
+    for (const packageSettingPath of fs.listSync(packageSettingsPath, [
       'json',
-      'cson'
+      'cson',
     ])) {
       const relativePath = path.relative(
         CONFIG.intermediateAppPath,
-        packageSettingPath
+        packageSettingPath,
       );
-      packageNewMetadata.settings[relativePath] = CSON.readFileSync(
-        packageSettingPath
-      );
+      packageNewMetadata.settings[relativePath] =
+        CSON.readFileSync(packageSettingPath);
     }
 
     const packageStyleSheetsPath = path.join(packagePath, 'styles');
@@ -209,8 +207,8 @@ function buildBundledPackagesMetadata() {
     if (packageMetadata.mainStyleSheet) {
       styleSheets = [fs.resolve(packagePath, packageMetadata.mainStyleSheet)];
     } else if (packageMetadata.styleSheets) {
-      styleSheets = packageMetadata.styleSheets.map(name =>
-        fs.resolve(packageStyleSheetsPath, name, ['css', 'less', ''])
+      styleSheets = packageMetadata.styleSheets.map((name) =>
+        fs.resolve(packageStyleSheetsPath, name, ['css', 'less', '']),
       );
     } else {
       const indexStylesheet = fs.resolve(packagePath, 'index', ['css', 'less']);
@@ -221,13 +219,13 @@ function buildBundledPackagesMetadata() {
       }
     }
 
-    packageNewMetadata.styleSheetPaths = styleSheets.map(styleSheetPath =>
-      path.relative(packagePath, styleSheetPath)
+    packageNewMetadata.styleSheetPaths = styleSheets.map((styleSheetPath) =>
+      path.relative(packagePath, styleSheetPath),
     );
 
     packages[packageMetadata.name] = packageNewMetadata;
     if (packageModuleCache.extensions) {
-      for (let extension of Object.keys(packageModuleCache.extensions)) {
+      for (const extension of Object.keys(packageModuleCache.extensions)) {
         const paths = packageModuleCache.extensions[extension];
         if (paths.length === 0) {
           delete packageModuleCache.extensions[extension];
@@ -242,7 +240,7 @@ function buildPlatformMenuMetadata() {
   const menuPath = path.join(
     CONFIG.repositoryRootPath,
     'menus',
-    `${process.platform}.cson`
+    `${process.platform}.cson`,
   );
   if (fs.existsSync(menuPath)) {
     return CSON.readFileSync(menuPath);
@@ -257,16 +255,16 @@ function buildPlatformKeymapsMetadata() {
     'freebsd',
     'linux',
     'sunos',
-    'win32'
-  ].filter(p => p !== process.platform);
+    'win32',
+  ].filter((p) => p !== process.platform);
   const keymapsPath = path.join(CONFIG.repositoryRootPath, 'keymaps');
   const keymaps = {};
-  for (let keymapName of fs.readdirSync(keymapsPath)) {
+  for (const keymapName of fs.readdirSync(keymapsPath)) {
     const keymapPath = path.join(keymapsPath, keymapName);
     if (keymapPath.endsWith('.cson') || keymapPath.endsWith('.json')) {
       const keymapPlatform = path.basename(
         keymapPath,
-        path.extname(keymapPath)
+        path.extname(keymapPath),
       );
       if (invalidPlatforms.indexOf(keymapPlatform) === -1) {
         keymaps[path.basename(keymapPath)] = CSON.readFileSync(keymapPath);
@@ -277,14 +275,14 @@ function buildPlatformKeymapsMetadata() {
 }
 
 function checkDeprecatedPackagesMetadata() {
-  for (let packageName of Object.keys(deprecatedPackagesMetadata)) {
+  for (const packageName of Object.keys(deprecatedPackagesMetadata)) {
     const packageMetadata = deprecatedPackagesMetadata[packageName];
     if (
       packageMetadata.version &&
       !semver.validRange(packageMetadata.version)
     ) {
       throw new Error(
-        `Invalid range: ${packageMetadata.version} (${packageName}).`
+        `Invalid range: ${packageMetadata.version} (${packageName}).`,
       );
     }
   }

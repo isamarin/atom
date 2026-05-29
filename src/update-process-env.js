@@ -5,7 +5,7 @@ const ENVIRONMENT_VARIABLES_TO_PRESERVE = new Set([
   'NODE_ENV',
   'NODE_PATH',
   'ATOM_HOME',
-  'ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT'
+  'ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT',
 ]);
 
 const PLATFORMS_KNOWN_TO_WORK = new Set(['darwin', 'linux']);
@@ -27,13 +27,13 @@ async function updateProcessEnv(launchEnv) {
   }
 
   if (envToAssign) {
-    for (let key in process.env) {
+    for (const key in process.env) {
       if (!ENVIRONMENT_VARIABLES_TO_PRESERVE.has(key)) {
         delete process.env[key];
       }
     }
 
-    for (let key in envToAssign) {
+    for (const key in envToAssign) {
       if (
         !ENVIRONMENT_VARIABLES_TO_PRESERVE.has(key) ||
         (!process.env[key] && envToAssign[key])
@@ -69,8 +69,8 @@ function shouldGetEnvFromShell(env) {
 }
 
 async function getEnvFromShell(env) {
-  let { stdout, error } = await new Promise(resolve => {
-    let child;
+  const { stdout, error } = await new Promise((resolve) => {
+    let child; // eslint-disable-line prefer-const
     let error;
     let stdout = '';
     let done = false;
@@ -87,14 +87,14 @@ async function getEnvFromShell(env) {
     child = childProcess.spawn(env.SHELL, ['-ilc', ENV_COMMAND], {
       encoding: 'utf8',
       detached: true,
-      stdio: ['ignore', 'pipe', process.stderr]
+      stdio: ['ignore', 'pipe', process.stderr],
     });
     const buffers = [];
-    child.on('error', e => {
+    child.on('error', (e) => {
       done = true;
       error = e;
     });
-    child.stdout.on('data', data => {
+    child.stdout.on('data', (data) => {
       buffers.push(data);
     });
     child.on('close', (code, signal) => {
@@ -119,7 +119,7 @@ async function getEnvFromShell(env) {
         ENV_COMMAND +
         '" failed with signal (' +
         error.signal +
-        ')'
+        ')',
     );
     console.log(error);
   }
@@ -128,12 +128,12 @@ async function getEnvFromShell(env) {
     return null;
   }
 
-  let result = {};
-  for (let line of stdout.split('\0')) {
+  const result = {};
+  for (const line of stdout.split('\0')) {
     if (line.includes('=')) {
-      let components = line.split('=');
-      let key = components.shift();
-      let value = components.join('=');
+      const components = line.split('=');
+      const key = components.shift();
+      const value = components.join('=');
       result[key] = value;
     }
   }

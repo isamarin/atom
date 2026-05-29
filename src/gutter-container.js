@@ -16,7 +16,7 @@ module.exports = class GutterContainer {
     // Create a copy, because `Gutter::destroy` removes the gutter from
     // GutterContainer's @gutters.
     const guttersToDestroy = this.gutters.slice(0);
-    for (let gutter of guttersToDestroy) {
+    for (const gutter of guttersToDestroy) {
       if (gutter.name !== 'line-number') {
         gutter.destroy();
       }
@@ -33,7 +33,7 @@ module.exports = class GutterContainer {
     }
     if (this.gutterWithName(gutterName)) {
       throw new Error(
-        'Tried to create a gutter with a name that is already in use.'
+        'Tried to create a gutter with a name that is already in use.',
       );
     }
     const newGutter = new Gutter(this, options);
@@ -61,7 +61,7 @@ module.exports = class GutterContainer {
   }
 
   gutterWithName(name) {
-    for (let gutter of this.gutters) {
+    for (const gutter of this.gutters) {
       if (gutter.name === name) {
         return gutter;
       }
@@ -70,7 +70,7 @@ module.exports = class GutterContainer {
   }
 
   observeGutters(callback) {
-    for (let gutter of this.getGutters()) {
+    for (const gutter of this.getGutters()) {
       callback(gutter);
     }
     return this.onDidAddGutter(callback);
@@ -99,7 +99,7 @@ module.exports = class GutterContainer {
     } else {
       throw new Error(
         'The given gutter cannot be removed because it is not ' +
-          'within this GutterContainer.'
+          'within this GutterContainer.',
       );
     }
   }

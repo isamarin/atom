@@ -14,7 +14,7 @@ module.exports = class PanelContainer {
   }
 
   destroy() {
-    for (let panel of this.getPanels()) {
+    for (const panel of this.getPanels()) {
       panel.destroy();
     }
     this.subscriptions.dispose();
@@ -26,7 +26,7 @@ module.exports = class PanelContainer {
     if (!this.element) {
       this.element = createPanelContainerElement().initialize(
         this,
-        this.viewRegistry
+        this.viewRegistry,
       );
     }
     return this.element;
@@ -79,7 +79,7 @@ module.exports = class PanelContainer {
   }
 
   panelForItem(item) {
-    for (let panel of this.panels) {
+    for (const panel of this.panels) {
       if (panel.getItem() === item) {
         return panel;
       }

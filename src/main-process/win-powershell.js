@@ -8,14 +8,14 @@ if (process.env.SystemRoot) {
     system32Path,
     'WindowsPowerShell',
     'v1.0',
-    'powershell.exe'
+    'powershell.exe',
   );
 } else {
   powershellPath = 'powershell.exe';
 }
 
 // Spawn powershell.exe and callback when it completes
-const spawnPowershell = function(args, callback) {
+const spawnPowershell = function (args, callback) {
   // Set encoding and execute the command, capture the output, and return it
   // via .NET's console in order to have consistent UTF-8 encoding.
   // See http://stackoverflow.com/questions/22349139/utf-8-output-from-powershell
@@ -38,15 +38,15 @@ $output=${args[0]}
 //   It will be invoked with the same arguments provided by {Spawner.spawn}.
 //
 // Returns the user's path {String}.
-exports.getPath = callback =>
+exports.getPath = (callback) =>
   spawnPowershell(
     ["[environment]::GetEnvironmentVariable('Path','User')"],
-    function(error, stdout) {
+    function (error, stdout) {
       if (error != null) {
         return callback(error);
       }
 
       const pathOutput = stdout.replace(/^\s+|\s+$/g, '');
       return callback(null, pathOutput);
-    }
+    },
   );

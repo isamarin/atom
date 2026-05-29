@@ -11,7 +11,7 @@ describe('AtomPaths', () => {
   const portableAtomHomePath = path.join(
     atomPaths.getAppDirectory(),
     '..',
-    '.atom'
+    '.atom',
   );
 
   afterEach(() => {

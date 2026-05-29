@@ -7,18 +7,18 @@ describe('GitDiff when targeting nested repository', () => {
 
   beforeEach(() => {
     screenUpdates = 0;
-    spyOn(window, 'requestAnimationFrame').andCallFake(fn => {
+    spyOn(window, 'requestAnimationFrame').andCallFake((fn) => {
       fn();
       screenUpdates++;
     });
-    spyOn(window, 'cancelAnimationFrame').andCallFake(i => null);
+    spyOn(window, 'cancelAnimationFrame').andCallFake((i) => null);
 
     projectPath = temp.mkdirSync('git-diff-spec-');
 
     fs.copySync(path.join(__dirname, 'fixtures', 'working-dir'), projectPath);
     fs.moveSync(
       path.join(projectPath, 'git.git'),
-      path.join(projectPath, '.git')
+      path.join(projectPath, '.git'),
     );
 
     // The nested repo doesn't need to be managed by the temp module because
@@ -28,7 +28,7 @@ describe('GitDiff when targeting nested repository', () => {
     fs.copySync(path.join(__dirname, 'fixtures', 'working-dir'), nestedPath);
     fs.moveSync(
       path.join(nestedPath, 'git.git'),
-      path.join(nestedPath, '.git')
+      path.join(nestedPath, '.git'),
     );
 
     atom.project.setPaths([projectPath]);
@@ -67,7 +67,7 @@ describe('GitDiff when targeting nested repository', () => {
       waitsFor(() => screenUpdates > 0);
       runs(() => {
         expect(
-          editorElement.querySelectorAll('.git-line-modified').length
+          editorElement.querySelectorAll('.git-line-modified').length,
         ).toBe(1);
       });
     });

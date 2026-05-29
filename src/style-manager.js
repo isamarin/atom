@@ -26,7 +26,7 @@ module.exports = class StyleManager {
       this.cacheDirPath = path.join(
         this.configDirPath,
         'compile-cache',
-        'style-manager'
+        'style-manager',
       );
     }
   }
@@ -51,7 +51,7 @@ module.exports = class StyleManager {
   // Returns a {Disposable} on which `.dispose()` can be called to cancel the
   // subscription.
   observeStyleElements(callback) {
-    for (let styleElement of this.getStyleElements()) {
+    for (const styleElement of this.getStyleElements()) {
       callback(styleElement);
     }
 
@@ -149,12 +149,12 @@ module.exports = class StyleManager {
     } else {
       const transformed = this.upgradeDeprecatedSelectorsForStyleSheet(
         source,
-        params.context
+        params.context,
       );
       styleElement.textContent = transformed.source;
       if (transformed.deprecationMessage) {
         this.deprecationsBySourcePath[params.sourcePath] = {
-          message: transformed.deprecationMessage
+          message: transformed.deprecationMessage,
         };
         this.emitter.emit('did-update-deprecations');
       }
@@ -216,7 +216,7 @@ module.exports = class StyleManager {
       } catch (e) {
         const transformed = transformDeprecatedShadowDOMSelectors(
           styleSheet,
-          context
+          context,
         );
         fs.writeFileSync(cacheFilePath, JSON.stringify(transformed));
         return transformed;
@@ -239,14 +239,14 @@ module.exports = class StyleManager {
   }
 
   restoreSnapshot(styleElementsToRestore) {
-    for (let styleElement of this.getStyleElements()) {
+    for (const styleElement of this.getStyleElements()) {
       if (!styleElementsToRestore.includes(styleElement)) {
         this.removeStyleElement(styleElement);
       }
     }
 
     const existingStyleElements = this.getStyleElements();
-    for (let styleElement of styleElementsToRestore) {
+    for (const styleElement of styleElementsToRestore) {
       if (!existingStyleElements.includes(styleElement)) {
         this.addStyleElement(styleElement);
       }
@@ -272,7 +272,7 @@ module.exports = class StyleManager {
     } else {
       const stylesheetPath = fs.resolve(
         path.join(this.configDirPath, 'styles'),
-        ['css', 'less']
+        ['css', 'less'],
       );
       if (fs.isFileSync(stylesheetPath)) {
         return stylesheetPath;
@@ -293,9 +293,9 @@ function transformDeprecatedShadowDOMSelectors(css, context) {
   }
 
   if (transformedSource) {
-    transformedSource.walkRules(rule => {
-      const transformedSelector = selectorParser(selectors => {
-        selectors.each(selector => {
+    transformedSource.walkRules((rule) => {
+      const transformedSelector = selectorParser((selectors) => {
+        selectors.each((selector) => {
           const firstNode = selector.nodes[0];
           if (
             context === 'atom-text-editor' &&
@@ -303,7 +303,7 @@ function transformDeprecatedShadowDOMSelectors(css, context) {
             firstNode.value === ':host'
           ) {
             const atomTextEditorElementNode = selectorParser.tag({
-              value: 'atom-text-editor'
+              value: 'atom-text-editor',
             });
             firstNode.replaceWith(atomTextEditorElementNode);
           }
@@ -311,7 +311,7 @@ function transformDeprecatedShadowDOMSelectors(css, context) {
           let previousNodeIsAtomTextEditor = false;
           let targetsAtomTextEditorShadow = context === 'atom-text-editor';
           let previousNode;
-          selector.each(node => {
+          selector.each((node) => {
             if (targetsAtomTextEditorShadow && node.type === 'class') {
               if (DEPRECATED_SYNTAX_SELECTORS.has(node.value)) {
                 node.value = `syntax--${node.value}`;
@@ -342,7 +342,7 @@ function transformDeprecatedShadowDOMSelectors(css, context) {
       if (transformedSelector !== rule.selector) {
         transformedSelectors.push({
           before: rule.selector,
-          after: transformedSelector
+          after: transformedSelector,
         });
         rule.selector = transformedSelector;
       }
@@ -363,7 +363,9 @@ function transformDeprecatedShadowDOMSelectors(css, context) {
       deprecationMessage += 'upgrade the following selectors:\n\n';
       deprecationMessage +=
         transformedSelectors
-          .map(selector => `* \`${selector.before}\` => \`${selector.after}\``)
+          .map(
+            (selector) => `* \`${selector.before}\` => \`${selector.after}\``,
+          )
           .join('\n\n') + '\n\n';
       deprecationMessage +=
         'Automatic translation of selectors will be removed in a few release cycles to minimize startup time. ';

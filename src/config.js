@@ -5,7 +5,7 @@ const {
   setValueAtKeyPath,
   deleteValueAtKeyPath,
   pushKeyPath,
-  splitKeyPath
+  splitKeyPath,
 } = require('key-path-helpers');
 const Color = require('./color');
 const ScopedPropertyStore = require('scoped-property-store');
@@ -389,9 +389,9 @@ class Config {
   }
 
   static addSchemaEnforcers(filters) {
-    for (let typeName in filters) {
+    for (const typeName in filters) {
       const functions = filters[typeName];
-      for (let name in functions) {
+      for (const name in functions) {
         const enforcerFunction = functions[name];
         this.addSchemaEnforcer(typeName, enforcerFunction);
       }
@@ -404,12 +404,12 @@ class Config {
     if (!Array.isArray(types)) {
       types = [types];
     }
-    for (let type of types) {
+    for (const type of types) {
       try {
         const enforcerFunctions = schemaEnforcers[type].concat(
-          schemaEnforcers['*']
+          schemaEnforcers['*'],
         );
-        for (let enforcer of enforcerFunctions) {
+        for (const enforcer of enforcerFunctions) {
           // At some point in one's life, one must call upon an enforcer.
           value = enforcer.call(this, keyPath, value, schema);
         }
@@ -447,7 +447,7 @@ class Config {
     this.emitter = new Emitter();
     this.schema = {
       type: 'object',
-      properties: {}
+      properties: {},
     };
 
     this.defaultSettings = {};
@@ -500,13 +500,14 @@ class Config {
       [keyPath, callback] = args;
     } else if (
       args.length === 3 &&
-      (_.isString(args[0]) && _.isObject(args[1]))
+      _.isString(args[0]) &&
+      _.isObject(args[1])
     ) {
       [keyPath, options, callback] = args;
       scopeDescriptor = options.scope;
     } else {
       console.error(
-        'An unsupported form of Config::observe is being used. See https://atom.io/docs/api/latest/Config for details'
+        'An unsupported form of Config::observe is being used. See https://atom.io/docs/api/latest/Config for details',
       );
       return;
     }
@@ -517,7 +518,7 @@ class Config {
       return this.observeKeyPath(
         keyPath,
         options != null ? options : {},
-        callback
+        callback,
       );
     }
   }
@@ -647,38 +648,36 @@ class Config {
   //  * `scopeDescriptor` The {ScopeDescriptor} with which the value is associated
   //  * `value` The value for the key-path
   getAll(keyPath, options) {
-    let globalValue, result, scope;
+    let result, scope;
     if (options != null) {
       ({ scope } = options);
     }
 
     if (scope != null) {
-      let legacyScopeDescriptor;
       const scopeDescriptor = ScopeDescriptor.fromObject(scope);
       result = this.scopedSettingsStore.getAll(
         scopeDescriptor.getScopeChain(),
         keyPath,
-        options
+        options,
       );
-      legacyScopeDescriptor = this.getLegacyScopeDescriptorForNewScopeDescriptor(
-        scopeDescriptor
-      );
+      const legacyScopeDescriptor =
+        this.getLegacyScopeDescriptorForNewScopeDescriptor(scopeDescriptor);
       if (legacyScopeDescriptor) {
         result.push(
           ...Array.from(
             this.scopedSettingsStore.getAll(
               legacyScopeDescriptor.getScopeChain(),
               keyPath,
-              options
-            ) || []
-          )
+              options,
+            ) || [],
+          ),
         );
       }
     } else {
       result = [];
     }
 
-    globalValue = this.getRawValue(keyPath, options);
+    const globalValue = this.getRawValue(keyPath, options);
     if (globalValue) {
       result.push({ scopeSelector: '*', value: globalValue });
     }
@@ -744,7 +743,7 @@ class Config {
 
     if (source && !scopeSelector && source !== this.projectFile) {
       throw new Error(
-        "::set with a 'source' and no 'sourceSelector' is not yet implemented!"
+        "::set with a 'source' and no 'sourceSelector' is not yet implemented!",
       );
     }
 
@@ -790,12 +789,12 @@ class Config {
       if (keyPath != null) {
         let settings = this.scopedSettingsStore.propertiesForSourceAndSelector(
           source,
-          scopeSelector
+          scopeSelector,
         );
         if (getValueAtKeyPath(settings, keyPath) != null) {
           this.scopedSettingsStore.removePropertiesForSourceAndSelector(
             source,
-            scopeSelector
+            scopeSelector,
           );
           setValueAtKeyPath(settings, keyPath, undefined);
           settings = withoutEmptyObjects(settings);
@@ -803,7 +802,7 @@ class Config {
             this.set(null, settings, {
               scopeSelector,
               source,
-              priority: this.priorityForSource(source)
+              priority: this.priorityForSource(source),
             });
           }
 
@@ -816,20 +815,20 @@ class Config {
       } else {
         this.scopedSettingsStore.removePropertiesForSourceAndSelector(
           source,
-          scopeSelector
+          scopeSelector,
         );
         return this.emitChangeEvent();
       }
     } else {
       for (scopeSelector in this.scopedSettingsStore.propertiesForSource(
-        source
+        source,
       )) {
         this.unset(keyPath, { scopeSelector, source });
       }
       if (keyPath != null && source === this.mainSource) {
         return this.set(
           keyPath,
-          getValueAtKeyPath(this.defaultSettings, keyPath)
+          getValueAtKeyPath(this.defaultSettings, keyPath),
         );
       }
     }
@@ -839,7 +838,7 @@ class Config {
   // settings have been added via {::set}.
   getSources() {
     return _.uniq(
-      _.pluck(this.scopedSettingsStore.propertySets, 'source')
+      _.pluck(this.scopedSettingsStore.propertySets, 'source'),
     ).sort();
   }
 
@@ -855,7 +854,7 @@ class Config {
   getSchema(keyPath) {
     const keys = splitKeyPath(keyPath);
     let { schema } = this;
-    for (let key of keys) {
+    for (const key of keys) {
       let childSchema;
       if (schema.type === 'object') {
         childSchema =
@@ -918,10 +917,12 @@ class Config {
     let endTransaction;
     this.beginTransaction();
     try {
-      endTransaction = fn => (...args) => {
-        this.endTransaction();
-        return fn(...args);
-      };
+      endTransaction =
+        (fn) =>
+        (...args) => {
+          this.endTransaction();
+          return fn(...args);
+        };
       const result = callback();
       return new Promise((resolve, reject) => {
         return result
@@ -970,19 +971,19 @@ class Config {
   setSchema(keyPath, schema) {
     if (!isPlainObject(schema)) {
       throw new Error(
-        `Error loading schema for ${keyPath}: schemas can only be objects!`
+        `Error loading schema for ${keyPath}: schemas can only be objects!`,
       );
     }
 
     if (schema.type == null) {
       throw new Error(
-        `Error loading schema for ${keyPath}: schema objects must have a type attribute`
+        `Error loading schema for ${keyPath}: schema objects must have a type attribute`,
       );
     }
 
     let rootSchema = this.schema;
     if (keyPath) {
-      for (let key of splitKeyPath(keyPath)) {
+      for (const key of splitKeyPath(keyPath)) {
         rootSchema.type = 'object';
         if (rootSchema.properties == null) {
           rootSchema.properties = {};
@@ -1008,7 +1009,7 @@ class Config {
       let allSettings = { '*': this.settings };
       allSettings = Object.assign(
         allSettings,
-        this.scopedSettingsStore.propertiesForSource(this.mainSource)
+        this.scopedSettingsStore.propertiesForSource(this.mainSource),
       );
       allSettings = sortObject(allSettings);
       this.saveCallback(allSettings);
@@ -1041,12 +1042,12 @@ class Config {
     return this.transact(() => {
       this._clearUnscopedSettingsForSource(source);
       this.settingsLoaded = true;
-      for (let key in newSettings) {
+      for (const key in newSettings) {
         const value = newSettings[key];
         this.set(key, value, { save: false, source });
       }
       if (this.pendingOperations.length) {
-        for (let op of this.pendingOperations) {
+        for (const op of this.pendingOperations) {
           op();
         }
         this.pendingOperations = [];
@@ -1132,7 +1133,9 @@ class Config {
 
   observeKeyPath(keyPath, options, callback) {
     callback(this.get(keyPath));
-    return this.onDidChangeKeyPath(keyPath, event => callback(event.newValue));
+    return this.onDidChangeKeyPath(keyPath, (event) =>
+      callback(event.newValue),
+    );
   }
 
   onDidChangeKeyPath(keyPath, callback) {
@@ -1166,13 +1169,13 @@ class Config {
       const keys = splitKeyPath(keyPath);
       this.transact(() => {
         const result = [];
-        for (let key in defaults) {
+        for (const key in defaults) {
           const childValue = defaults[key];
-          if (!defaults.hasOwnProperty(key)) {
+          if (!Object.prototype.hasOwnProperty.call(defaults, key)) {
             continue;
           }
           result.push(
-            this.setDefaults(keys.concat([key]).join('.'), childValue)
+            this.setDefaults(keys.concat([key]).join('.'), childValue),
           );
         }
         return result;
@@ -1184,8 +1187,8 @@ class Config {
       } catch (e) {
         console.warn(
           `'${keyPath}' could not set the default. Attempted default: ${JSON.stringify(
-            defaults
-          )}; Schema: ${JSON.stringify(this.getSchema(keyPath))}`
+            defaults,
+          )}; Schema: ${JSON.stringify(this.getSchema(keyPath))}`,
         );
       }
     }
@@ -1195,7 +1198,7 @@ class Config {
     if (object instanceof Color) {
       return object.clone();
     } else if (Array.isArray(object)) {
-      return object.map(value => this.deepClone(value));
+      return object.map((value) => this.deepClone(value));
     } else if (isPlainObject(object)) {
       return _.mapObject(object, (key, value) => [key, this.deepClone(value)]);
     } else {
@@ -1209,7 +1212,7 @@ class Config {
     while (++i < arguments.length) {
       const object = arguments[i];
       if (isPlainObject(result) && isPlainObject(object)) {
-        for (let key of Object.keys(object)) {
+        for (const key of Object.keys(object)) {
           result[key] = this.deepDefaults(result[key], object[key]);
         }
       } else {
@@ -1233,9 +1236,9 @@ class Config {
   setScopedDefaultsFromSchema(keyPath, schema) {
     if (schema.scopes != null && isPlainObject(schema.scopes)) {
       const scopedDefaults = {};
-      for (let scope in schema.scopes) {
+      for (const scope in schema.scopes) {
         const scopeSchema = schema.scopes[scope];
-        if (!scopeSchema.hasOwnProperty('default')) {
+        if (!Object.prototype.hasOwnProperty.call(scopeSchema, 'default')) {
           continue;
         }
         scopedDefaults[scope] = {};
@@ -1250,14 +1253,14 @@ class Config {
       isPlainObject(schema.properties)
     ) {
       const keys = splitKeyPath(keyPath);
-      for (let key in schema.properties) {
+      for (const key in schema.properties) {
         const childValue = schema.properties[key];
-        if (!schema.properties.hasOwnProperty(key)) {
+        if (!Object.prototype.hasOwnProperty.call(schema.properties, key)) {
           continue;
         }
         this.setScopedDefaultsFromSchema(
           keys.concat([key]).join('.'),
-          childValue
+          childValue,
         );
       }
     }
@@ -1273,7 +1276,7 @@ class Config {
     ) {
       const defaults = {};
       const properties = schema.properties || {};
-      for (let key in properties) {
+      for (const key in properties) {
         const value = properties[key];
         defaults[key] = this.extractDefaultsFromSchema(value);
       }
@@ -1307,16 +1310,15 @@ class Config {
     }
     return this.transact(() => {
       this.settings = this.makeValueConformToSchema(null, this.settings, {
-        suppressException: true
+        suppressException: true,
       });
-      const selectorsAndSettings = this.scopedSettingsStore.propertiesForSource(
-        source
-      );
+      const selectorsAndSettings =
+        this.scopedSettingsStore.propertiesForSource(source);
       this.scopedSettingsStore.removePropertiesForSource(source);
-      for (let scopeSelector in selectorsAndSettings) {
+      for (const scopeSelector in selectorsAndSettings) {
         let settings = selectorsAndSettings[scopeSelector];
         settings = this.makeValueConformToSchema(null, settings, {
-          suppressException: true
+          suppressException: true,
         });
         this.setRawScopedValue(null, settings, source, scopeSelector);
       }
@@ -1349,16 +1351,16 @@ class Config {
     const priority = this.priorityForSource(source);
     this.scopedSettingsStore.removePropertiesForSource(source);
 
-    for (let scopeSelector in newScopedSettings) {
+    for (const scopeSelector in newScopedSettings) {
       let settings = newScopedSettings[scopeSelector];
       settings = this.makeValueConformToSchema(null, settings, {
-        suppressException: true
+        suppressException: true,
       });
       const validatedSettings = {};
       validatedSettings[scopeSelector] = withoutEmptyObjects(settings);
       if (validatedSettings[scopeSelector] != null) {
         this.scopedSettingsStore.addProperties(source, validatedSettings, {
-          priority
+          priority,
         });
       }
     }
@@ -1376,7 +1378,7 @@ class Config {
     const settingsBySelector = {};
     settingsBySelector[selector] = value;
     this.scopedSettingsStore.addProperties(source, settingsBySelector, {
-      priority: this.priorityForSource(source)
+      priority: this.priorityForSource(source),
     });
     return this.emitChangeEvent();
   }
@@ -1386,27 +1388,26 @@ class Config {
     const result = this.scopedSettingsStore.getPropertyValue(
       scopeDescriptor.getScopeChain(),
       keyPath,
-      options
+      options,
     );
 
-    const legacyScopeDescriptor = this.getLegacyScopeDescriptorForNewScopeDescriptor(
-      scopeDescriptor
-    );
+    const legacyScopeDescriptor =
+      this.getLegacyScopeDescriptorForNewScopeDescriptor(scopeDescriptor);
     if (result != null) {
       return result;
     } else if (legacyScopeDescriptor) {
       return this.scopedSettingsStore.getPropertyValue(
         legacyScopeDescriptor.getScopeChain(),
         keyPath,
-        options
+        options,
       );
     }
   }
 
   observeScopedKeyPath(scope, keyPath, callback) {
     callback(this.get(keyPath, { scope }));
-    return this.onDidChangeScopedKeyPath(scope, keyPath, event =>
-      callback(event.newValue)
+    return this.onDidChangeScopedKeyPath(scope, keyPath, (event) =>
+      callback(event.newValue),
     );
   }
 
@@ -1435,7 +1436,7 @@ Config.addSchemaEnforcers({
   any: {
     coerce(keyPath, value, schema) {
       return value;
-    }
+    },
   },
 
   integer: {
@@ -1444,12 +1445,12 @@ Config.addSchemaEnforcers({
       if (isNaN(value) || !isFinite(value)) {
         throw new Error(
           `Validation failed at ${keyPath}, ${JSON.stringify(
-            value
-          )} cannot be coerced into an int`
+            value,
+          )} cannot be coerced into an int`,
         );
       }
       return value;
-    }
+    },
   },
 
   number: {
@@ -1458,12 +1459,12 @@ Config.addSchemaEnforcers({
       if (isNaN(value) || !isFinite(value)) {
         throw new Error(
           `Validation failed at ${keyPath}, ${JSON.stringify(
-            value
-          )} cannot be coerced into a number`
+            value,
+          )} cannot be coerced into a number`,
         );
       }
       return value;
-    }
+    },
   },
 
   boolean: {
@@ -1477,8 +1478,8 @@ Config.addSchemaEnforcers({
           } else {
             throw new Error(
               `Validation failed at ${keyPath}, ${JSON.stringify(
-                value
-              )} must be a boolean or the string 'true' or 'false'`
+                value,
+              )} must be a boolean or the string 'true' or 'false'`,
             );
           }
         case 'boolean':
@@ -1486,11 +1487,11 @@ Config.addSchemaEnforcers({
         default:
           throw new Error(
             `Validation failed at ${keyPath}, ${JSON.stringify(
-              value
-            )} must be a boolean or the string 'true' or 'false'`
+              value,
+            )} must be a boolean or the string 'true' or 'false'`,
           );
       }
-    }
+    },
   },
 
   string: {
@@ -1498,8 +1499,8 @@ Config.addSchemaEnforcers({
       if (typeof value !== 'string') {
         throw new Error(
           `Validation failed at ${keyPath}, ${JSON.stringify(
-            value
-          )} must be a string`
+            value,
+          )} must be a string`,
         );
       }
       return value;
@@ -1514,7 +1515,7 @@ Config.addSchemaEnforcers({
       } else {
         return value;
       }
-    }
+    },
   },
 
   null: {
@@ -1523,12 +1524,12 @@ Config.addSchemaEnforcers({
       if (![undefined, null].includes(value)) {
         throw new Error(
           `Validation failed at ${keyPath}, ${JSON.stringify(
-            value
-          )} must be null`
+            value,
+          )} must be null`,
         );
       }
       return value;
-    }
+    },
   },
 
   object: {
@@ -1536,8 +1537,8 @@ Config.addSchemaEnforcers({
       if (!isPlainObject(value)) {
         throw new Error(
           `Validation failed at ${keyPath}, ${JSON.stringify(
-            value
-          )} must be an object`
+            value,
+          )} must be an object`,
         );
       }
       if (schema.properties == null) {
@@ -1554,7 +1555,7 @@ Config.addSchemaEnforcers({
       }
 
       const newValue = {};
-      for (let prop in value) {
+      for (const prop in value) {
         const propValue = value[prop];
         const childSchema =
           schema.properties[prop] != null
@@ -1565,7 +1566,7 @@ Config.addSchemaEnforcers({
             newValue[prop] = this.executeSchemaEnforcers(
               pushKeyPath(keyPath, prop),
               propValue,
-              childSchema
+              childSchema,
             );
           } catch (error) {
             console.warn(`Error setting item in object: ${error.message}`);
@@ -1579,7 +1580,7 @@ Config.addSchemaEnforcers({
       }
 
       return newValue;
-    }
+    },
   },
 
   array: {
@@ -1587,17 +1588,17 @@ Config.addSchemaEnforcers({
       if (!Array.isArray(value)) {
         throw new Error(
           `Validation failed at ${keyPath}, ${JSON.stringify(
-            value
-          )} must be an array`
+            value,
+          )} must be an array`,
         );
       }
       const itemSchema = schema.items;
       if (itemSchema != null) {
         const newValue = [];
-        for (let item of value) {
+        for (const item of value) {
           try {
             newValue.push(
-              this.executeSchemaEnforcers(keyPath, item, itemSchema)
+              this.executeSchemaEnforcers(keyPath, item, itemSchema),
             );
           } catch (error) {
             console.warn(`Error setting item in array: ${error.message}`);
@@ -1607,7 +1608,7 @@ Config.addSchemaEnforcers({
       } else {
         return value;
       }
-    }
+    },
   },
 
   color: {
@@ -1616,12 +1617,12 @@ Config.addSchemaEnforcers({
       if (color == null) {
         throw new Error(
           `Validation failed at ${keyPath}, ${JSON.stringify(
-            value
-          )} cannot be coerced into a color`
+            value,
+          )} cannot be coerced into a color`,
         );
       }
       return color;
-    }
+    },
   },
 
   '*': {
@@ -1642,8 +1643,8 @@ Config.addSchemaEnforcers({
       let possibleValues = schema.enum;
 
       if (Array.isArray(possibleValues)) {
-        possibleValues = possibleValues.map(value => {
-          if (value.hasOwnProperty('value')) {
+        possibleValues = possibleValues.map((value) => {
+          if (Object.prototype.hasOwnProperty.call(value, 'value')) {
             return value.value;
           } else {
             return value;
@@ -1659,7 +1660,7 @@ Config.addSchemaEnforcers({
         return value;
       }
 
-      for (let possibleValue of possibleValues) {
+      for (const possibleValue of possibleValues) {
         // Using `isEqual` for possibility of placing enums on array and object schemas
         if (_.isEqual(possibleValue, value)) {
           return value;
@@ -1668,35 +1669,35 @@ Config.addSchemaEnforcers({
 
       throw new Error(
         `Validation failed at ${keyPath}, ${JSON.stringify(
-          value
-        )} is not one of ${JSON.stringify(possibleValues)}`
+          value,
+        )} is not one of ${JSON.stringify(possibleValues)}`,
       );
-    }
-  }
+    },
+  },
 });
 
-let isPlainObject = value =>
+const isPlainObject = (value) =>
   _.isObject(value) &&
   !Array.isArray(value) &&
   !_.isFunction(value) &&
   !_.isString(value) &&
   !(value instanceof Color);
 
-let sortObject = value => {
+const sortObject = (value) => {
   if (!isPlainObject(value)) {
     return value;
   }
   const result = {};
-  for (let key of Object.keys(value).sort()) {
+  for (const key of Object.keys(value).sort()) {
     result[key] = sortObject(value[key]);
   }
   return result;
 };
 
-const withoutEmptyObjects = object => {
+const withoutEmptyObjects = (object) => {
   let resultObject;
   if (isPlainObject(object)) {
-    for (let key in object) {
+    for (const key in object) {
       const value = object[key];
       const newValue = withoutEmptyObjects(value);
       if (newValue != null) {

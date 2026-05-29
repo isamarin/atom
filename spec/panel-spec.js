@@ -74,7 +74,7 @@ describe('Panel', () => {
     it('initially renders panel created with visible: false', () => {
       const panel = new Panel(
         { visible: false, item: new TestPanelItem() },
-        atom.views
+        atom.views,
       );
       const element = panel.getElement();
       expect(element.style.display).toBe('none');
@@ -97,7 +97,7 @@ describe('Panel', () => {
     it('initially renders panel created with visible: false', () => {
       const panel = new Panel(
         { className: 'some classes', item: new TestPanelItem() },
-        atom.views
+        atom.views,
       );
       const element = panel.getElement();
 

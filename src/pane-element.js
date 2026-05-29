@@ -31,7 +31,7 @@ class PaneElement extends HTMLElement {
   }
 
   subscribeToDOMEvents() {
-    const handleFocus = event => {
+    const handleFocus = (event) => {
       if (
         !(
           this.isActivating ||
@@ -48,20 +48,22 @@ class PaneElement extends HTMLElement {
         event.stopPropagation();
       }
     };
-    const handleBlur = event => {
+    const handleBlur = (event) => {
       if (!this.contains(event.relatedTarget)) {
         this.model.blur();
       }
     };
-    const handleDragOver = event => {
+    const handleDragOver = (event) => {
       event.preventDefault();
       event.stopPropagation();
     };
-    const handleDrop = event => {
+    const handleDrop = (event) => {
       event.preventDefault();
       event.stopPropagation();
       this.getModel().activate();
-      const pathsToOpen = [...event.dataTransfer.files].map(file => file.path);
+      const pathsToOpen = [...event.dataTransfer.files].map(
+        (file) => file.path,
+      );
       if (pathsToOpen.length > 0) {
         this.applicationDelegate.open({ pathsToOpen, here: true });
       }
@@ -78,29 +80,29 @@ class PaneElement extends HTMLElement {
     this.applicationDelegate = applicationDelegate;
     if (this.views == null) {
       throw new Error(
-        'Must pass a views parameter when initializing PaneElements'
+        'Must pass a views parameter when initializing PaneElements',
       );
     }
     if (this.applicationDelegate == null) {
       throw new Error(
-        'Must pass an applicationDelegate parameter when initializing PaneElements'
+        'Must pass an applicationDelegate parameter when initializing PaneElements',
       );
     }
     this.subscriptions.add(this.model.onDidActivate(this.activated.bind(this)));
     this.subscriptions.add(
-      this.model.observeActive(this.activeStatusChanged.bind(this))
+      this.model.observeActive(this.activeStatusChanged.bind(this)),
     );
     this.subscriptions.add(
-      this.model.observeActiveItem(this.activeItemChanged.bind(this))
+      this.model.observeActiveItem(this.activeItemChanged.bind(this)),
     );
     this.subscriptions.add(
-      this.model.onDidRemoveItem(this.itemRemoved.bind(this))
+      this.model.onDidRemoveItem(this.itemRemoved.bind(this)),
     );
     this.subscriptions.add(
-      this.model.onDidDestroy(this.paneDestroyed.bind(this))
+      this.model.onDidDestroy(this.paneDestroyed.bind(this)),
     );
     this.subscriptions.add(
-      this.model.observeFlexScale(this.flexScaleChanged.bind(this))
+      this.model.observeFlexScale(this.flexScaleChanged.bind(this)),
     );
     return this;
   }
@@ -222,5 +224,5 @@ function createPaneElement() {
 window.customElements.define('atom-pane', PaneElement);
 
 module.exports = {
-  createPaneElement
+  createPaneElement,
 };

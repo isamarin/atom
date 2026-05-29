@@ -18,13 +18,13 @@ module.exports = class Notification {
   validate() {
     if (typeof this.message !== 'string') {
       throw new Error(
-        `Notification must be created with string message: ${this.message}`
+        `Notification must be created with string message: ${this.message}`,
       );
     }
 
     if (!_.isObject(this.options) || Array.isArray(this.options)) {
       throw new Error(
-        `Notification must be created with an options object: ${this.options}`
+        `Notification must be created with an options object: ${this.options}`,
       );
     }
   }

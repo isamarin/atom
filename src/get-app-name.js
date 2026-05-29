@@ -11,7 +11,7 @@ module.exports = function getAppName() {
 
   if (releaseChannel !== 'stable') {
     appNameParts.push(
-      releaseChannel.charAt(0).toUpperCase() + releaseChannel.slice(1)
+      releaseChannel.charAt(0).toUpperCase() + releaseChannel.slice(1),
     );
   }
 

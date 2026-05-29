@@ -24,7 +24,7 @@ module.exports = class Pane {
 
   static deserialize(
     state,
-    { deserializers, applicationDelegate, config, notifications, views }
+    { deserializers, applicationDelegate, config, notifications, views },
   ) {
     const { activeItemIndex } = state;
     const activeItemURI = state.activeItemURI || state.activeItemUri;
@@ -39,8 +39,8 @@ module.exports = class Pane {
     state.activeItem = items[activeItemIndex];
     if (!state.activeItem && activeItemURI) {
       state.activeItem = state.items.find(
-        item =>
-          typeof item.getURI === 'function' && item.getURI() === activeItemURI
+        (item) =>
+          typeof item.getURI === 'function' && item.getURI() === activeItemURI,
       );
     }
 
@@ -51,10 +51,10 @@ module.exports = class Pane {
           notificationManager: notifications,
           viewRegistry: views,
           config,
-          applicationDelegate
+          applicationDelegate,
         },
-        state
-      )
+        state,
+      ),
     );
   }
 
@@ -62,9 +62,8 @@ module.exports = class Pane {
     this.setPendingItem = this.setPendingItem.bind(this);
     this.getPendingItem = this.getPendingItem.bind(this);
     this.clearPendingItem = this.clearPendingItem.bind(this);
-    this.onItemDidTerminatePendingState = this.onItemDidTerminatePendingState.bind(
-      this
-    );
+    this.onItemDidTerminatePendingState =
+      this.onItemDidTerminatePendingState.bind(this);
     this.saveItem = this.saveItem.bind(this);
     this.saveItemAs = this.saveItemAs.bind(this);
 
@@ -90,7 +89,7 @@ module.exports = class Pane {
     this.itemStack = [];
     this.container = null;
 
-    this.addItems((params.items || []).filter(item => item));
+    this.addItems((params.items || []).filter((item) => item));
     if (!this.getActiveItem()) this.setActiveItem(this.items[0]);
     this.addItemsToStack(params.itemStackIndices || []);
     this.setFlexScale(params.flexScale || 1);
@@ -100,7 +99,7 @@ module.exports = class Pane {
     if (!this.element) {
       this.element = createPaneElement().initialize(this, {
         views: this.viewRegistry,
-        applicationDelegate: this.applicationDelegate
+        applicationDelegate: this.applicationDelegate,
       });
     }
     return this.element;
@@ -108,7 +107,7 @@ module.exports = class Pane {
 
   serialize() {
     const itemsToBeSerialized = this.items.filter(
-      item => item && typeof item.serialize === 'function'
+      (item) => item && typeof item.serialize === 'function',
     );
 
     const itemStackIndices = [];
@@ -123,11 +122,11 @@ module.exports = class Pane {
     return {
       deserializer: 'Pane',
       id: this.id,
-      items: itemsToBeSerialized.map(item => item.serialize()),
+      items: itemsToBeSerialized.map((item) => item.serialize()),
       itemStackIndices,
       activeItemIndex,
       focused: this.focused,
-      flexScale: this.flexScale
+      flexScale: this.flexScale,
     };
   }
 
@@ -258,7 +257,7 @@ module.exports = class Pane {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeActive(callback) {
-    return this.container.onDidChangeActivePane(activePane => {
+    return this.container.onDidChangeActivePane((activePane) => {
       const isActive = this === activePane;
       callback(isActive);
     });
@@ -332,7 +331,7 @@ module.exports = class Pane {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   observeItems(callback) {
-    for (let item of this.getItems()) {
+    for (const item of this.getItems()) {
       callback(item);
     }
     return this.onDidAddItem(({ item }) => callback(item));
@@ -478,7 +477,7 @@ module.exports = class Pane {
         itemStackIndices = this.items.map((item, i) => i);
       }
 
-      for (let itemIndex of itemStackIndices) {
+      for (const itemIndex of itemStackIndices) {
         this.addItemToStack(this.items[itemIndex]);
       }
     }
@@ -636,7 +635,7 @@ module.exports = class Pane {
     //   addItem(item, index=@getActiveItemIndex() + 1)
     if (typeof options === 'number') {
       Grim.deprecate(
-        `Pane::addItem(item, ${options}) is deprecated in favor of Pane::addItem(item, {index: ${options}})`
+        `Pane::addItem(item, ${options}) is deprecated in favor of Pane::addItem(item, {index: ${options}})`,
       );
       options = { index: options };
     }
@@ -648,14 +647,15 @@ module.exports = class Pane {
 
     if (!item || typeof item !== 'object') {
       throw new Error(
-        `Pane items must be objects. Attempted to add item ${item}.`
+        `Pane items must be objects. Attempted to add item ${item}.`,
       );
     }
 
     if (typeof item.isDestroyed === 'function' && item.isDestroyed()) {
       throw new Error(
-        `Adding a pane item with URI '${typeof item.getURI === 'function' &&
-          item.getURI()}' that has already been destroyed`
+        `Adding a pane item with URI '${
+          typeof item.getURI === 'function' && item.getURI()
+        }' that has already been destroyed`,
       );
     }
 
@@ -665,14 +665,14 @@ module.exports = class Pane {
     this.subscriptionsPerItem.set(item, itemSubscriptions);
     if (typeof item.onDidDestroy === 'function') {
       itemSubscriptions.add(
-        item.onDidDestroy(() => this.removeItem(item, false))
+        item.onDidDestroy(() => this.removeItem(item, false)),
       );
     }
     if (typeof item.onDidTerminatePendingState === 'function') {
       itemSubscriptions.add(
         item.onDidTerminatePendingState(() => {
           if (this.getPendingItem() === item) this.clearPendingItem();
-        })
+        }),
       );
     }
 
@@ -699,7 +699,7 @@ module.exports = class Pane {
       if (mostRecentPendingItem) {
         this.emitter.emit(
           'item-did-terminate-pending-state',
-          mostRecentPendingItem
+          mostRecentPendingItem,
         );
       }
     }
@@ -727,7 +727,7 @@ module.exports = class Pane {
   //
   // Returns an {Array} of added items.
   addItems(items, index = this.getActiveItemIndex() + 1) {
-    items = items.filter(item => !this.items.includes(item));
+    items = items.filter((item) => !this.items.includes(item));
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       this.addItem(item, { index: index + i });
@@ -744,7 +744,7 @@ module.exports = class Pane {
       item,
       index,
       destroyed: !moved,
-      moved
+      moved,
     });
     this.unsubscribeFromItem(item);
 
@@ -762,7 +762,7 @@ module.exports = class Pane {
       item,
       index,
       destroyed: !moved,
-      moved
+      moved,
     });
     if (!moved && this.container)
       this.container.didDestroyPaneItem({ item, index, pane: this });
@@ -844,7 +844,7 @@ module.exports = class Pane {
     if (
       this.container &&
       this.container.emitter.listenerCountForEventName(
-        'will-destroy-pane-item'
+        'will-destroy-pane-item',
       ) > 0
     ) {
       let preventClosing = false;
@@ -854,7 +854,7 @@ module.exports = class Pane {
         pane: this,
         prevent: () => {
           preventClosing = true;
-        }
+        },
       });
       if (preventClosing) return false;
     }
@@ -873,15 +873,15 @@ module.exports = class Pane {
 
   // Public: Destroy all items.
   destroyItems() {
-    return Promise.all(this.getItems().map(item => this.destroyItem(item)));
+    return Promise.all(this.getItems().map((item) => this.destroyItem(item)));
   }
 
   // Public: Destroy all items except for the active item.
   destroyInactiveItems() {
     return Promise.all(
       this.getItems()
-        .filter(item => item !== this.activeItem)
-        .map(item => this.destroyItem(item))
+        .filter((item) => item !== this.activeItem)
+        .map((item) => this.destroyItem(item)),
     );
   }
 
@@ -912,12 +912,12 @@ module.exports = class Pane {
             message,
             detail:
               'Your changes will be lost if you close this item without saving.',
-            buttons: [saveButtonText, 'Cancel', "&Don't Save"]
+            buttons: [saveButtonText, 'Cancel', "&Don't Save"],
           },
-          response => {
+          (response) => {
             switch (response) {
               case 0:
-                return saveFn(item, error => {
+                return saveFn(item, (error) => {
                   if (error instanceof SaveCancelledError) {
                     resolve(false);
                   } else if (error) {
@@ -925,8 +925,8 @@ module.exports = class Pane {
                       'Save as',
                       this.saveItemAs,
                       `'${title}' could not be saved.\nError: ${this.getMessageForErrorCode(
-                        error.code
-                      )}`
+                        error.code,
+                      )}`,
                     );
                   } else {
                     resolve(true);
@@ -937,14 +937,14 @@ module.exports = class Pane {
               case 2:
                 return resolve(true);
             }
-          }
+          },
         );
       };
 
       saveDialog(
         'Save',
         this.saveItem,
-        `'${title}' has changes, do you want to save them?`
+        `'${title}' has changes, do you want to save them?`,
       );
     });
   }
@@ -990,7 +990,7 @@ module.exports = class Pane {
           .then(() => {
             if (nextAction) nextAction();
           })
-          .catch(error => {
+          .catch((error) => {
             if (nextAction) {
               nextAction(error);
             } else {
@@ -1028,10 +1028,10 @@ module.exports = class Pane {
       saveOptions.defaultPath = itemPath;
 
     let resolveSaveDialogPromise = null;
-    const saveDialogPromise = new Promise(resolve => {
+    const saveDialogPromise = new Promise((resolve) => {
       resolveSaveDialogPromise = resolve;
     });
-    this.applicationDelegate.showSaveDialog(saveOptions, newItemPath => {
+    this.applicationDelegate.showSaveDialog(saveOptions, (newItemPath) => {
       if (newItemPath) {
         promisify(() => item.saveAs(newItemPath))
           .then(() => {
@@ -1041,7 +1041,7 @@ module.exports = class Pane {
               resolveSaveDialogPromise();
             }
           })
-          .catch(error => {
+          .catch((error) => {
             if (nextAction) {
               resolveSaveDialogPromise(nextAction(error));
             } else {
@@ -1051,7 +1051,7 @@ module.exports = class Pane {
           });
       } else if (nextAction) {
         resolveSaveDialogPromise(
-          nextAction(new SaveCancelledError('Save Cancelled'))
+          nextAction(new SaveCancelledError('Save Cancelled')),
         );
       } else {
         resolveSaveDialogPromise();
@@ -1063,7 +1063,7 @@ module.exports = class Pane {
 
   // Public: Save all items.
   saveItems() {
-    for (let item of this.getItems()) {
+    for (const item of this.getItems()) {
       if (typeof item.isModified === 'function' && item.isModified()) {
         this.saveItem(item);
       }
@@ -1075,12 +1075,13 @@ module.exports = class Pane {
   //
   // * `uri` {String} containing a URI.
   itemForURI(uri) {
-    return this.items.find(item => {
+    return this.items.find((item) => {
       if (typeof item.getURI === 'function') {
         return item.getURI() === uri;
       } else if (typeof item.getUri === 'function') {
         return item.getUri() === uri;
       }
+      return false;
     });
   }
 
@@ -1146,7 +1147,7 @@ module.exports = class Pane {
     }
     this.emitter.emit('did-destroy');
     this.emitter.dispose();
-    for (let item of this.items.slice()) {
+    for (const item of this.items.slice()) {
       if (typeof item.destroy === 'function') item.destroy();
     }
     if (this.container) this.container.didDestroyPane({ pane: this });
@@ -1225,10 +1226,10 @@ module.exports = class Pane {
             container: this.container,
             orientation,
             children: [this],
-            flexScale: this.flexScale
+            flexScale: this.flexScale,
           },
-          this.viewRegistry
-        )
+          this.viewRegistry,
+        ),
       );
       this.setFlexScale(1);
     }
@@ -1240,10 +1241,10 @@ module.exports = class Pane {
           notificationManager: this.notificationManager,
           deserializerManager: this.deserializerManager,
           config: this.config,
-          viewRegistry: this.viewRegistry
+          viewRegistry: this.viewRegistry,
         },
-        params
-      )
+        params,
+      ),
     );
 
     switch (side) {
@@ -1279,9 +1280,8 @@ module.exports = class Pane {
 
   findRightmostSibling() {
     if (this.parent.orientation === 'horizontal') {
-      const rightmostSibling = this.parent.children[
-        this.parent.children.length - 1
-      ];
+      const rightmostSibling =
+        this.parent.children[this.parent.children.length - 1];
       if (rightmostSibling instanceof PaneAxis) {
         return this;
       } else {
@@ -1320,9 +1320,8 @@ module.exports = class Pane {
 
   findBottommostSibling() {
     if (this.parent.orientation === 'vertical') {
-      const bottommostSibling = this.parent.children[
-        this.parent.children.length - 1
-      ];
+      const bottommostSibling =
+        this.parent.children[this.parent.children.length - 1];
       if (bottommostSibling instanceof PaneAxis) {
         return this;
       } else {
@@ -1350,8 +1349,8 @@ module.exports = class Pane {
   // closing has been cancelled.
   close() {
     return Promise.all(
-      this.getItems().map(item => this.promptToSaveItem(item))
-    ).then(results => {
+      this.getItems().map((item) => this.promptToSaveItem(item)),
+    ).then((results) => {
       if (!results.includes(false)) return this.destroy();
     });
   }
@@ -1372,22 +1371,22 @@ module.exports = class Pane {
       (error.message && error.message.endsWith('is a directory'))
     ) {
       return this.notificationManager.addWarning(
-        `Unable to save file: ${error.message}`
+        `Unable to save file: ${error.message}`,
       );
     } else if (
       ['EPERM', 'EBUSY', 'UNKNOWN', 'EEXIST', 'ELOOP', 'EAGAIN'].includes(
-        error.code
+        error.code,
       )
     ) {
       addWarningWithPath('Unable to save file', { detail: error.message });
     } else {
       const errorMatch = /ENOTDIR, not a directory '([^']+)'/.exec(
-        error.message
+        error.message,
       );
       if (errorMatch) {
         const fileName = errorMatch[1];
         this.notificationManager.addWarning(
-          `Unable to save file: A directory in the path '${fileName}' could not be written to`
+          `Unable to save file: A directory in the path '${fileName}' could not be written to`,
         );
       } else {
         throw error;

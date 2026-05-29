@@ -20,7 +20,7 @@ class PanelContainerElement extends HTMLElement {
     this.viewRegistry = viewRegistry;
 
     this.subscriptions.add(
-      this.model.onDidAddPanel(this.panelAdded.bind(this))
+      this.model.onDidAddPanel(this.panelAdded.bind(this)),
     );
     this.subscriptions.add(this.model.onDidDestroy(this.destroyed.bind(this)));
     this.classList.add(this.model.getLocation());
@@ -45,7 +45,7 @@ class PanelContainerElement extends HTMLElement {
     } else {
       panelElement.classList.add(
         'tool-panel',
-        `panel-${this.model.getLocation()}`
+        `panel-${this.model.getLocation()}`,
       );
     }
 
@@ -59,11 +59,11 @@ class PanelContainerElement extends HTMLElement {
     if (this.model.isModal()) {
       this.hideAllPanelsExcept(panel);
       this.subscriptions.add(
-        panel.onDidChangeVisible(visible => {
+        panel.onDidChangeVisible((visible) => {
           if (visible) {
             this.hideAllPanelsExcept(panel);
           }
-        })
+        }),
       );
 
       if (panel.autoFocus) {
@@ -75,7 +75,7 @@ class PanelContainerElement extends HTMLElement {
           // closing is handled by core Atom commands and this already deactivates
           // on visibility changes
           escapeDeactivates: false,
-          delayInitialFocus: false
+          delayInitialFocus: false,
         };
 
         if (panel.autoFocus !== true) {
@@ -84,13 +84,13 @@ class PanelContainerElement extends HTMLElement {
         const modalFocusTrap = createFocusTrap(panelElement, focusOptions);
 
         this.subscriptions.add(
-          panel.onDidChangeVisible(visible => {
+          panel.onDidChangeVisible((visible) => {
             if (visible) {
               modalFocusTrap.activate();
             } else {
               modalFocusTrap.deactivate();
             }
-          })
+          }),
         );
       }
     }
@@ -104,7 +104,7 @@ class PanelContainerElement extends HTMLElement {
   }
 
   hideAllPanelsExcept(excludedPanel) {
-    for (let panel of this.model.getPanels()) {
+    for (const panel of this.model.getPanels()) {
       if (panel !== excludedPanel) {
         panel.hide();
       }
@@ -119,5 +119,5 @@ function createPanelContainerElement() {
 }
 
 module.exports = {
-  createPanelContainerElement
+  createPanelContainerElement,
 };

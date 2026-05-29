@@ -152,7 +152,7 @@ function processSubmatch(submatch, lineText, offsetRow) {
 
   return {
     range: [start, end],
-    lineText: cleanResultLine({ text: lineParts.join('\n') })
+    lineText: cleanResultLine({ text: lineParts.join('\n') }),
   };
 }
 
@@ -203,8 +203,8 @@ module.exports = class RipgrepDirectorySearcher {
   search(directories, regexp, options) {
     const numPathsFound = { num: 0 };
 
-    const allPromises = directories.map(directory =>
-      this.searchInDirectory(directory, regexp, options, numPathsFound)
+    const allPromises = directories.map((directory) =>
+      this.searchInDirectory(directory, regexp, options, numPathsFound),
     );
 
     const promise = Promise.all(allPromises);
@@ -223,7 +223,7 @@ module.exports = class RipgrepDirectorySearcher {
     if (!this.rgPath) {
       this.rgPath = require('vscode-ripgrep').rgPath.replace(
         /\bapp\.asar\b/,
-        'app.asar.unpacked'
+        'app.asar.unpacked',
       );
     }
 
@@ -242,13 +242,13 @@ module.exports = class RipgrepDirectorySearcher {
     }
     for (const inclusion of this.prepareGlobs(
       options.inclusions,
-      directoryPath
+      directoryPath,
     )) {
       args.push('--glob', inclusion);
     }
     for (const exclusion of this.prepareGlobs(
       options.exclusions,
-      directoryPath
+      directoryPath,
     )) {
       args.push('--glob', '!' + exclusion);
     }
@@ -277,7 +277,7 @@ module.exports = class RipgrepDirectorySearcher {
 
     const child = spawn(this.rgPath, args, {
       cwd: directoryPath,
-      stdio: ['pipe', 'pipe', 'pipe']
+      stdio: ['pipe', 'pipe', 'pipe'],
     });
 
     const didMatch = options.didMatch || (() => {});
@@ -299,11 +299,11 @@ module.exports = class RipgrepDirectorySearcher {
         }
       });
 
-      child.stderr.on('data', chunk => {
+      child.stderr.on('data', (chunk) => {
         bufferError += chunk;
       });
 
-      child.stdout.on('data', chunk => {
+      child.stdout.on('data', (chunk) => {
         if (cancelled) {
           return;
         }
@@ -318,7 +318,7 @@ module.exports = class RipgrepDirectorySearcher {
           if (message.type === 'begin') {
             pendingEvent = {
               filePath: path.join(directoryPath, getText(message.data.path)),
-              matches: []
+              matches: [],
             };
             pendingLeadingContext = [];
             pendingTrailingContexts = new Set();
@@ -332,7 +332,7 @@ module.exports = class RipgrepDirectorySearcher {
               const { lineText, range } = processSubmatch(
                 submatch,
                 getText(message.data.lines),
-                message.data.line_number - 1
+                message.data.line_number - 1,
               );
 
               pendingEvent.matches.push({
@@ -341,7 +341,7 @@ module.exports = class RipgrepDirectorySearcher {
                 lineTextOffset: 0,
                 range,
                 leadingContextLines: [...pendingLeadingContext],
-                trailingContextLines
+                trailingContextLines,
               });
             }
           } else if (message.type === 'end') {

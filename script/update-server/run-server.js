@@ -12,15 +12,15 @@ const buildPath = path.resolve(__dirname, '..', '..', 'out');
 const packageJsonPath = path.join(buildPath, 'app', 'package.json');
 if (!fs.existsSync(buildPath) || !fs.existsSync(packageJsonPath)) {
   console.log(
-    `This script requires a full Atom build with release packages for the current platform in the following path:\n    ${buildPath}\n`
+    `This script requires a full Atom build with release packages for the current platform in the following path:\n    ${buildPath}\n`,
   );
   if (process.platform === 'darwin') {
     console.log(
-      `Run this command before trying again:\n    script/build --compress-artifacts --test-sign\n\n`
+      `Run this command before trying again:\n    script/build --compress-artifacts --test-sign\n\n`,
     );
   } else if (process.platform === 'win32') {
     console.log(
-      `Run this command before trying again:\n    script/build --create-windows-installer\n\n`
+      `Run this command before trying again:\n    script/build --create-windows-installer\n\n`,
     );
   }
   process.exit(1);
@@ -33,7 +33,7 @@ const releaseChannel = versionMatch ? versionMatch[1] : 'stable';
 console.log(
   `Serving ${
     appMetadata.productName
-  } release assets (channel = ${releaseChannel})\n`.green
+  } release assets (channel = ${releaseChannel})\n`.green,
 );
 
 function getMacZip(req, res) {
@@ -47,41 +47,41 @@ function getMacUpdates(req, res) {
       name: appMetadata.version,
       pub_date: new Date().toISOString(),
       url: `http://localhost:${port}/mac/atom-mac.zip`,
-      notes: '<p>No Details</p>'
+      notes: '<p>No Details</p>',
     };
 
     console.log(
       `Received request for macOS updates (version = ${
         req.query.version
       }), sending\n`,
-      updateInfo
+      updateInfo,
     );
     res.json(updateInfo);
   } else {
     console.log(
       `Received request for macOS updates, sending 204 as Atom is up to date (version = ${
         req.query.version
-      })`
+      })`,
     );
     res.sendStatus(204);
   }
 }
 
 function getReleasesFile(fileName) {
-  return function(req, res) {
+  return function (req, res) {
     console.log(
-      `Received request for ${fileName}, version: ${req.query.version}`
+      `Received request for ${fileName}, version: ${req.query.version}`,
     );
     if (req.query.version) {
       const versionMatch = (req.query.version || '').match(
-        /-(beta|nightly)\d+$/
+        /-(beta|nightly)\d+$/,
       );
       const versionChannel = (versionMatch && versionMatch[1]) || 'stable';
       if (releaseChannel !== versionChannel) {
         console.log(
           `Atom requested an update for version ${
             req.query.version
-          } but the current release channel is ${releaseChannel}`
+          } but the current release channel is ${releaseChannel}`,
         );
         res.sendStatus(404);
         return;
@@ -93,7 +93,7 @@ function getReleasesFile(fileName) {
 }
 
 function getNupkgFile(is64bit) {
-  return function(req, res) {
+  return function (req, res) {
     let nupkgFile = req.params.nupkg;
     if (is64bit) {
       const nupkgMatch = nupkgFile.match(/atom-(.+)-(delta|full)\.nupkg/);
@@ -103,7 +103,7 @@ function getNupkgFile(is64bit) {
     }
 
     console.log(
-      `Received request for ${req.params.nupkg}, sending ${nupkgFile}`
+      `Received request for ${req.params.nupkg}, sending ${nupkgFile}`,
     );
     res.sendFile(path.join(buildPath, nupkgFile));
   };
@@ -121,7 +121,7 @@ if (process.platform === 'darwin') {
   console.log(
     `The current platform '${
       process.platform
-    }' doesn't support Squirrel updates, exiting.`.red
+    }' doesn't support Squirrel updates, exiting.`.red,
   );
   process.exit(1);
 }
@@ -129,6 +129,6 @@ if (process.platform === 'darwin') {
 app.listen(port, () => {
   console.log(
     `Run Atom with ATOM_UPDATE_URL_PREFIX="http://localhost:${port}" set to test updates!\n`
-      .yellow
+      .yellow,
   );
 });

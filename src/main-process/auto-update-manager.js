@@ -26,7 +26,7 @@ module.exports = class AutoUpdateManager extends EventEmitter {
       '..',
       '..',
       'resources',
-      'atom.png'
+      'atom.png',
     );
     this.updateUrlPrefix =
       process.env.ATOM_UPDATE_URL_PREFIX || 'https://atom.io';
@@ -82,7 +82,7 @@ module.exports = class AutoUpdateManager extends EventEmitter {
         this.releaseVersion = releaseVersion;
         this.setState(UpdateAvailableState);
         this.emitUpdateAvailableEvent();
-      }
+      },
     );
 
     this.config.onDidChange('core.automaticallyUpdate', ({ newValue }) => {
@@ -109,12 +109,12 @@ module.exports = class AutoUpdateManager extends EventEmitter {
   emitUpdateAvailableEvent() {
     if (this.releaseVersion == null) return;
     this.emitWindowEvent('update-available', {
-      releaseVersion: this.releaseVersion
+      releaseVersion: this.releaseVersion,
     });
   }
 
   emitWindowEvent(eventName, payload) {
-    for (let atomWindow of this.getWindows()) {
+    for (const atomWindow of this.getWindows()) {
       atomWindow.sendMessage(eventName, payload);
     }
   }
@@ -174,14 +174,14 @@ module.exports = class AutoUpdateManager extends EventEmitter {
       icon: this.iconPath,
       message: 'No update available.',
       title: 'No Update Available',
-      detail: `Version ${this.version} is the latest version.`
+      detail: `Version ${this.version} is the latest version.`,
     });
   }
 
   onUpdateError(event, message) {
     autoUpdater.removeListener(
       'update-not-available',
-      this.onUpdateNotAvailable
+      this.onUpdateNotAvailable,
     );
     const { dialog } = require('electron');
     dialog.showMessageBox({
@@ -190,7 +190,7 @@ module.exports = class AutoUpdateManager extends EventEmitter {
       icon: this.iconPath,
       message: 'There was an error checking for updates.',
       title: 'Update Error',
-      detail: message
+      detail: message,
     });
   }
 

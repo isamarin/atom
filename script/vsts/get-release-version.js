@@ -29,17 +29,17 @@ async function getReleaseVersion() {
       url: 'https://api.github.com/repos/atom/atom-nightly-releases/releases',
       headers: {
         Accept: 'application/vnd.github.v3+json',
-        'User-Agent': 'Atom Release Build'
+        'User-Agent': 'Atom Release Build',
       },
-      json: true
+      json: true,
     });
 
     let releaseNumber = 0;
     const baseVersion = appMetadata.version.split('-')[0];
     if (releases && releases.length > 0) {
-      const latestRelease = releases.find(r => !r.draft);
+      const latestRelease = releases.find((r) => !r.draft);
       const versionMatch = latestRelease.tag_name.match(
-        /^v?(\d+\.\d+\.\d+)-nightly(\d+)$/
+        /^v?(\d+\.\d+\.\d+)-nightly(\d+)$/,
       );
 
       if (versionMatch && versionMatch[1] === baseVersion) {
@@ -54,7 +54,7 @@ async function getReleaseVersion() {
   // include the version.  Writing these strings to stdout causes VSTS to set
   // the associated variables.
   console.log(
-    `##vso[task.setvariable variable=ReleaseVersion;isOutput=true]${releaseVersion}`
+    `##vso[task.setvariable variable=ReleaseVersion;isOutput=true]${releaseVersion}`,
   );
   if (!process.env.SYSTEM_PULLREQUEST_PULLREQUESTNUMBER) {
     // Only set the build number on non-PR builds as it causes build errors when
@@ -62,7 +62,7 @@ async function getReleaseVersion() {
     console.log(
       `##vso[build.updatebuildnumber]${releaseVersion}+${
         process.env.BUILD_BUILDID
-      }`
+      }`,
     );
   }
 
@@ -82,17 +82,17 @@ async function getReleaseVersion() {
 
   console.log(
     `##vso[task.setvariable variable=AppName;isOutput=true]${getAppName(
-      releaseVersion
-    )}`
+      releaseVersion,
+    )}`,
   );
   console.log(
-    `##vso[task.setvariable variable=IsReleaseBranch;isOutput=true]${isReleaseBranch}`
+    `##vso[task.setvariable variable=IsReleaseBranch;isOutput=true]${isReleaseBranch}`,
   );
   console.log(
-    `##vso[task.setvariable variable=IsSignedZipBranch;isOutput=true]${isSignedZipBranch}`
+    `##vso[task.setvariable variable=IsSignedZipBranch;isOutput=true]${isSignedZipBranch}`,
   );
   console.log(
-    `##vso[task.setvariable variable=SHOULD_SIGN;isOutput=true]${SHOULD_SIGN}`
+    `##vso[task.setvariable variable=SHOULD_SIGN;isOutput=true]${SHOULD_SIGN}`,
   );
 }
 

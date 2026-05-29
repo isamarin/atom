@@ -6,7 +6,7 @@
 
 const childProcess = require('child_process');
 
-module.exports = function() {
+module.exports = function () {
   const result = childProcess.spawnSync.apply(childProcess, arguments);
   if (result.error) {
     throw result.error;
@@ -14,7 +14,7 @@ module.exports = function() {
     if (result.stdout) console.error(result.stdout.toString());
     if (result.stderr) console.error(result.stderr.toString());
     throw new Error(
-      `Command ${result.args.join(' ')} exited with code "${result.status}"`
+      `Command ${result.args.join(' ')} exited with code "${result.status}"`,
     );
   } else {
     return result;

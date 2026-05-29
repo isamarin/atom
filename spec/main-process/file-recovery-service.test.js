@@ -8,7 +8,7 @@ const sinon = require('sinon');
 const { escapeRegExp } = require('underscore-plus');
 const temp = require('temp').track();
 
-describe('FileRecoveryService', function() {
+describe('FileRecoveryService', function () {
   let recoveryService, recoveryDirectory, spies;
 
   this.timeout(10 * 1000);
@@ -122,8 +122,8 @@ describe('FileRecoveryService', function() {
       const filePath = temp.path();
       fs.writeFileSync(filePath, 'content');
 
-      let logs = [];
-      spies.stub(console, 'log').callsFake(message => logs.push(message));
+      const logs = [];
+      spies.stub(console, 'log').callsFake((message) => logs.push(message));
       spies.stub(dialog, 'showMessageBox');
 
       // Copy files to be recovered before mocking fs.createWriteStream
@@ -131,12 +131,9 @@ describe('FileRecoveryService', function() {
 
       // Stub out fs.createWriteStream so that we can return a fake error when
       // attempting to copy the recovered file to its original location
-      var fakeEmitter = new EventEmitter();
-      var onStub = spies.stub(fakeEmitter, 'on');
-      onStub
-        .withArgs('error')
-        .yields(new Error('Nope'))
-        .returns(fakeEmitter);
+      const fakeEmitter = new EventEmitter();
+      const onStub = spies.stub(fakeEmitter, 'on');
+      onStub.withArgs('error').yields(new Error('Nope')).returns(fakeEmitter);
       onStub.withArgs('open').returns(fakeEmitter);
       spies
         .stub(fsreal, 'createWriteStream')
@@ -144,7 +141,7 @@ describe('FileRecoveryService', function() {
         .returns(fakeEmitter);
 
       await recoveryService.didCrashWindow(mockWindow);
-      let recoveryFiles = fs.listTreeSync(recoveryDirectory);
+      const recoveryFiles = fs.listTreeSync(recoveryDirectory);
       assert.equal(recoveryFiles.length, 1);
       assert.equal(logs.length, 1);
       assert.match(logs[0], new RegExp(escapeRegExp(filePath)));

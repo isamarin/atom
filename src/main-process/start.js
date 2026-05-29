@@ -17,7 +17,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   global.shellStartTime = startTime;
   StartupTime.addMarker('main-process:start');
 
-  process.on('uncaughtException', function(error = {}) {
+  process.on('uncaughtException', function (error = {}) {
     if (error.message != null) {
       console.log(error.message);
     }
@@ -27,7 +27,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
     }
   });
 
-  process.on('unhandledRejection', function(error = {}) {
+  process.on('unhandledRejection', function (error = {}) {
     if (error.message != null) {
       console.log(error.message);
     }
@@ -63,14 +63,13 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   } else if (args.test && args.mainProcess) {
     app.setPath(
       'userData',
-      temp.mkdirSync('atom-user-data-dir-for-main-process-tests')
+      temp.mkdirSync('atom-user-data-dir-for-main-process-tests'),
     );
     console.log = previousConsoleLog;
-    app.on('ready', function() {
-      const testRunner = require(path.join(
-        args.resourcePath,
-        'spec/main-process/mocha-test-runner'
-      ));
+    app.on('ready', function () {
+      const testRunner = require(
+        path.join(args.resourcePath, 'spec/main-process/mocha-test-runner'),
+      );
       testRunner(args.pathsToOpen);
     });
     return;
@@ -103,8 +102,8 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   app.on('will-finish-launching', () =>
     startCrashReporter({
       uploadToServer: config.get('core.telemetryConsent') === 'limited',
-      releaseChannel
-    })
+      releaseChannel,
+    }),
   );
 
   if (args.userDataDir != null) {
@@ -116,16 +115,13 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   require('@electron/remote/main').initialize();
 
   StartupTime.addMarker('main-process:electron-onready:start');
-  app.on('ready', function() {
+  app.on('ready', function () {
     StartupTime.addMarker('main-process:electron-onready:end');
     app.removeListener('open-file', addPathToOpen);
     app.removeListener('open-url', addUrlToOpen);
-    const AtomApplication = require(path.join(
-      args.resourcePath,
-      'src',
-      'main-process',
-      'atom-application'
-    ));
+    const AtomApplication = require(
+      path.join(args.resourcePath, 'src', 'main-process', 'atom-application'),
+    );
     AtomApplication.open(args);
   });
 };
@@ -162,7 +158,7 @@ function normalizeDriveLetterName(filePath) {
   if (process.platform === 'win32' && filePath) {
     return filePath.replace(
       /^([a-z]):/,
-      ([driveLetter]) => driveLetter.toUpperCase() + ':'
+      ([driveLetter]) => driveLetter.toUpperCase() + ':',
     );
   } else {
     return filePath;

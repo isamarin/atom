@@ -7,11 +7,11 @@ const path = require('path');
 
 const CONFIG = require('../config');
 
-module.exports = function() {
+module.exports = function () {
   console.log(
-    `Transpiling CoffeeScript paths in ${CONFIG.intermediateAppPath}`
+    `Transpiling CoffeeScript paths in ${CONFIG.intermediateAppPath}`,
   );
-  for (let path of getPathsToTranspile()) {
+  for (const path of getPathsToTranspile()) {
     transpileCoffeeScriptPath(path);
   }
 };
@@ -20,15 +20,17 @@ function getPathsToTranspile() {
   let paths = [];
   paths = paths.concat(
     glob.sync(path.join(CONFIG.intermediateAppPath, 'src', '**', '*.coffee'), {
-      nodir: true
-    })
+      nodir: true,
+    }),
   );
   paths = paths.concat(
     glob.sync(path.join(CONFIG.intermediateAppPath, 'spec', '*.coffee'), {
-      nodir: true
-    })
+      nodir: true,
+    }),
   );
-  for (let packageName of Object.keys(CONFIG.appMetadata.packageDependencies)) {
+  for (const packageName of Object.keys(
+    CONFIG.appMetadata.packageDependencies,
+  )) {
     paths = paths.concat(
       glob.sync(
         path.join(
@@ -36,7 +38,7 @@ function getPathsToTranspile() {
           'node_modules',
           packageName,
           '**',
-          '*.coffee'
+          '*.coffee',
         ),
         {
           ignore: path.join(
@@ -45,11 +47,11 @@ function getPathsToTranspile() {
             packageName,
             'spec',
             '**',
-            '*.coffee'
+            '*.coffee',
           ),
-          nodir: true
-        }
-      )
+          nodir: true,
+        },
+      ),
     );
   }
   return paths;
@@ -59,7 +61,7 @@ function transpileCoffeeScriptPath(coffeePath) {
   const jsPath = coffeePath.replace(/coffee$/g, 'js');
   fs.writeFileSync(
     jsPath,
-    CompileCache.addPathToCache(coffeePath, CONFIG.atomHomeDirPath)
+    CompileCache.addPathToCache(coffeePath, CONFIG.atomHomeDirPath),
   );
   fs.unlinkSync(coffeePath);
 }

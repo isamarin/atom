@@ -28,8 +28,9 @@ module.exports = class Color {
       ParsedColor = require('color');
     }
 
+    let parsedColor;
     try {
-      var parsedColor = ParsedColor(value);
+      parsedColor = ParsedColor(value);
     } catch (error) {
       return null;
     }
@@ -38,7 +39,7 @@ module.exports = class Color {
       parsedColor.red(),
       parsedColor.green(),
       parsedColor.blue(),
-      parsedColor.alpha()
+      parsedColor.alpha(),
     );
   }
 
@@ -84,7 +85,7 @@ module.exports = class Color {
   // Essential: Returns a {String} in the form `'#abcdef'`.
   toHexString() {
     return `#${numberToHexString(this.red)}${numberToHexString(
-      this.green
+      this.green,
     )}${numberToHexString(this.blue)}`;
   }
 

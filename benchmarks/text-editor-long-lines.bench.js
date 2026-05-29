@@ -6,11 +6,13 @@ const SIZES_IN_KB = [512, 1024, 2048];
 const REPEATED_TEXT = fs
   .readFileSync(
     path.join(__dirname, '..', 'spec', 'fixtures', 'sample.js'),
-    'utf8'
+    'utf8',
   )
   .replace(/\n/g, '');
 const TEXT = REPEATED_TEXT.repeat(
-  Math.ceil((SIZES_IN_KB[SIZES_IN_KB.length - 1] * 1024) / REPEATED_TEXT.length)
+  Math.ceil(
+    (SIZES_IN_KB[SIZES_IN_KB.length - 1] * 1024) / REPEATED_TEXT.length,
+  ),
 );
 
 module.exports = async ({ test }) => {
@@ -24,7 +26,7 @@ module.exports = async ({ test }) => {
 
   console.log(atom.getLoadSettings().resourcePath);
 
-  for (let pane of atom.workspace.getPanes()) {
+  for (const pane of atom.workspace.getPanes()) {
     pane.destroy();
   }
 
@@ -37,7 +39,7 @@ module.exports = async ({ test }) => {
     const editor = new TextEditor({
       buffer,
       autoHeight: false,
-      largeFileMode: true
+      largeFileMode: true,
     });
     atom.grammars.assignLanguageMode(buffer, 'source.js');
     atom.workspace.getActivePane().activateItem(editor);
@@ -46,7 +48,7 @@ module.exports = async ({ test }) => {
     data.push({
       name: 'Opening a large single-line file',
       x: sizeInKB,
-      duration: t1 - t0
+      duration: t1 - t0,
     });
 
     const tickDurations = [];
@@ -59,25 +61,24 @@ module.exports = async ({ test }) => {
     }
 
     data.push({
-      name:
-        'Max time event loop was blocked after opening a large single-line file',
+      name: 'Max time event loop was blocked after opening a large single-line file',
       x: sizeInKB,
-      duration: Math.max(...tickDurations)
+      duration: Math.max(...tickDurations),
     });
 
     t0 = window.performance.now();
     editor.setCursorScreenPosition(
       editor.element.screenPositionForPixelPosition({
         top: 100,
-        left: 30
-      })
+        left: 30,
+      }),
     );
     t1 = window.performance.now();
 
     data.push({
       name: 'Clicking the editor after opening a large single-line file',
       x: sizeInKB,
-      duration: t1 - t0
+      duration: t1 - t0,
     });
 
     t0 = window.performance.now();
@@ -87,7 +88,7 @@ module.exports = async ({ test }) => {
     data.push({
       name: 'Scrolling down after opening a large single-line file',
       x: sizeInKB,
-      duration: t1 - t0
+      duration: t1 - t0,
     });
 
     editor.destroy();
@@ -101,5 +102,5 @@ module.exports = async ({ test }) => {
 };
 
 function timeout(duration) {
-  return new Promise(resolve => setTimeout(resolve, duration));
+  return new Promise((resolve) => setTimeout(resolve, duration));
 }

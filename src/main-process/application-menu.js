@@ -12,8 +12,8 @@ module.exports = class ApplicationMenu {
     this.autoUpdateManager = autoUpdateManager;
     this.windowTemplates = new WeakMap();
     this.setActiveTemplate(this.getDefaultTemplate());
-    this.autoUpdateManager.on('state-changed', state =>
-      this.showUpdateMenuItem(state)
+    this.autoUpdateManager.on('state-changed', (state) =>
+      this.showUpdateMenuItem(state),
     );
   }
 
@@ -69,7 +69,7 @@ module.exports = class ApplicationMenu {
   flattenMenuItems(menu) {
     const object = menu.items || {};
     let items = [];
-    for (let index in object) {
+    for (const index in object) {
       const item = object[index];
       items.push(item);
       if (item.submenu)
@@ -85,7 +85,7 @@ module.exports = class ApplicationMenu {
   // Returns an Array of native menu items.
   flattenMenuTemplate(template) {
     let items = [];
-    for (let item of template) {
+    for (const item of template) {
       items.push(item);
       if (item.submenu)
         items = items.concat(this.flattenMenuTemplate(item.submenu));
@@ -98,15 +98,15 @@ module.exports = class ApplicationMenu {
   // enable - If true enables all window specific items, if false disables all
   //          window specific items.
   enableWindowSpecificItems(enable) {
-    for (let item of this.flattenMenuItems(this.menu)) {
+    for (const item of this.flattenMenuItems(this.menu)) {
       if (item.metadata && item.metadata.windowSpecific) item.enabled = enable;
     }
   }
 
   // Replaces VERSION with the current version.
   substituteVersion(template) {
-    let item = this.flattenMenuTemplate(template).find(
-      ({ label }) => label === 'VERSION'
+    const item = this.flattenMenuTemplate(template).find(
+      ({ label }) => label === 'VERSION',
     );
     if (item) item.label = `Version ${this.version}`;
   }
@@ -115,16 +115,16 @@ module.exports = class ApplicationMenu {
   showUpdateMenuItem(state) {
     const items = this.flattenMenuItems(this.menu);
     const checkForUpdateItem = items.find(
-      ({ id }) => id === 'Check for Update'
+      ({ id }) => id === 'Check for Update',
     );
     const checkingForUpdateItem = items.find(
-      ({ id }) => id === 'Checking for Update'
+      ({ id }) => id === 'Checking for Update',
     );
     const downloadingUpdateItem = items.find(
-      ({ id }) => id === 'Downloading Update'
+      ({ id }) => id === 'Downloading Update',
     );
     const installUpdateItem = items.find(
-      ({ id }) => id === 'Restart and Install Update'
+      ({ id }) => id === 'Restart and Install Update',
     );
 
     if (
@@ -170,7 +170,7 @@ module.exports = class ApplicationMenu {
           {
             label: 'Check for Update',
             id: 'Check for Update',
-            metadata: { autoUpdate: true }
+            metadata: { autoUpdate: true },
           },
           {
             label: 'Reload',
@@ -179,7 +179,7 @@ module.exports = class ApplicationMenu {
             click: () => {
               const window = this.focusedWindow();
               if (window) window.reload();
-            }
+            },
           },
           {
             label: 'Close Window',
@@ -188,7 +188,7 @@ module.exports = class ApplicationMenu {
             click: () => {
               const window = this.focusedWindow();
               if (window) window.close();
-            }
+            },
           },
           {
             label: 'Toggle Dev Tools',
@@ -197,23 +197,23 @@ module.exports = class ApplicationMenu {
             click: () => {
               const window = this.focusedWindow();
               if (window) window.toggleDevTools();
-            }
+            },
           },
           {
             label: 'Quit',
             id: 'Quit',
             accelerator: 'Command+Q',
-            click: () => app.quit()
-          }
-        ]
-      }
+            click: () => app.quit(),
+          },
+        ],
+      },
     ];
   }
 
   focusedWindow() {
     return global.atomApplication
       .getAllWindows()
-      .find(window => window.isFocused());
+      .find((window) => window.isFocused());
   }
 
   // Combines a menu template with the appropriate keystroke.
@@ -225,7 +225,7 @@ module.exports = class ApplicationMenu {
   //
   // Returns a complete menu configuration object for atom-shell's menu API.
   translateTemplate(template, keystrokesByCommand) {
-    template.forEach(item => {
+    template.forEach((item) => {
       if (item.metadata == null) item.metadata = {};
       if (item.command) {
         const keystrokes = keystrokesByCommand[item.command];

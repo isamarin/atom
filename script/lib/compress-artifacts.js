@@ -7,14 +7,14 @@ const { path7za } = require('7zip-bin');
 
 const CONFIG = require('../config');
 
-module.exports = function(packagedAppPath) {
+module.exports = function (packagedAppPath) {
   const appArchivePath = path.join(CONFIG.buildOutputPath, getArchiveName());
   compress(packagedAppPath, appArchivePath);
 
   if (process.platform === 'darwin') {
     const symbolsArchivePath = path.join(
       CONFIG.buildOutputPath,
-      'atom-mac-symbols.zip'
+      'atom-mac-symbols.zip',
     );
     compress(CONFIG.symbolsPath, symbolsArchivePath);
   }
@@ -63,6 +63,6 @@ function compress(inputDirPath, outputArchivePath) {
   compressArguments.push(outputArchivePath, path.basename(inputDirPath));
   spawnSync(compressCommand, compressArguments, {
     cwd: path.dirname(inputDirPath),
-    maxBuffer: 2024 * 2024
+    maxBuffer: 2024 * 2024,
   });
 }

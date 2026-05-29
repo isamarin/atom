@@ -86,7 +86,7 @@ describe('PanelContainer', () => {
           container.onDidAddPanel(addPanelSpy);
           const panel = new Panel(
             { item: new TestPanelItem(), priority: 0 },
-            atom.views
+            atom.views,
           );
           container.addPanel(panel);
 
@@ -100,14 +100,14 @@ describe('PanelContainer', () => {
           const addPanelSpy = jasmine.createSpy();
           let panel = new Panel(
             { item: new TestPanelItem(), priority: 1000 },
-            atom.views
+            atom.views,
           );
           container.addPanel(panel);
 
           container.onDidAddPanel(addPanelSpy);
           panel = new Panel(
             { item: new TestPanelItem(), priority: 101 },
-            atom.views
+            atom.views,
           );
           container.addPanel(panel);
 
@@ -132,7 +132,7 @@ describe('PanelContainer', () => {
           container.onDidAddPanel(addPanelSpy);
           const panel = new Panel(
             { item: new TestPanelItem(), priority: 1000 },
-            atom.views
+            atom.views,
           );
           container.addPanel(panel);
 
@@ -147,7 +147,7 @@ describe('PanelContainer', () => {
           container.onDidAddPanel(addPanelSpy);
           const panel = new Panel(
             { item: new TestPanelItem(), priority: 0 },
-            atom.views
+            atom.views,
           );
           container.addPanel(panel);
 

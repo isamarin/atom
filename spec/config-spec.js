@@ -6,7 +6,7 @@ describe('Config', () => {
     atom.config.settingsLoaded = true;
 
     savedSettings = [];
-    atom.config.saveCallback = function(settings) {
+    atom.config.saveCallback = function (settings) {
       savedSettings.push(settings);
     };
   });
@@ -48,21 +48,21 @@ describe('Config', () => {
         atom.config.setSchema('x.y', { type: 'integer', default: 4 });
 
         expect(
-          atom.config.get('x.y', { sources: ['a'], scope: ['.foo'] })
+          atom.config.get('x.y', { sources: ['a'], scope: ['.foo'] }),
         ).toBe(1);
         expect(
-          atom.config.get('x.y', { sources: ['b'], scope: ['.foo'] })
+          atom.config.get('x.y', { sources: ['b'], scope: ['.foo'] }),
         ).toBe(2);
         expect(
-          atom.config.get('x.y', { sources: ['c'], scope: ['.foo'] })
+          atom.config.get('x.y', { sources: ['c'], scope: ['.foo'] }),
         ).toBe(3);
         // Schema defaults never match a specific source. We could potentially add a special "schema" source.
         expect(
-          atom.config.get('x.y', { sources: ['x'], scope: ['.foo'] })
+          atom.config.get('x.y', { sources: ['x'], scope: ['.foo'] }),
         ).toBeUndefined();
 
         expect(
-          atom.config.get(null, { sources: ['a'], scope: ['.foo'] }).x.y
+          atom.config.get(null, { sources: ['a'], scope: ['.foo'] }).x.y,
         ).toBe(1);
       }));
 
@@ -75,83 +75,83 @@ describe('Config', () => {
         atom.config.setSchema('x.y', { type: 'integer', default: 4 });
 
         expect(
-          atom.config.get('x.y', { excludeSources: ['a'], scope: ['.foo'] })
+          atom.config.get('x.y', { excludeSources: ['a'], scope: ['.foo'] }),
         ).toBe(3);
         expect(
-          atom.config.get('x.y', { excludeSources: ['c'], scope: ['.foo'] })
+          atom.config.get('x.y', { excludeSources: ['c'], scope: ['.foo'] }),
         ).toBe(2);
         expect(
           atom.config.get('x.y', {
             excludeSources: ['b', 'c'],
-            scope: ['.foo']
-          })
+            scope: ['.foo'],
+          }),
         ).toBe(1);
         expect(
           atom.config.get('x.y', {
             excludeSources: ['b', 'c', 'a'],
-            scope: ['.foo']
-          })
+            scope: ['.foo'],
+          }),
         ).toBe(0);
         expect(
           atom.config.get('x.y', {
             excludeSources: ['b', 'c', 'a', atom.config.getUserConfigPath()],
-            scope: ['.foo']
-          })
+            scope: ['.foo'],
+          }),
         ).toBe(4);
         expect(
           atom.config.get('x.y', {
-            excludeSources: [atom.config.getUserConfigPath()]
-          })
+            excludeSources: [atom.config.getUserConfigPath()],
+          }),
         ).toBe(4);
       }));
 
     describe("when a 'scope' option is given", () => {
       it('returns the property with the most specific scope selector', () => {
         atom.config.set('foo.bar.baz', 42, {
-          scopeSelector: '.source.coffee .string.quoted.double.coffee'
+          scopeSelector: '.source.coffee .string.quoted.double.coffee',
         });
         atom.config.set('foo.bar.baz', 22, {
-          scopeSelector: '.source .string.quoted.double'
+          scopeSelector: '.source .string.quoted.double',
         });
         atom.config.set('foo.bar.baz', 11, { scopeSelector: '.source' });
 
         expect(
           atom.config.get('foo.bar.baz', {
-            scope: ['.source.coffee', '.string.quoted.double.coffee']
-          })
+            scope: ['.source.coffee', '.string.quoted.double.coffee'],
+          }),
         ).toBe(42);
         expect(
           atom.config.get('foo.bar.baz', {
-            scope: ['.source.js', '.string.quoted.double.js']
-          })
+            scope: ['.source.js', '.string.quoted.double.js'],
+          }),
         ).toBe(22);
         expect(
           atom.config.get('foo.bar.baz', {
-            scope: ['.source.js', '.variable.assignment.js']
-          })
+            scope: ['.source.js', '.variable.assignment.js'],
+          }),
         ).toBe(11);
         expect(
-          atom.config.get('foo.bar.baz', { scope: ['.text'] })
+          atom.config.get('foo.bar.baz', { scope: ['.text'] }),
         ).toBeUndefined();
       });
 
       it('favors the most recently added properties in the event of a specificity tie', () => {
         atom.config.set('foo.bar.baz', 42, {
-          scopeSelector: '.source.coffee .string.quoted.single'
+          scopeSelector: '.source.coffee .string.quoted.single',
         });
         atom.config.set('foo.bar.baz', 22, {
-          scopeSelector: '.source.coffee .string.quoted.double'
+          scopeSelector: '.source.coffee .string.quoted.double',
         });
 
         expect(
           atom.config.get('foo.bar.baz', {
-            scope: ['.source.coffee', '.string.quoted.single']
-          })
+            scope: ['.source.coffee', '.string.quoted.single'],
+          }),
         ).toBe(42);
         expect(
           atom.config.get('foo.bar.baz', {
-            scope: ['.source.coffee', '.string.quoted.single.double']
-          })
+            scope: ['.source.coffee', '.string.quoted.single.double'],
+          }),
         ).toBe(22);
       });
 
@@ -160,22 +160,22 @@ describe('Config', () => {
           atom.config.setDefaults('foo', { hasDefault: 'ok' });
           expect(
             atom.config.get('foo.hasDefault', {
-              scope: ['.source.coffee', '.string.quoted.single']
-            })
+              scope: ['.source.coffee', '.string.quoted.single'],
+            }),
           ).toBe('ok');
         }));
 
       describe('when package settings are added after user settings', () =>
         it("returns the user's setting because the user's setting has higher priority", () => {
           atom.config.set('foo.bar.baz', 100, {
-            scopeSelector: '.source.coffee'
+            scopeSelector: '.source.coffee',
           });
           atom.config.set('foo.bar.baz', 1, {
             scopeSelector: '.source.coffee',
-            source: 'some-package'
+            source: 'some-package',
           });
           expect(
-            atom.config.get('foo.bar.baz', { scope: ['.source.coffee'] })
+            atom.config.get('foo.bar.baz', { scope: ['.source.coffee'] }),
           ).toBe(100);
         }));
     });
@@ -187,7 +187,7 @@ describe('Config', () => {
       expect(atom.config.set('foo', 43, { scopeSelector: '.a .b' })).toBe(true);
       expect(atom.config.set('foo', 42, { scopeSelector: '.a' })).toBe(true);
       expect(atom.config.set('foo', 44, { scopeSelector: '.a .b.c' })).toBe(
-        true
+        true,
       );
 
       expect(atom.config.set('foo', -44, { scopeSelector: '.d' })).toBe(true);
@@ -196,7 +196,7 @@ describe('Config', () => {
         { scopeSelector: '.a .b.c', value: 44 },
         { scopeSelector: '.a .b', value: 43 },
         { scopeSelector: '.a', value: 42 },
-        { scopeSelector: '*', value: 41 }
+        { scopeSelector: '*', value: 41 },
       ]);
     });
 
@@ -205,7 +205,7 @@ describe('Config', () => {
       expect(atom.config.set('foo', 43, { scopeSelector: '.a .b' })).toBe(true);
       expect(atom.config.getAll('foo', { scope: ['.a', '.b.c'] })).toEqual([
         { scopeSelector: '.a .b', value: 43 },
-        { scopeSelector: '*', value: 40 }
+        { scopeSelector: '*', value: 40 },
       ]);
     });
   });
@@ -229,7 +229,7 @@ describe('Config', () => {
     it("does not save when a non-default 'source' is given", () => {
       atom.config.set('foo.bar.baz', 42, {
         source: 'some-other-source',
-        scopeSelector: '.a'
+        scopeSelector: '.a',
       });
       advanceClock(500);
       expect(savedSettings.length).toBe(0);
@@ -237,7 +237,7 @@ describe('Config', () => {
 
     it("does not allow a 'source' option without a 'scopeSelector'", () => {
       expect(() =>
-        atom.config.set('foo', 1, { source: ['.source.ruby'] })
+        atom.config.set('foo', 1, { source: ['.source.ruby'] }),
       ).toThrow();
     });
 
@@ -247,11 +247,11 @@ describe('Config', () => {
         expect(atom.config.get('editor.tabLength')).toBe(6);
         expect(
           atom.config.set(null, {
-            editor: { tabLength: 8, scopeSelector: ['.source.js'] }
-          })
+            editor: { tabLength: 8, scopeSelector: ['.source.js'] },
+          }),
         ).toBe(true);
         expect(
-          atom.config.get('editor.tabLength', { scope: ['.source.js'] })
+          atom.config.get('editor.tabLength', { scope: ['.source.js'] }),
         ).toBe(8);
       }));
 
@@ -262,29 +262,29 @@ describe('Config', () => {
           properties: {
             same: {
               type: 'number',
-              default: 1
+              default: 1,
             },
             changes: {
               type: 'number',
-              default: 1
+              default: 1,
             },
             sameArray: {
               type: 'array',
-              default: [1, 2, 3]
+              default: [1, 2, 3],
             },
             sameObject: {
               type: 'object',
-              default: { a: 1, b: 2 }
+              default: { a: 1, b: 2 },
             },
             null: {
               type: '*',
-              default: null
+              default: null,
             },
             undefined: {
               type: '*',
-              default: undefined
-            }
-          }
+              default: undefined,
+            },
+          },
         });
         expect(atom.config.settings.foo).toBeUndefined();
 
@@ -298,45 +298,45 @@ describe('Config', () => {
         const userConfigPath = atom.config.getUserConfigPath();
 
         expect(
-          atom.config.get('foo.same', { sources: [userConfigPath] })
+          atom.config.get('foo.same', { sources: [userConfigPath] }),
         ).toBeUndefined();
 
         expect(atom.config.get('foo.changes')).toBe(2);
         expect(
-          atom.config.get('foo.changes', { sources: [userConfigPath] })
+          atom.config.get('foo.changes', { sources: [userConfigPath] }),
         ).toBe(2);
 
         atom.config.set('foo.changes', 1);
         expect(
-          atom.config.get('foo.changes', { sources: [userConfigPath] })
+          atom.config.get('foo.changes', { sources: [userConfigPath] }),
         ).toBeUndefined();
       }));
 
     describe("when a 'scopeSelector' is given", () =>
       it('sets the value and overrides the others', () => {
         atom.config.set('foo.bar.baz', 42, {
-          scopeSelector: '.source.coffee .string.quoted.double.coffee'
+          scopeSelector: '.source.coffee .string.quoted.double.coffee',
         });
         atom.config.set('foo.bar.baz', 22, {
-          scopeSelector: '.source .string.quoted.double'
+          scopeSelector: '.source .string.quoted.double',
         });
         atom.config.set('foo.bar.baz', 11, { scopeSelector: '.source' });
 
         expect(
           atom.config.get('foo.bar.baz', {
-            scope: ['.source.coffee', '.string.quoted.double.coffee']
-          })
+            scope: ['.source.coffee', '.string.quoted.double.coffee'],
+          }),
         ).toBe(42);
 
         expect(
           atom.config.set('foo.bar.baz', 100, {
-            scopeSelector: '.source.coffee .string.quoted.double.coffee'
-          })
+            scopeSelector: '.source.coffee .string.quoted.double.coffee',
+          }),
         ).toBe(true);
         expect(
           atom.config.get('foo.bar.baz', {
-            scope: ['.source.coffee', '.string.quoted.double.coffee']
-          })
+            scope: ['.source.coffee', '.string.quoted.double.coffee'],
+          }),
         ).toBe(100);
       }));
   });
@@ -351,20 +351,20 @@ describe('Config', () => {
             properties: {
               baz: {
                 type: 'integer',
-                default: 0
+                default: 0,
               },
               ok: {
                 type: 'integer',
-                default: 0
-              }
-            }
+                default: 0,
+              },
+            },
           },
           quux: {
             type: 'integer',
-            default: 0
-          }
-        }
-      })
+            default: 0,
+          },
+        },
+      }),
     );
 
     it('sets the value of the key path to its default', () => {
@@ -395,21 +395,21 @@ describe('Config', () => {
         it('removes all scoped settings with the given source', () => {
           atom.config.set('foo.bar.baz', 1, {
             scopeSelector: '.a',
-            source: 'source-a'
+            source: 'source-a',
           });
           atom.config.set('foo.bar.quux', 2, {
             scopeSelector: '.b',
-            source: 'source-a'
+            source: 'source-a',
           });
           expect(atom.config.get('foo.bar', { scope: ['.a.b'] })).toEqual({
             baz: 1,
-            quux: 2
+            quux: 2,
           });
 
           atom.config.unset(null, { source: 'source-a' });
           expect(atom.config.get('foo.bar', { scope: ['.a'] })).toEqual({
             baz: 0,
-            ok: 0
+            ok: 0,
           });
         }));
 
@@ -418,19 +418,19 @@ describe('Config', () => {
           atom.config.set('foo.bar.baz', 1);
           atom.config.set('foo.bar.baz', 2, {
             scopeSelector: '.a',
-            source: 'source-a'
+            source: 'source-a',
           });
           atom.config.set('foo.bar.baz', 3, {
             scopeSelector: '.a.b',
-            source: 'source-b'
+            source: 'source-b',
           });
           expect(atom.config.get('foo.bar.baz', { scope: ['.a.b'] })).toEqual(
-            3
+            3,
           );
 
           atom.config.unset('foo.bar.baz', { source: 'source-b' });
           expect(atom.config.get('foo.bar.baz', { scope: ['.a.b'] })).toEqual(
-            2
+            2,
           );
           expect(atom.config.get('foo.bar.baz')).toEqual(1);
         }));
@@ -442,12 +442,12 @@ describe('Config', () => {
           atom.config.set(
             'foo.bar',
             { baz: 1, ok: 2 },
-            { scopeSelector: '.a' }
+            { scopeSelector: '.a' },
           );
           atom.config.set(
             'foo.bar',
             { baz: 11, ok: 12 },
-            { scopeSelector: '.b' }
+            { scopeSelector: '.b' },
           );
           atom.config.set('foo.bar', { baz: 21, ok: 22 });
 
@@ -468,12 +468,12 @@ describe('Config', () => {
         atom.config.setDefaults('foo', { bar: { baz: 10 } });
         atom.config.set('foo.bar.baz', 55, { scopeSelector: '.source.coffee' });
         expect(
-          atom.config.get('foo.bar.baz', { scope: ['.source.coffee'] })
+          atom.config.get('foo.bar.baz', { scope: ['.source.coffee'] }),
         ).toBe(55);
 
         atom.config.unset('foo.bar.baz', { scopeSelector: '.source.coffee' });
         expect(
-          atom.config.get('foo.bar.baz', { scope: ['.source.coffee'] })
+          atom.config.get('foo.bar.baz', { scope: ['.source.coffee'] }),
         ).toBe(10);
       });
 
@@ -481,20 +481,20 @@ describe('Config', () => {
         atom.config.setDefaults('foo', { bar: { baz: 10 } });
         atom.config.set('foo.bar.baz', 42, {
           scopeSelector: '.source.coffee',
-          source: 'some-source'
+          source: 'some-source',
         });
         atom.config.set('foo.bar.baz', 55, { scopeSelector: '.source.coffee' });
         atom.config.set('foo.bar.ok', 100, { scopeSelector: '.source.coffee' });
         expect(
-          atom.config.get('foo.bar.baz', { scope: ['.source.coffee'] })
+          atom.config.get('foo.bar.baz', { scope: ['.source.coffee'] }),
         ).toBe(55);
 
         atom.config.unset('foo.bar.baz', { scopeSelector: '.source.coffee' });
         expect(
-          atom.config.get('foo.bar.baz', { scope: ['.source.coffee'] })
+          atom.config.get('foo.bar.baz', { scope: ['.source.coffee'] }),
         ).toBe(42);
         expect(
-          atom.config.get('foo.bar.ok', { scope: ['.source.coffee'] })
+          atom.config.get('foo.bar.ok', { scope: ['.source.coffee'] }),
         ).toBe(100);
       });
 
@@ -511,57 +511,57 @@ describe('Config', () => {
       it('allows removing settings for a specific source and scope selector', () => {
         atom.config.set('foo.bar.baz', 55, {
           scopeSelector: '.source.coffee',
-          source: 'source-a'
+          source: 'source-a',
         });
         atom.config.set('foo.bar.baz', 65, {
           scopeSelector: '.source.coffee',
-          source: 'source-b'
+          source: 'source-b',
         });
         expect(
-          atom.config.get('foo.bar.baz', { scope: ['.source.coffee'] })
+          atom.config.get('foo.bar.baz', { scope: ['.source.coffee'] }),
         ).toBe(65);
 
         atom.config.unset('foo.bar.baz', {
           source: 'source-b',
-          scopeSelector: '.source.coffee'
+          scopeSelector: '.source.coffee',
         });
         expect(
           atom.config.get('foo.bar.baz', {
-            scope: ['.source.coffee', '.string']
-          })
+            scope: ['.source.coffee', '.string'],
+          }),
         ).toBe(55);
       });
 
       it('allows removing all settings for a specific source', () => {
         atom.config.set('foo.bar.baz', 55, {
           scopeSelector: '.source.coffee',
-          source: 'source-a'
+          source: 'source-a',
         });
         atom.config.set('foo.bar.baz', 65, {
           scopeSelector: '.source.coffee',
-          source: 'source-b'
+          source: 'source-b',
         });
         atom.config.set('foo.bar.ok', 65, {
           scopeSelector: '.source.coffee',
-          source: 'source-b'
+          source: 'source-b',
         });
         expect(
-          atom.config.get('foo.bar.baz', { scope: ['.source.coffee'] })
+          atom.config.get('foo.bar.baz', { scope: ['.source.coffee'] }),
         ).toBe(65);
 
         atom.config.unset(null, {
           source: 'source-b',
-          scopeSelector: '.source.coffee'
+          scopeSelector: '.source.coffee',
         });
         expect(
           atom.config.get('foo.bar.baz', {
-            scope: ['.source.coffee', '.string']
-          })
+            scope: ['.source.coffee', '.string'],
+          }),
         ).toBe(55);
         expect(
           atom.config.get('foo.bar.ok', {
-            scope: ['.source.coffee', '.string']
-          })
+            scope: ['.source.coffee', '.string'],
+          }),
         ).toBe(0);
       });
 
@@ -570,14 +570,13 @@ describe('Config', () => {
         atom.config.setDefaults('foo', { bar: { baz: 10 } });
         atom.config.unset('foo.bar.baz', { scopeSelector: '.source.coffee' });
         expect(
-          atom.config.get('foo.bar.baz', { scope: ['.source.coffee'] })
+          atom.config.get('foo.bar.baz', { scope: ['.source.coffee'] }),
         ).toBe(10);
 
         expect(savedSettings.length).toBe(0);
 
-        const scopedProperties = atom.config.scopedSettingsStore.propertiesForSource(
-          'user-config'
-        );
+        const scopedProperties =
+          atom.config.scopedSettingsStore.propertiesForSource('user-config');
         expect(scopedProperties['.coffee.source']).toBeUndefined();
       });
 
@@ -586,7 +585,7 @@ describe('Config', () => {
         atom.config.set('foo.bar.baz', 55, { scopeSelector: '.source.coffee' });
         atom.config.set('foo.bar.ok', 20, { scopeSelector: '.source.coffee' });
         expect(
-          atom.config.get('foo.bar.baz', { scope: ['.source.coffee'] })
+          atom.config.get('foo.bar.baz', { scope: ['.source.coffee'] }),
         ).toBe(55);
 
         advanceClock(150);
@@ -594,19 +593,19 @@ describe('Config', () => {
 
         atom.config.unset('foo.bar.baz', { scopeSelector: '.source.coffee' });
         expect(
-          atom.config.get('foo.bar.baz', { scope: ['.source.coffee'] })
+          atom.config.get('foo.bar.baz', { scope: ['.source.coffee'] }),
         ).toBe(10);
         expect(
-          atom.config.get('foo.bar.ok', { scope: ['.source.coffee'] })
+          atom.config.get('foo.bar.ok', { scope: ['.source.coffee'] }),
         ).toBe(20);
 
         advanceClock(150);
         expect(savedSettings[0]['.coffee.source']).toEqual({
           foo: {
             bar: {
-              ok: 20
-            }
-          }
+              ok: 20,
+            },
+          },
         });
 
         atom.config.unset('foo.bar.ok', { scopeSelector: '.source.coffee' });
@@ -626,7 +625,7 @@ describe('Config', () => {
         advanceClock(150);
         expect(savedSettings.length).toBe(0);
         expect(
-          atom.config.get('foo.bar.baz', { scope: ['.source.coffee'] })
+          atom.config.get('foo.bar.baz', { scope: ['.source.coffee'] }),
         ).toBe(55);
       });
     });
@@ -649,7 +648,7 @@ describe('Config', () => {
         atom.config.set('foo.bar.baz', 'value 2');
         expect(observeHandler).toHaveBeenCalledWith({
           newValue: 'value 2',
-          oldValue: 'value 1'
+          oldValue: 'value 1',
         });
         observeHandler.reset();
         observeHandler.andCallFake(() => {
@@ -658,7 +657,7 @@ describe('Config', () => {
         expect(() => atom.config.set('foo.bar.baz', 'value 1')).toThrow('oops');
         expect(observeHandler).toHaveBeenCalledWith({
           newValue: 'value 1',
-          oldValue: 'value 2'
+          oldValue: 'value 2',
         });
         observeHandler.reset();
 
@@ -684,30 +683,30 @@ describe('Config', () => {
         atom.config.set('foo.bar.baz', 'value 2');
         expect(observeHandler).toHaveBeenCalled();
         expect(observeHandler.mostRecentCall.args[0].newValue.foo.bar.baz).toBe(
-          'value 2'
+          'value 2',
         );
         expect(observeHandler.mostRecentCall.args[0].oldValue.foo.bar.baz).toBe(
-          'value 1'
+          'value 1',
         );
 
         observeHandler.reset();
         atom.config.set('foo.bar.baz', 'value 1');
         expect(observeHandler).toHaveBeenCalled();
         expect(observeHandler.mostRecentCall.args[0].newValue.foo.bar.baz).toBe(
-          'value 1'
+          'value 1',
         );
         expect(observeHandler.mostRecentCall.args[0].oldValue.foo.bar.baz).toBe(
-          'value 2'
+          'value 2',
         );
 
         observeHandler.reset();
         atom.config.set('foo.bar.int', 1);
         expect(observeHandler).toHaveBeenCalled();
         expect(observeHandler.mostRecentCall.args[0].newValue.foo.bar.int).toBe(
-          1
+          1,
         );
         expect(observeHandler.mostRecentCall.args[0].oldValue.foo.bar.int).toBe(
-          undefined
+          undefined,
         );
       });
     });
@@ -718,40 +717,40 @@ describe('Config', () => {
         atom.config.onDidChange(
           'foo.bar.baz',
           { scope: ['.source.coffee', '.string.quoted.double.coffee'] },
-          changeSpy
+          changeSpy,
         );
 
         atom.config.set('foo.bar.baz', 12);
         expect(changeSpy).toHaveBeenCalledWith({
           oldValue: undefined,
-          newValue: 12
+          newValue: 12,
         });
         changeSpy.reset();
 
         atom.config.set('foo.bar.baz', 22, {
           scopeSelector: '.source .string.quoted.double',
-          source: 'a'
+          source: 'a',
         });
         expect(changeSpy).toHaveBeenCalledWith({ oldValue: 12, newValue: 22 });
         changeSpy.reset();
 
         atom.config.set('foo.bar.baz', 42, {
           scopeSelector: '.source.coffee .string.quoted.double.coffee',
-          source: 'b'
+          source: 'b',
         });
         expect(changeSpy).toHaveBeenCalledWith({ oldValue: 22, newValue: 42 });
         changeSpy.reset();
 
         atom.config.unset(null, {
           scopeSelector: '.source.coffee .string.quoted.double.coffee',
-          source: 'b'
+          source: 'b',
         });
         expect(changeSpy).toHaveBeenCalledWith({ oldValue: 42, newValue: 22 });
         changeSpy.reset();
 
         atom.config.unset(null, {
           scopeSelector: '.source .string.quoted.double',
-          source: 'a'
+          source: 'a',
         });
         expect(changeSpy).toHaveBeenCalledWith({ oldValue: 22, newValue: 12 });
         changeSpy.reset();
@@ -759,7 +758,7 @@ describe('Config', () => {
         atom.config.set('foo.bar.baz', undefined);
         expect(changeSpy).toHaveBeenCalledWith({
           oldValue: 12,
-          newValue: undefined
+          newValue: undefined,
         });
         changeSpy.reset();
       }));
@@ -819,7 +818,7 @@ describe('Config', () => {
       const bazCatHandler = jasmine.createSpy('bazCatHandler');
       observeSubscription = atom.config.observe(
         'foo.bar.bazCat',
-        bazCatHandler
+        bazCatHandler,
       );
 
       bazCatHandler.reset();
@@ -839,12 +838,12 @@ describe('Config', () => {
         atom.config.observe(
           'foo.bar.baz',
           { scope: ['.some.scope'] },
-          observeHandler
+          observeHandler,
         );
         atom.config.observe(
           'foo.bar.baz',
           { scope: ['.another.scope'] },
-          otherHandler
+          otherHandler,
         );
 
         atom.config.set('foo.bar.baz', 'value 2', { scopeSelector: '.some' });
@@ -857,7 +856,7 @@ describe('Config', () => {
         atom.config.observe(
           'foo.bar.baz',
           { scope: ['.source.coffee', '.string.quoted.double.coffee'] },
-          changeSpy
+          changeSpy,
         );
         expect(changeSpy).toHaveBeenCalledWith('value 1');
         changeSpy.reset();
@@ -868,28 +867,28 @@ describe('Config', () => {
 
         atom.config.set('foo.bar.baz', 22, {
           scopeSelector: '.source .string.quoted.double',
-          source: 'a'
+          source: 'a',
         });
         expect(changeSpy).toHaveBeenCalledWith(22);
         changeSpy.reset();
 
         atom.config.set('foo.bar.baz', 42, {
           scopeSelector: '.source.coffee .string.quoted.double.coffee',
-          source: 'b'
+          source: 'b',
         });
         expect(changeSpy).toHaveBeenCalledWith(42);
         changeSpy.reset();
 
         atom.config.unset(null, {
           scopeSelector: '.source.coffee .string.quoted.double.coffee',
-          source: 'b'
+          source: 'b',
         });
         expect(changeSpy).toHaveBeenCalledWith(22);
         changeSpy.reset();
 
         atom.config.unset(null, {
           scopeSelector: '.source .string.quoted.double',
-          source: 'a'
+          source: 'a',
         });
         expect(changeSpy).toHaveBeenCalledWith(12);
         changeSpy.reset();
@@ -919,7 +918,7 @@ describe('Config', () => {
       expect(changeSpy.callCount).toBe(1);
       expect(changeSpy.argsForCall[0][0]).toEqual({
         newValue: 3,
-        oldValue: undefined
+        oldValue: undefined,
       });
     });
 
@@ -947,9 +946,9 @@ describe('Config', () => {
       });
 
       waitsForPromise(() =>
-        transactionPromise.then(result => {
+        transactionPromise.then((result) => {
           promiseResult = result;
-        })
+        }),
       );
 
       runs(() => {
@@ -957,7 +956,7 @@ describe('Config', () => {
         expect(changeSpy.callCount).toBe(1);
         expect(changeSpy.argsForCall[0][0]).toEqual({
           newValue: 3,
-          oldValue: undefined
+          oldValue: undefined,
         });
       });
     });
@@ -972,9 +971,9 @@ describe('Config', () => {
       });
 
       waitsForPromise(() =>
-        transactionPromise.catch(error => {
+        transactionPromise.catch((error) => {
           promiseError = error;
-        })
+        }),
       );
 
       runs(() => {
@@ -982,7 +981,7 @@ describe('Config', () => {
         expect(changeSpy.callCount).toBe(1);
         expect(changeSpy.argsForCall[0][0]).toEqual({
           newValue: 3,
-          oldValue: undefined
+          oldValue: undefined,
         });
       });
     });
@@ -998,9 +997,9 @@ describe('Config', () => {
       });
 
       waitsForPromise(() =>
-        transactionPromise.catch(e => {
+        transactionPromise.catch((e) => {
           promiseError = e;
-        })
+        }),
       );
 
       runs(() => {
@@ -1008,7 +1007,7 @@ describe('Config', () => {
         expect(changeSpy.callCount).toBe(1);
         expect(changeSpy.argsForCall[0][0]).toEqual({
           newValue: 3,
-          oldValue: undefined
+          oldValue: undefined,
         });
       });
     });
@@ -1026,7 +1025,7 @@ describe('Config', () => {
       expect(atom.config.getSources()).toEqual([
         'source-1',
         'source-2',
-        'source-3'
+        'source-3',
       ]);
     });
   });
@@ -1064,7 +1063,7 @@ describe('Config', () => {
       expect(foundKeys).toEqual(expectedKeys);
       expectedKeys = ['bar', 'foo'];
       foundKeys = [];
-      for (const key in writtenConfig['*']['baz']) {
+      for (const key in writtenConfig['*'].baz) {
         if (expectedKeys.includes(key)) {
           foundKeys.push(key);
         }
@@ -1077,7 +1076,7 @@ describe('Config', () => {
         atom.config.set('foo.bar', 'ruby', { scopeSelector: '.source.ruby' });
         atom.config.set('foo.omg', 'wow', { scopeSelector: '.source.ruby' });
         atom.config.set('foo.bar', 'coffee', {
-          scopeSelector: '.source.coffee'
+          scopeSelector: '.source.coffee',
         });
 
         savedSettings.length = 0;
@@ -1089,14 +1088,14 @@ describe('Config', () => {
           '.ruby.source': {
             foo: {
               bar: 'ruby',
-              omg: 'wow'
-            }
+              omg: 'wow',
+            },
           },
           '.coffee.source': {
             foo: {
-              bar: 'coffee'
-            }
-          }
+              bar: 'coffee',
+            },
+          },
         });
       });
     });
@@ -1109,13 +1108,13 @@ describe('Config', () => {
         properties: {
           bar: {
             type: 'string',
-            default: 'def'
+            default: 'def',
           },
           int: {
             type: 'integer',
-            default: 12
-          }
-        }
+            default: 12,
+          },
+        },
       });
     });
 
@@ -1124,19 +1123,19 @@ describe('Config', () => {
         atom.config.resetUserSettings({
           '*': {
             foo: {
-              bar: 'baz'
-            }
+              bar: 'baz',
+            },
           },
 
           '.source.ruby': {
             foo: {
-              bar: 'more-specific'
-            }
-          }
+              bar: 'more-specific',
+            },
+          },
         });
         expect(atom.config.get('foo.bar')).toBe('baz');
         expect(atom.config.get('foo.bar', { scope: ['.source.ruby'] })).toBe(
-          'more-specific'
+          'more-specific',
         );
       });
     });
@@ -1147,23 +1146,23 @@ describe('Config', () => {
           '*': {
             foo: {
               bar: 'omg',
-              int: 'baz'
-            }
+              int: 'baz',
+            },
           },
           '.source.ruby': {
             foo: {
               bar: 'scoped',
-              int: 'nope'
-            }
-          }
+              int: 'nope',
+            },
+          },
         });
         expect(atom.config.get('foo.int')).toBe(12);
         expect(atom.config.get('foo.bar')).toBe('omg');
         expect(atom.config.get('foo.int', { scope: ['.source.ruby'] })).toBe(
-          12
+          12,
         );
         expect(atom.config.get('foo.bar', { scope: ['.source.ruby'] })).toBe(
-          'scoped'
+          'scoped',
         );
       });
     });
@@ -1185,8 +1184,8 @@ describe('Config', () => {
         atom.config.resetUserSettings({
           foo: {
             bar: 'baz',
-            int: 'bad value'
-          }
+            int: 'bad value',
+          },
         });
         expect(atom.config.get('foo.bar')).toBe('baz');
         expect(atom.config.get('foo.int')).toBe(12);
@@ -1197,14 +1196,14 @@ describe('Config', () => {
 
     it('does not fire a change event for paths that did not change', () => {
       atom.config.resetUserSettings({
-        foo: { bar: 'baz', int: 3 }
+        foo: { bar: 'baz', int: 3 },
       });
 
       const noChangeSpy = jasmine.createSpy('unchanged');
       atom.config.onDidChange('foo.bar', noChangeSpy);
 
       atom.config.resetUserSettings({
-        foo: { bar: 'baz', int: 4 }
+        foo: { bar: 'baz', int: 4 },
       });
 
       expect(noChangeSpy).not.toHaveBeenCalled();
@@ -1216,19 +1215,19 @@ describe('Config', () => {
       atom.config.setSchema('foo.bar', {
         type: 'array',
         items: {
-          type: 'string'
-        }
+          type: 'string',
+        },
       });
 
       atom.config.resetUserSettings({
-        foo: { bar: ['baz', 'quux'], int: 2 }
+        foo: { bar: ['baz', 'quux'], int: 2 },
       });
 
       const noChangeSpy = jasmine.createSpy('unchanged');
       atom.config.onDidChange('foo.bar', noChangeSpy);
 
       atom.config.resetUserSettings({
-        foo: { bar: ['baz', 'quux'], int: 2 }
+        foo: { bar: ['baz', 'quux'], int: 2 },
       });
 
       expect(noChangeSpy).not.toHaveBeenCalled();
@@ -1238,14 +1237,14 @@ describe('Config', () => {
     describe('when a setting with a default is removed', () => {
       it('resets the setting back to the default', () => {
         atom.config.resetUserSettings({
-          foo: { bar: ['baz', 'quux'], int: 2 }
+          foo: { bar: ['baz', 'quux'], int: 2 },
         });
 
         const events = [];
-        atom.config.onDidChange('foo.int', event => events.push(event));
+        atom.config.onDidChange('foo.int', (event) => events.push(event));
 
         atom.config.resetUserSettings({
-          foo: { bar: ['baz', 'quux'] }
+          foo: { bar: ['baz', 'quux'] },
         });
 
         expect(events.length).toBe(1);
@@ -1258,9 +1257,9 @@ describe('Config', () => {
         '*': {
           foo: {
             bar: 'baz',
-            int: 99
-          }
-        }
+            int: 99,
+          },
+        },
       });
 
       atom.config.set('foo.int', 50, { scopeSelector: '*' });
@@ -1269,7 +1268,7 @@ describe('Config', () => {
 
       expect(savedSettings[0]['*'].foo).toEqual({
         bar: 'baz',
-        int: 50
+        int: 50,
       });
       expect(atom.config.get('foo.int', { scope: ['*'] })).toEqual(50);
       expect(atom.config.get('foo.bar', { scope: ['*'] })).toEqual('baz');
@@ -1287,7 +1286,7 @@ describe('Config', () => {
       expect(atom.config.pushAtKeyPath('foo.bar.baz', 'b')).toBe(2);
       expect(atom.config.get('foo.bar.baz')).toEqual(['a', 'b']);
       expect(observeHandler).toHaveBeenCalledWith(
-        atom.config.get('foo.bar.baz')
+        atom.config.get('foo.bar.baz'),
       );
     });
   });
@@ -1302,7 +1301,7 @@ describe('Config', () => {
       expect(atom.config.unshiftAtKeyPath('foo.bar.baz', 'a')).toBe(2);
       expect(atom.config.get('foo.bar.baz')).toEqual(['a', 'b']);
       expect(observeHandler).toHaveBeenCalledWith(
-        atom.config.get('foo.bar.baz')
+        atom.config.get('foo.bar.baz'),
       );
     });
   });
@@ -1316,11 +1315,11 @@ describe('Config', () => {
 
       expect(atom.config.removeAtKeyPath('foo.bar.baz', 'b')).toEqual([
         'a',
-        'c'
+        'c',
       ]);
       expect(atom.config.get('foo.bar.baz')).toEqual(['a', 'c']);
       expect(observeHandler).toHaveBeenCalledWith(
-        atom.config.get('foo.bar.baz')
+        atom.config.get('foo.bar.baz'),
       );
     });
   });
@@ -1354,9 +1353,9 @@ describe('Config', () => {
         properties: {
           anInt: {
             type: 'integer',
-            default: 12
-          }
-        }
+            default: 12,
+          },
+        },
       };
 
       atom.config.setSchema('foo.bar', schema);
@@ -1369,11 +1368,11 @@ describe('Config', () => {
             properties: {
               anInt: {
                 type: 'integer',
-                default: 12
-              }
-            }
-          }
-        }
+                default: 12,
+              },
+            },
+          },
+        },
       });
     });
 
@@ -1383,27 +1382,27 @@ describe('Config', () => {
         properties: {
           anInt: {
             type: 'integer',
-            default: 12
+            default: 12,
           },
           anObject: {
             type: 'object',
             properties: {
               nestedInt: {
                 type: 'integer',
-                default: 24
+                default: 24,
               },
               nestedObject: {
                 type: 'object',
                 properties: {
                   superNestedInt: {
                     type: 'integer',
-                    default: 36
-                  }
-                }
-              }
-            }
-          }
-        }
+                    default: 36,
+                  },
+                },
+              },
+            },
+          },
+        },
       };
 
       atom.config.setSchema('foo.bar', schema);
@@ -1411,8 +1410,8 @@ describe('Config', () => {
       expect(atom.config.get('foo.bar.anObject')).toEqual({
         nestedInt: 24,
         nestedObject: {
-          superNestedInt: 36
-        }
+          superNestedInt: 36,
+        },
       });
 
       expect(atom.config.get('foo')).toEqual({
@@ -1421,10 +1420,10 @@ describe('Config', () => {
           anObject: {
             nestedInt: 24,
             nestedObject: {
-              superNestedInt: 36
-            }
-          }
-        }
+              superNestedInt: 36,
+            },
+          },
+        },
       });
       atom.config.set('foo.bar.anObject.nestedObject.superNestedInt', 37);
       expect(atom.config.get('foo')).toEqual({
@@ -1433,24 +1432,24 @@ describe('Config', () => {
           anObject: {
             nestedInt: 24,
             nestedObject: {
-              superNestedInt: 37
-            }
-          }
-        }
+              superNestedInt: 37,
+            },
+          },
+        },
       });
     });
 
     it('can set a non-object schema', () => {
       const schema = {
         type: 'integer',
-        default: 12
+        default: 12,
       };
 
       atom.config.setSchema('foo.bar.anInt', schema);
       expect(atom.config.get('foo.bar.anInt')).toBe(12);
       expect(atom.config.getSchema('foo.bar.anInt')).toEqual({
         type: 'integer',
-        default: 12
+        default: 12,
       });
     });
 
@@ -1460,9 +1459,9 @@ describe('Config', () => {
         properties: {
           anInt: {
             type: 'integer',
-            default: 12
-          }
-        }
+            default: 12,
+          },
+        },
       };
 
       atom.config.setSchema('foo.bar', schema);
@@ -1472,14 +1471,14 @@ describe('Config', () => {
         properties: {
           anInt: {
             type: 'integer',
-            default: 12
-          }
-        }
+            default: 12,
+          },
+        },
       });
 
       expect(atom.config.getSchema('foo.bar.anInt')).toEqual({
         type: 'integer',
-        default: 12
+        default: 12,
       });
 
       expect(atom.config.getSchema('foo.baz')).toEqual({ type: 'any' });
@@ -1492,18 +1491,18 @@ describe('Config', () => {
         default: 'ok',
         scopes: {
           '.source.js': {
-            default: 'omg'
-          }
-        }
+            default: 'omg',
+          },
+        },
       };
       atom.config.setSchema('foo.bar.str', schema);
 
       expect(atom.config.get('foo.bar.str')).toBe('ok');
       expect(atom.config.get('foo.bar.str', { scope: ['.source.js'] })).toBe(
-        'omg'
+        'omg',
       );
       expect(
-        atom.config.get('foo.bar.str', { scope: ['.source.coffee'] })
+        atom.config.get('foo.bar.str', { scope: ['.source.coffee'] }),
       ).toBe('ok');
     });
 
@@ -1515,13 +1514,13 @@ describe('Config', () => {
           properties: {
             int: {
               type: 'integer',
-              default: 2
+              default: 2,
             },
             str: {
               type: 'string',
-              default: 'def'
-            }
-          }
+              default: 'def',
+            },
+          },
         };
       });
 
@@ -1529,90 +1528,90 @@ describe('Config', () => {
         expect(atom.config.set('foo.bar.str', 'global')).toBe(true);
         expect(
           atom.config.set('foo.bar.str', 'scoped', {
-            scopeSelector: '.source.js'
-          })
+            scopeSelector: '.source.js',
+          }),
         ).toBe(true);
         expect(atom.config.get('foo.bar.str')).toBe('global');
         expect(atom.config.get('foo.bar.str', { scope: ['.source.js'] })).toBe(
-          'scoped'
+          'scoped',
         );
 
         expect(atom.config.set('foo.bar.noschema', 'nsGlobal')).toBe(true);
         expect(
           atom.config.set('foo.bar.noschema', 'nsScoped', {
-            scopeSelector: '.source.js'
-          })
+            scopeSelector: '.source.js',
+          }),
         ).toBe(true);
         expect(atom.config.get('foo.bar.noschema')).toBe('nsGlobal');
         expect(
-          atom.config.get('foo.bar.noschema', { scope: ['.source.js'] })
+          atom.config.get('foo.bar.noschema', { scope: ['.source.js'] }),
         ).toBe('nsScoped');
 
         expect(atom.config.set('foo.bar.int', 'nope')).toBe(true);
         expect(
           atom.config.set('foo.bar.int', 'notanint', {
-            scopeSelector: '.source.js'
-          })
+            scopeSelector: '.source.js',
+          }),
         ).toBe(true);
         expect(
           atom.config.set('foo.bar.int', 23, {
-            scopeSelector: '.source.coffee'
-          })
+            scopeSelector: '.source.coffee',
+          }),
         ).toBe(true);
         expect(atom.config.get('foo.bar.int')).toBe('nope');
         expect(atom.config.get('foo.bar.int', { scope: ['.source.js'] })).toBe(
-          'notanint'
+          'notanint',
         );
         expect(
-          atom.config.get('foo.bar.int', { scope: ['.source.coffee'] })
+          atom.config.get('foo.bar.int', { scope: ['.source.coffee'] }),
         ).toBe(23);
 
         atom.config.setSchema('foo.bar', schema);
 
         expect(atom.config.get('foo.bar.str')).toBe('global');
         expect(atom.config.get('foo.bar.str', { scope: ['.source.js'] })).toBe(
-          'scoped'
+          'scoped',
         );
         expect(atom.config.get('foo.bar.noschema')).toBe('nsGlobal');
         expect(
-          atom.config.get('foo.bar.noschema', { scope: ['.source.js'] })
+          atom.config.get('foo.bar.noschema', { scope: ['.source.js'] }),
         ).toBe('nsScoped');
 
         expect(atom.config.get('foo.bar.int')).toBe(2);
         expect(atom.config.get('foo.bar.int', { scope: ['.source.js'] })).toBe(
-          2
+          2,
         );
         expect(
-          atom.config.get('foo.bar.int', { scope: ['.source.coffee'] })
+          atom.config.get('foo.bar.int', { scope: ['.source.coffee'] }),
         ).toBe(23);
       });
 
       it('sets all values that adhere to the schema', () => {
         expect(atom.config.set('foo.bar.int', 10)).toBe(true);
         expect(
-          atom.config.set('foo.bar.int', 15, { scopeSelector: '.source.js' })
+          atom.config.set('foo.bar.int', 15, { scopeSelector: '.source.js' }),
         ).toBe(true);
         expect(
           atom.config.set('foo.bar.int', 23, {
-            scopeSelector: '.source.coffee'
-          })
+            scopeSelector: '.source.coffee',
+          }),
         ).toBe(true);
         expect(atom.config.get('foo.bar.int')).toBe(10);
         expect(atom.config.get('foo.bar.int', { scope: ['.source.js'] })).toBe(
-          15
+          15,
         );
         expect(
-          atom.config.get('foo.bar.int', { scope: ['.source.coffee'] })
+          atom.config.get('foo.bar.int', { scope: ['.source.coffee'] }),
         ).toBe(23);
 
         atom.config.setSchema('foo.bar', schema);
 
         expect(atom.config.get('foo.bar.int')).toBe(10);
         expect(atom.config.get('foo.bar.int', { scope: ['.source.js'] })).toBe(
-          15
+          15,
         );
         expect(
-          atom.config.get('foo.bar.int', { scope: ['.source.coffee'] })
+          atom.config.get('foo.bar.int', { scope: ['.source.coffee'] }),
         ).toBe(23);
       });
     });
@@ -1621,7 +1620,7 @@ describe('Config', () => {
       beforeEach(() => {
         const schema = {
           type: 'integer',
-          default: 12
+          default: 12,
         };
         atom.config.setSchema('foo.bar.anInt', schema);
       });
@@ -1655,7 +1654,7 @@ describe('Config', () => {
             type: 'integer',
             minimum: 10,
             maximum: 20,
-            default: 12
+            default: 12,
           };
           atom.config.setSchema('foo.bar.anInt', schema);
         });
@@ -1674,7 +1673,7 @@ describe('Config', () => {
       beforeEach(() => {
         const schema = {
           type: ['integer', 'string'],
-          default: 12
+          default: 12,
         };
         atom.config.setSchema('foo.bar.anInt', schema);
       });
@@ -1692,7 +1691,7 @@ describe('Config', () => {
       beforeEach(() => {
         const schema = {
           type: ['string', 'boolean'],
-          default: 'def'
+          default: 'def',
         };
         atom.config.setSchema('foo.bar', schema);
       });
@@ -1713,7 +1712,7 @@ describe('Config', () => {
       beforeEach(() => {
         const schema = {
           type: 'number',
-          default: 12.1
+          default: 12.1,
         };
         atom.config.setSchema('foo.bar.aFloat', schema);
       });
@@ -1737,7 +1736,7 @@ describe('Config', () => {
             type: 'number',
             minimum: 11.2,
             maximum: 25.4,
-            default: 12.1
+            default: 12.1,
           };
           atom.config.setSchema('foo.bar.aFloat', schema);
         });
@@ -1756,7 +1755,7 @@ describe('Config', () => {
       beforeEach(() => {
         const schema = {
           type: 'boolean',
-          default: true
+          default: true,
         };
         atom.config.setSchema('foo.bar.aBool', schema);
       });
@@ -1793,7 +1792,7 @@ describe('Config', () => {
       beforeEach(() => {
         const schema = {
           type: 'string',
-          default: 'ok'
+          default: 'ok',
         };
         atom.config.setSchema('foo.bar.aString', schema);
       });
@@ -1817,7 +1816,7 @@ describe('Config', () => {
         expect(atom.config.get('foo.bar.aString')).toBe('ok');
 
         expect(atom.config.set('foo.bar.aString', { nope: 'nope' })).toBe(
-          false
+          false,
         );
         expect(atom.config.get('foo.bar.aString')).toBe('ok');
       });
@@ -1832,7 +1831,7 @@ describe('Config', () => {
           const schema = {
             type: 'string',
             default: 'ok',
-            maximumLength: 3
+            maximumLength: 3,
           };
           atom.config.setSchema('foo.bar.aString', schema);
           atom.config.set('foo.bar.aString', 'abcdefg');
@@ -1847,18 +1846,18 @@ describe('Config', () => {
           properties: {
             anInt: {
               type: 'integer',
-              default: 12
+              default: 12,
             },
             nestedObject: {
               type: 'object',
               properties: {
                 nestedBool: {
                   type: 'boolean',
-                  default: false
-                }
-              }
-            }
-          }
+                  default: false,
+                },
+              },
+            },
+          },
         };
         atom.config.setSchema('foo.bar', schema);
       });
@@ -1867,14 +1866,14 @@ describe('Config', () => {
         atom.config.set('foo.bar', {
           anInt: '23',
           nestedObject: {
-            nestedBool: 'true'
-          }
+            nestedBool: 'true',
+          },
         });
         expect(atom.config.get('foo.bar')).toEqual({
           anInt: 23,
           nestedObject: {
-            nestedBool: true
-          }
+            nestedBool: true,
+          },
         });
       });
 
@@ -1883,13 +1882,13 @@ describe('Config', () => {
           atom.config.set('foo.bar', {
             anInt: 'nope',
             nestedObject: {
-              nestedBool: true
-            }
-          })
+              nestedBool: true,
+            },
+          }),
         ).toBe(true);
         expect(atom.config.get('foo.bar.anInt')).toEqual(12);
         expect(atom.config.get('foo.bar.nestedObject.nestedBool')).toEqual(
-          true
+          true,
         );
       });
 
@@ -1900,20 +1899,20 @@ describe('Config', () => {
             properties: {
               anInt: {
                 type: 'integer',
-                default: 12
-              }
+                default: 12,
+              },
             },
-            additionalProperties: false
+            additionalProperties: false,
           });
 
           expect(
-            atom.config.set('foo.bar', { anInt: 5, somethingElse: 'ok' })
+            atom.config.set('foo.bar', { anInt: 5, somethingElse: 'ok' }),
           ).toBe(true);
           expect(atom.config.get('foo.bar.anInt')).toBe(5);
           expect(atom.config.get('foo.bar.somethingElse')).toBeUndefined();
 
           expect(atom.config.set('foo.bar.somethingElse', { anInt: 5 })).toBe(
-            false
+            false,
           );
           expect(atom.config.get('foo.bar.somethingElse')).toBeUndefined();
         }));
@@ -1925,16 +1924,16 @@ describe('Config', () => {
             properties: {
               anInt: {
                 type: 'integer',
-                default: 12
-              }
+                default: 12,
+              },
             },
             additionalProperties: {
-              type: 'string'
-            }
+              type: 'string',
+            },
           });
 
           expect(
-            atom.config.set('foo.bar', { anInt: 5, somethingElse: 'ok' })
+            atom.config.set('foo.bar', { anInt: 5, somethingElse: 'ok' }),
           ).toBe(true);
           expect(atom.config.get('foo.bar.anInt')).toBe(5);
           expect(atom.config.get('foo.bar.somethingElse')).toBe('ok');
@@ -1943,7 +1942,7 @@ describe('Config', () => {
           expect(atom.config.get('foo.bar.somethingElse')).toBe('ok');
 
           expect(
-            atom.config.set('foo.bar', { anInt: 6, somethingElse: 7 })
+            atom.config.set('foo.bar', { anInt: 6, somethingElse: 7 }),
           ).toBe(true);
           expect(atom.config.get('foo.bar.anInt')).toBe(6);
           expect(atom.config.get('foo.bar.somethingElse')).toBe(undefined);
@@ -1956,8 +1955,8 @@ describe('Config', () => {
           type: 'array',
           default: [1, 2, 3],
           items: {
-            type: 'integer'
-          }
+            type: 'integer',
+          },
         };
         atom.config.setSchema('foo.bar', schema);
       });
@@ -1978,7 +1977,7 @@ describe('Config', () => {
       beforeEach(() => {
         const schema = {
           type: 'color',
-          default: 'white'
+          default: 'white',
         };
         atom.config.setSchema('foo.bar.aColor', schema);
       });
@@ -2025,82 +2024,82 @@ describe('Config', () => {
           red: 255,
           green: 0,
           blue: 0,
-          alpha: 1
+          alpha: 1,
         });
         atom.config.set('foo.bar.aColor', '#020');
         expect(atom.config.get('foo.bar.aColor')).toEqual({
           red: 0,
           green: 34,
           blue: 0,
-          alpha: 1
+          alpha: 1,
         });
         atom.config.set('foo.bar.aColor', '#abcdef');
         expect(atom.config.get('foo.bar.aColor')).toEqual({
           red: 171,
           green: 205,
           blue: 239,
-          alpha: 1
+          alpha: 1,
         });
         atom.config.set('foo.bar.aColor', 'rgb(1,2,3)');
         expect(atom.config.get('foo.bar.aColor')).toEqual({
           red: 1,
           green: 2,
           blue: 3,
-          alpha: 1
+          alpha: 1,
         });
         atom.config.set('foo.bar.aColor', 'rgba(4,5,6,.7)');
         expect(atom.config.get('foo.bar.aColor')).toEqual({
           red: 4,
           green: 5,
           blue: 6,
-          alpha: 0.7
+          alpha: 0.7,
         });
         atom.config.set('foo.bar.aColor', 'hsl(120,100%,50%)');
         expect(atom.config.get('foo.bar.aColor')).toEqual({
           red: 0,
           green: 255,
           blue: 0,
-          alpha: 1
+          alpha: 1,
         });
         atom.config.set('foo.bar.aColor', 'hsla(120,100%,50%,0.3)');
         expect(atom.config.get('foo.bar.aColor')).toEqual({
           red: 0,
           green: 255,
           blue: 0,
-          alpha: 0.3
+          alpha: 0.3,
         });
         atom.config.set('foo.bar.aColor', {
           red: 100,
           green: 255,
           blue: 2,
-          alpha: 0.5
+          alpha: 0.5,
         });
         expect(atom.config.get('foo.bar.aColor')).toEqual({
           red: 100,
           green: 255,
           blue: 2,
-          alpha: 0.5
+          alpha: 0.5,
         });
         atom.config.set('foo.bar.aColor', { red: 255 });
         expect(atom.config.get('foo.bar.aColor')).toEqual({
           red: 255,
           green: 0,
           blue: 0,
-          alpha: 1
+          alpha: 1,
         });
         atom.config.set('foo.bar.aColor', { red: 1000 });
         expect(atom.config.get('foo.bar.aColor')).toEqual({
           red: 255,
           green: 0,
           blue: 0,
-          alpha: 1
+          alpha: 1,
         });
         atom.config.set('foo.bar.aColor', { red: 'dark' });
         expect(atom.config.get('foo.bar.aColor')).toEqual({
           red: 0,
           green: 0,
           blue: 0,
-          alpha: 1
+          alpha: 1,
         });
       });
 
@@ -2110,7 +2109,7 @@ describe('Config', () => {
           red: 255,
           green: 255,
           blue: 255,
-          alpha: 1
+          alpha: 1,
         });
       });
 
@@ -2120,7 +2119,7 @@ describe('Config', () => {
           red: 255,
           green: 255,
           blue: 255,
-          alpha: 1
+          alpha: 1,
         });
 
         atom.config.set('foo.bar.aColor', 'nope');
@@ -2128,7 +2127,7 @@ describe('Config', () => {
           red: 255,
           green: 255,
           blue: 255,
-          alpha: 1
+          alpha: 1,
         });
 
         atom.config.set('foo.bar.aColor', 30);
@@ -2136,7 +2135,7 @@ describe('Config', () => {
           red: 255,
           green: 255,
           blue: 255,
-          alpha: 1
+          alpha: 1,
         });
 
         atom.config.set('foo.bar.aColor', false);
@@ -2144,7 +2143,7 @@ describe('Config', () => {
           red: 255,
           green: 255,
           blue: 255,
-          alpha: 1
+          alpha: 1,
         });
       });
 
@@ -2166,20 +2165,20 @@ describe('Config', () => {
             str: {
               type: 'string',
               default: 'ok',
-              enum: ['ok', 'one', 'two']
+              enum: ['ok', 'one', 'two'],
             },
             int: {
               type: 'integer',
               default: 2,
-              enum: [2, 3, 5]
+              enum: [2, 3, 5],
             },
             arr: {
               type: 'array',
               default: ['one', 'two'],
               items: {
                 type: 'string',
-                enum: ['one', 'two', 'three']
-              }
+                enum: ['one', 'two', 'three'],
+              },
             },
             str_options: {
               type: 'string',
@@ -2187,10 +2186,10 @@ describe('Config', () => {
               enum: [
                 { value: 'one', description: 'One' },
                 'two',
-                { value: 'three', description: 'Three' }
-              ]
-            }
-          }
+                { value: 'three', description: 'Three' },
+              ],
+            },
+          },
         };
 
         atom.config.setSchema('foo.bar', schema);
@@ -2252,12 +2251,12 @@ describe('Config', () => {
       atom.config.resetUserSettings({
         '*': {
           foo: {
-            bar: 'baz'
+            bar: 'baz',
           },
           do: {
-            ray: 'me'
-          }
-        }
+            ray: 'me',
+          },
+        },
       });
 
       advanceClock(100);
@@ -2282,7 +2281,7 @@ describe('Config', () => {
         it('returns a deep clone of the property value', () => {
           atom.config.resetProjectSettings(
             { '*': { value: { array: [1, { b: 2 }, 3] } } },
-            dummyPath
+            dummyPath,
           );
           const retrievedValue = atom.config.get('value');
           retrievedValue.array[0] = 4;
@@ -2295,7 +2294,7 @@ describe('Config', () => {
           expect(atom.config.get('foo')).toBe('wei');
           atom.config.resetProjectSettings(
             { '*': { foo: { bar: 'baz' } } },
-            dummyPath
+            dummyPath,
           );
           expect(atom.config.get('foo.bar')).toBe('baz');
         });
@@ -2310,12 +2309,12 @@ describe('Config', () => {
           expect(atom.config.set('foo.bar.str', 'global')).toBe(true);
           expect(
             atom.config.set('foo.bar.str', 'scoped', {
-              scopeSelector: '.source.js'
-            })
+              scopeSelector: '.source.js',
+            }),
           ).toBe(true);
           expect(atom.config.get('foo.bar.str')).toBe('global');
           expect(
-            atom.config.get('foo.bar.str', { scope: ['.source.js'] })
+            atom.config.get('foo.bar.str', { scope: ['.source.js'] }),
           ).toBe('scoped');
         });
 
@@ -2330,18 +2329,18 @@ describe('Config', () => {
         it('gets scoped values correctly', () => {
           atom.config.set('foo', 'bam', { scope: ['second'] });
           expect(atom.config.get('foo', { scopeSelector: 'second' })).toBe(
-            'bam'
+            'bam',
           );
           atom.config.resetProjectSettings(
             { '*': { foo: 'baz' }, second: { foo: 'bar' } },
-            dummyPath
+            dummyPath,
           );
           expect(atom.config.get('foo', { scopeSelector: 'second' })).toBe(
-            'baz'
+            'baz',
           );
           atom.config.clearProjectSettings();
           expect(atom.config.get('foo', { scopeSelector: 'second' })).toBe(
-            'bam'
+            'bam',
           );
         });
 
@@ -2350,7 +2349,7 @@ describe('Config', () => {
           expect(atom.config.get('foo')).toBe('bar');
           atom.config.resetProjectSettings(
             { '*': { foo: 'baz' }, second: { foo: 'bar' } },
-            dummyPath
+            dummyPath,
           );
           expect(atom.config.get('foo')).toBe('baz');
           expect(atom.config.getSources().length).toBe(1);
@@ -2369,8 +2368,8 @@ describe('Config', () => {
         expect(atom.config.getAll('a')).toEqual([
           {
             scopeSelector: '*',
-            value: 'b'
-          }
+            value: 'b',
+          },
         ]);
       });
     });

@@ -12,47 +12,44 @@ const PREFIXES = [
   '"use babel"',
   "'use babel'",
   '/* @flow */',
-  '// @flow'
+  '// @flow',
 ];
 
 const PREFIX_LENGTH = Math.max.apply(
   Math,
-  PREFIXES.map(function(prefix) {
+  PREFIXES.map(function (prefix) {
     return prefix.length;
-  })
+  }),
 );
 
-exports.shouldCompile = function(sourceCode) {
+exports.shouldCompile = function (sourceCode) {
   const start = sourceCode.substr(0, PREFIX_LENGTH);
-  return PREFIXES.some(function(prefix) {
+  return PREFIXES.some(function (prefix) {
     return start.indexOf(prefix) === 0;
   });
 };
 
-exports.getCachePath = function(sourceCode) {
+exports.getCachePath = function (sourceCode) {
   if (babelVersionDirectory == null) {
     const babelVersion = require('babel-core/package.json').version;
     babelVersionDirectory = path.join(
       'js',
       'babel',
-      createVersionAndOptionsDigest(babelVersion, defaultOptions)
+      createVersionAndOptionsDigest(babelVersion, defaultOptions),
     );
   }
 
   return path.join(
     babelVersionDirectory,
-    crypto
-      .createHash('sha1')
-      .update(sourceCode, 'utf8')
-      .digest('hex') + '.js'
+    crypto.createHash('sha1').update(sourceCode, 'utf8').digest('hex') + '.js',
   );
 };
 
-exports.compile = function(sourceCode, filePath) {
+exports.compile = function (sourceCode, filePath) {
   if (!babel) {
     babel = require('babel-core');
     const Logger = require('babel-core/lib/transformation/file/logger');
-    const noop = function() {};
+    const noop = function () {};
     Logger.prototype.debug = noop;
     Logger.prototype.verbose = noop;
   }

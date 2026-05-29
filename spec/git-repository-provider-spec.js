@@ -12,13 +12,13 @@ describe('GitRepositoryProvider', () => {
     provider = new GitRepositoryProvider(
       atom.project,
       atom.config,
-      atom.confirm
+      atom.confirm,
     );
   });
 
   afterEach(() => {
     if (provider) {
-      Object.keys(provider.pathToRepository).forEach(key => {
+      Object.keys(provider.pathToRepository).forEach((key) => {
         provider.pathToRepository[key].destroy();
       });
     }
@@ -28,7 +28,7 @@ describe('GitRepositoryProvider', () => {
     describe('when specified a Directory with a Git repository', () => {
       it('resolves with a GitRepository', async () => {
         const directory = new Directory(
-          path.join(__dirname, 'fixtures', 'git', 'master.git')
+          path.join(__dirname, 'fixtures', 'git', 'master.git'),
         );
         const result = await provider.repositoryForDirectory(directory);
         expect(result).toBeInstanceOf(GitRepository);
@@ -36,17 +36,17 @@ describe('GitRepositoryProvider', () => {
         expect(result.getType()).toBe('git');
 
         // Refresh should be started
-        await new Promise(resolve => result.onDidChangeStatuses(resolve));
+        await new Promise((resolve) => result.onDidChangeStatuses(resolve));
       });
 
       it('resolves with the same GitRepository for different Directory objects in the same repo', async () => {
         const firstRepo = await provider.repositoryForDirectory(
-          new Directory(path.join(__dirname, 'fixtures', 'git', 'master.git'))
+          new Directory(path.join(__dirname, 'fixtures', 'git', 'master.git')),
         );
         const secondRepo = await provider.repositoryForDirectory(
           new Directory(
-            path.join(__dirname, 'fixtures', 'git', 'master.git', 'objects')
-          )
+            path.join(__dirname, 'fixtures', 'git', 'master.git', 'objects'),
+          ),
         );
 
         expect(firstRepo).toBeInstanceOf(GitRepository);
@@ -81,12 +81,12 @@ describe('GitRepositoryProvider', () => {
           __dirname,
           'fixtures',
           'git',
-          'master.git'
+          'master.git',
         );
         const workDirPath = temp.mkdirSync('git-workdir');
         fs.writeFileSync(
           path.join(workDirPath, '.git'),
-          `gitdir: ${gitDirPath}\n`
+          `gitdir: ${gitDirPath}\n`,
         );
 
         const directory = new Directory(workDirPath);
@@ -106,8 +106,8 @@ describe('GitRepositoryProvider', () => {
             'git',
             'master.git',
             'worktrees',
-            'worktree-dir'
-          )
+            'worktree-dir',
+          ),
         );
         const result = await provider.repositoryForDirectory(directory);
         expect(result).toBeInstanceOf(GitRepository);
@@ -126,7 +126,7 @@ describe('GitRepositoryProvider', () => {
           getSubdirectory() {},
           isRoot() {
             return true;
-          }
+          },
         };
         spyOn(directory, 'getSubdirectory').andReturn(subdirectory);
       });
@@ -143,7 +143,7 @@ describe('GitRepositoryProvider', () => {
     describe('when specified a Directory with a Git repository', () => {
       it('resolves with a GitRepository', async () => {
         const directory = new Directory(
-          path.join(__dirname, 'fixtures', 'git', 'master.git')
+          path.join(__dirname, 'fixtures', 'git', 'master.git'),
         );
         const result = provider.repositoryForDirectorySync(directory);
         expect(result).toBeInstanceOf(GitRepository);
@@ -151,17 +151,17 @@ describe('GitRepositoryProvider', () => {
         expect(result.getType()).toBe('git');
 
         // Refresh should be started
-        await new Promise(resolve => result.onDidChangeStatuses(resolve));
+        await new Promise((resolve) => result.onDidChangeStatuses(resolve));
       });
 
       it('resolves with the same GitRepository for different Directory objects in the same repo', () => {
         const firstRepo = provider.repositoryForDirectorySync(
-          new Directory(path.join(__dirname, 'fixtures', 'git', 'master.git'))
+          new Directory(path.join(__dirname, 'fixtures', 'git', 'master.git')),
         );
         const secondRepo = provider.repositoryForDirectorySync(
           new Directory(
-            path.join(__dirname, 'fixtures', 'git', 'master.git', 'objects')
-          )
+            path.join(__dirname, 'fixtures', 'git', 'master.git', 'objects'),
+          ),
         );
 
         expect(firstRepo).toBeInstanceOf(GitRepository);
@@ -196,12 +196,12 @@ describe('GitRepositoryProvider', () => {
           __dirname,
           'fixtures',
           'git',
-          'master.git'
+          'master.git',
         );
         const workDirPath = temp.mkdirSync('git-workdir');
         fs.writeFileSync(
           path.join(workDirPath, '.git'),
-          `gitdir: ${gitDirPath}\n`
+          `gitdir: ${gitDirPath}\n`,
         );
 
         const directory = new Directory(workDirPath);
@@ -221,8 +221,8 @@ describe('GitRepositoryProvider', () => {
             'git',
             'master.git',
             'worktrees',
-            'worktree-dir'
-          )
+            'worktree-dir',
+          ),
         );
         const result = provider.repositoryForDirectorySync(directory);
         expect(result).toBeInstanceOf(GitRepository);
@@ -241,7 +241,7 @@ describe('GitRepositoryProvider', () => {
           getSubdirectory() {},
           isRoot() {
             return true;
-          }
+          },
         };
         spyOn(directory, 'getSubdirectory').andReturn(subdirectory);
       });

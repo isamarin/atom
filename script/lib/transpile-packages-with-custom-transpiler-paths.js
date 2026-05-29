@@ -11,22 +11,24 @@ const runApmInstall = require('./run-apm-install');
 
 require('colors');
 
-module.exports = function() {
+module.exports = function () {
   console.log(
     `Transpiling packages with custom transpiler configurations in ${
       CONFIG.intermediateAppPath
-    }`
+    }`,
   );
-  for (let packageName of Object.keys(CONFIG.appMetadata.packageDependencies)) {
+  for (const packageName of Object.keys(
+    CONFIG.appMetadata.packageDependencies,
+  )) {
     const rootPackagePath = path.join(
       CONFIG.repositoryRootPath,
       'node_modules',
-      packageName
+      packageName,
     );
     const intermediatePackagePath = path.join(
       CONFIG.intermediateAppPath,
       'node_modules',
-      packageName
+      packageName,
     );
 
     const metadataPath = path.join(intermediatePackagePath, 'package.json');
@@ -36,7 +38,7 @@ module.exports = function() {
       console.log(' transpiling for package '.cyan + packageName.cyan);
       const rootPackageBackup = backupNodeModules(rootPackagePath);
       const intermediatePackageBackup = backupNodeModules(
-        intermediatePackagePath
+        intermediatePackagePath,
       );
 
       // Run `apm install` in the *root* package's path, so we get devDeps w/o apm's weird caching
@@ -47,19 +49,19 @@ module.exports = function() {
       }
       fs.copySync(
         rootPackageBackup.nodeModulesPath,
-        intermediatePackageBackup.nodeModulesPath
+        intermediatePackageBackup.nodeModulesPath,
       );
 
       CompileCache.addTranspilerConfigForPath(
         intermediatePackagePath,
         metadata.name,
         metadata,
-        metadata.atomTranspilers
+        metadata.atomTranspilers,
       );
-      for (let config of metadata.atomTranspilers) {
+      for (const config of metadata.atomTranspilers) {
         const pathsToCompile = glob.sync(
           path.join(intermediatePackagePath, config.glob),
-          { nodir: true }
+          { nodir: true },
         );
         pathsToCompile.forEach(transpilePath);
       }
@@ -70,7 +72,7 @@ module.exports = function() {
       fs.writeFileSync(
         metadataPath,
         JSON.stringify(metadata, null, '  '),
-        'utf8'
+        'utf8',
       );
 
       CompileCache.removeTranspilerConfigForPath(intermediatePackagePath);
@@ -83,6 +85,6 @@ module.exports = function() {
 function transpilePath(path) {
   fs.writeFileSync(
     path,
-    CompileCache.addPathToCache(path, CONFIG.atomHomeDirPath)
+    CompileCache.addPathToCache(path, CONFIG.atomHomeDirPath),
   );
 }

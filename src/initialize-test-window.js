@@ -9,11 +9,11 @@ function cloneObject(object) {
   return clone;
 }
 
-module.exports = async function({ blobStore }) {
+module.exports = async function ({ blobStore }) {
   const remote = require('@electron/remote');
   const getWindowLoadSettings = require('./get-window-load-settings');
 
-  const exitWithStatusCode = function(status) {
+  const exitWithStatusCode = function (status) {
     remote.app.emit('will-quit');
     remote.process.exit(status);
   };
@@ -37,7 +37,7 @@ module.exports = async function({ blobStore }) {
       headless,
       logFile,
       testPaths,
-      env
+      env,
     } = getWindowLoadSettings();
 
     if (headless) {
@@ -46,7 +46,7 @@ module.exports = async function({ blobStore }) {
 
       Object.defineProperties(process, {
         stdout: { value: remote.process.stdout },
-        stderr: { value: remote.process.stderr }
+        stderr: { value: remote.process.stderr },
       });
 
       console.log = (...args) =>
@@ -59,7 +59,7 @@ module.exports = async function({ blobStore }) {
       remote.getCurrentWindow().show();
     }
 
-    const handleKeydown = function(event) {
+    const handleKeydown = function (event) {
       // Reload: cmd-r / ctrl-r
       if ((event.metaKey || event.ctrlKey) && event.keyCode === 82) {
         ipcHelpers.call('window-method', 'reload');
@@ -90,7 +90,7 @@ module.exports = async function({ blobStore }) {
     // Add 'exports' to module search path.
     const exportsPath = path.join(
       getWindowLoadSettings().resourcePath,
-      'exports'
+      'exports',
     );
     require('module').globalPaths.push(exportsPath);
     process.env.NODE_PATH = exportsPath; // Set NODE_PATH env variable since tasks may need it.
@@ -107,7 +107,7 @@ module.exports = async function({ blobStore }) {
           packageRoot,
           packageMetadata.name,
           packageMetadata,
-          packageMetadata.atomTranspilers
+          packageMetadata.atomTranspilers,
         );
       }
     }
@@ -116,20 +116,22 @@ module.exports = async function({ blobStore }) {
 
     const clipboard = new Clipboard();
     TextEditor.setClipboard(clipboard);
-    TextEditor.viewForItem = item => atom.views.getView(item);
+    TextEditor.viewForItem = (item) => atom.views.getView(item);
 
     const testRunner = requireModule(testRunnerPath);
     const legacyTestRunner = require(legacyTestRunnerPath);
     const buildDefaultApplicationDelegate = () => new ApplicationDelegate();
-    const buildAtomEnvironment = function(params) {
+    const buildAtomEnvironment = function (params) {
       params = cloneObject(params);
-      if (!params.hasOwnProperty('clipboard')) {
+      if (!Object.prototype.hasOwnProperty.call(params, 'clipboard')) {
         params.clipboard = clipboard;
       }
-      if (!params.hasOwnProperty('blobStore')) {
+      if (!Object.prototype.hasOwnProperty.call(params, 'blobStore')) {
         params.blobStore = blobStore;
       }
-      if (!params.hasOwnProperty('onlyLoadBaseStyleSheets')) {
+      if (
+        !Object.prototype.hasOwnProperty.call(params, 'onlyLoadBaseStyleSheets')
+      ) {
         params.onlyLoadBaseStyleSheets = true;
       }
       const atomEnvironment = new AtomEnvironment(params);
@@ -144,7 +146,7 @@ module.exports = async function({ blobStore }) {
       testPaths,
       buildAtomEnvironment,
       buildDefaultApplicationDelegate,
-      legacyTestRunner
+      legacyTestRunner,
     });
 
     if (getWindowLoadSettings().headless) {

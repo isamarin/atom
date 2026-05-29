@@ -5,7 +5,7 @@ describe('text utilities', () => {
     it('returns true when the string contains a surrogate pair, variation sequence, or combined character', () => {
       expect(textUtils.hasPairedCharacter('abc')).toBe(false);
       expect(textUtils.hasPairedCharacter('a\uD835\uDF97b\uD835\uDF97c')).toBe(
-        true
+        true,
       );
       expect(textUtils.hasPairedCharacter('\uD835\uDF97')).toBe(true);
       expect(textUtils.hasPairedCharacter('\u2714\uFE0E')).toBe(true);
@@ -23,25 +23,25 @@ describe('text utilities', () => {
   describe('.isPairedCharacter(string, index)', () =>
     it('returns true when the index is the start of a high/low surrogate pair, variation sequence, or combined character', () => {
       expect(
-        textUtils.isPairedCharacter('a\uD835\uDF97b\uD835\uDF97c', 0)
+        textUtils.isPairedCharacter('a\uD835\uDF97b\uD835\uDF97c', 0),
       ).toBe(false);
       expect(
-        textUtils.isPairedCharacter('a\uD835\uDF97b\uD835\uDF97c', 1)
+        textUtils.isPairedCharacter('a\uD835\uDF97b\uD835\uDF97c', 1),
       ).toBe(true);
       expect(
-        textUtils.isPairedCharacter('a\uD835\uDF97b\uD835\uDF97c', 2)
+        textUtils.isPairedCharacter('a\uD835\uDF97b\uD835\uDF97c', 2),
       ).toBe(false);
       expect(
-        textUtils.isPairedCharacter('a\uD835\uDF97b\uD835\uDF97c', 3)
+        textUtils.isPairedCharacter('a\uD835\uDF97b\uD835\uDF97c', 3),
       ).toBe(false);
       expect(
-        textUtils.isPairedCharacter('a\uD835\uDF97b\uD835\uDF97c', 4)
+        textUtils.isPairedCharacter('a\uD835\uDF97b\uD835\uDF97c', 4),
       ).toBe(true);
       expect(
-        textUtils.isPairedCharacter('a\uD835\uDF97b\uD835\uDF97c', 5)
+        textUtils.isPairedCharacter('a\uD835\uDF97b\uD835\uDF97c', 5),
       ).toBe(false);
       expect(
-        textUtils.isPairedCharacter('a\uD835\uDF97b\uD835\uDF97c', 6)
+        textUtils.isPairedCharacter('a\uD835\uDF97b\uD835\uDF97c', 6),
       ).toBe(false);
 
       expect(textUtils.isPairedCharacter('a\u2714\uFE0E', 0)).toBe(false);

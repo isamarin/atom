@@ -31,7 +31,7 @@ describe('TextMateLanguageMode', () => {
       languageMode = new TextMateLanguageMode({
         buffer,
         grammar: atom.grammars.grammarForScopeName('source.js'),
-        tabLength: 2
+        tabLength: 2,
       });
       buffer.setLanguageMode(languageMode);
 
@@ -58,7 +58,7 @@ describe('TextMateLanguageMode', () => {
         languageMode = new TextMateLanguageMode({
           buffer,
           config,
-          grammar: atom.grammars.grammarForScopeName('source.js')
+          grammar: atom.grammars.grammarForScopeName('source.js'),
         });
         languageMode.startTokenizing();
       });
@@ -77,7 +77,7 @@ describe('TextMateLanguageMode', () => {
         languageMode = new TextMateLanguageMode({
           buffer,
           config,
-          grammar: atom.grammars.grammarForScopeName('source.js')
+          grammar: atom.grammars.grammarForScopeName('source.js'),
         });
         buffer.setLanguageMode(languageMode);
         languageMode.startTokenizing();
@@ -111,10 +111,10 @@ describe('TextMateLanguageMode', () => {
           // tokenize last chunk
           advanceClock();
           expect(
-            languageMode.tokenizedLines[10].ruleStack != null
+            languageMode.tokenizedLines[10].ruleStack != null,
           ).toBeTruthy();
           expect(
-            languageMode.tokenizedLines[12].ruleStack != null
+            languageMode.tokenizedLines[12].ruleStack != null,
           ).toBeTruthy();
         }));
 
@@ -136,7 +136,10 @@ describe('TextMateLanguageMode', () => {
           describe('when lines are removed', () => {
             it('pulls the invalid rows up', () => {
               expect(languageMode.firstInvalidRow()).toBe(5);
-              buffer.delete([[1, 0], [3, 0]]);
+              buffer.delete([
+                [1, 0],
+                [3, 0],
+              ]);
               expect(languageMode.firstInvalidRow()).toBe(2);
             });
           });
@@ -154,7 +157,13 @@ describe('TextMateLanguageMode', () => {
 
         describe('when there is a buffer change surrounding an invalid row', () => {
           it('pushes the invalid row to the end of the change', () => {
-            buffer.setTextInRange([[4, 0], [6, 0]], '\n\n\n');
+            buffer.setTextInRange(
+              [
+                [4, 0],
+                [6, 0],
+              ],
+              '\n\n\n',
+            );
             expect(languageMode.firstInvalidRow()).toBe(8);
           });
         });
@@ -162,7 +171,13 @@ describe('TextMateLanguageMode', () => {
         describe('when there is a buffer change inside an invalid region', () => {
           it('does not attempt to tokenize the lines in the change, and preserves the existing invalid row', () => {
             expect(languageMode.firstInvalidRow()).toBe(5);
-            buffer.setTextInRange([[6, 0], [7, 0]], '\n\n\n');
+            buffer.setTextInRange(
+              [
+                [6, 0],
+                [7, 0],
+              ],
+              '\n\n\n',
+            );
             expect(languageMode.tokenizedLines[6]).toBeUndefined();
             expect(languageMode.tokenizedLines[7]).toBeUndefined();
             expect(languageMode.firstInvalidRow()).toBe(5);
@@ -176,7 +191,13 @@ describe('TextMateLanguageMode', () => {
         describe('when there is a buffer change that is smaller than the chunk size', () => {
           describe('when lines are updated, but none are added or removed', () => {
             it('updates tokens to reflect the change', () => {
-              buffer.setTextInRange([[0, 0], [2, 0]], 'foo()\n7\n');
+              buffer.setTextInRange(
+                [
+                  [0, 0],
+                  [2, 0],
+                ],
+                'foo()\n7\n',
+              );
 
               expect(languageMode.tokenizedLines[0].tokens[1]).toEqual({
                 value: '(',
@@ -184,17 +205,17 @@ describe('TextMateLanguageMode', () => {
                   'source.js',
                   'meta.function-call.js',
                   'meta.arguments.js',
-                  'punctuation.definition.arguments.begin.bracket.round.js'
-                ]
+                  'punctuation.definition.arguments.begin.bracket.round.js',
+                ],
               });
               expect(languageMode.tokenizedLines[1].tokens[0]).toEqual({
                 value: '7',
-                scopes: ['source.js', 'constant.numeric.decimal.js']
+                scopes: ['source.js', 'constant.numeric.decimal.js'],
               });
               // line 2 is unchanged
               expect(languageMode.tokenizedLines[2].tokens[1]).toEqual({
                 value: 'if',
-                scopes: ['source.js', 'keyword.control.js']
+                scopes: ['source.js', 'keyword.control.js'],
               });
             });
 
@@ -203,18 +224,18 @@ describe('TextMateLanguageMode', () => {
                 buffer.insert([5, 30], '/* */');
                 buffer.insert([2, 0], '/*');
                 expect(languageMode.tokenizedLines[3].tokens[0].scopes).toEqual(
-                  ['source.js']
+                  ['source.js'],
                 );
 
                 advanceClock();
                 expect(languageMode.tokenizedLines[3].tokens[0].scopes).toEqual(
-                  ['source.js', 'comment.block.js']
+                  ['source.js', 'comment.block.js'],
                 );
                 expect(languageMode.tokenizedLines[4].tokens[0].scopes).toEqual(
-                  ['source.js', 'comment.block.js']
+                  ['source.js', 'comment.block.js'],
                 );
                 expect(languageMode.tokenizedLines[5].tokens[0].scopes).toEqual(
-                  ['source.js', 'comment.block.js']
+                  ['source.js', 'comment.block.js'],
                 );
               });
             });
@@ -226,19 +247,25 @@ describe('TextMateLanguageMode', () => {
               buffer.insert([1, 0], 'var ');
               expect(languageMode.tokenizedLines[1].tokens[0].scopes).toEqual([
                 'source.js',
-                'comment.block.js'
+                'comment.block.js',
               ]);
             });
           });
 
           describe('when lines are both updated and removed', () => {
             it('updates tokens to reflect the change', () => {
-              buffer.setTextInRange([[1, 0], [3, 0]], 'foo()');
+              buffer.setTextInRange(
+                [
+                  [1, 0],
+                  [3, 0],
+                ],
+                'foo()',
+              );
 
               // previous line 0 remains
               expect(languageMode.tokenizedLines[0].tokens[0]).toEqual({
                 value: 'var',
-                scopes: ['source.js', 'storage.type.var.js']
+                scopes: ['source.js', 'storage.type.var.js'],
               });
 
               // previous line 3 should be combined with input to form line 1
@@ -247,26 +274,26 @@ describe('TextMateLanguageMode', () => {
                 scopes: [
                   'source.js',
                   'meta.function-call.js',
-                  'entity.name.function.js'
-                ]
+                  'entity.name.function.js',
+                ],
               });
               expect(languageMode.tokenizedLines[1].tokens[6]).toEqual({
                 value: '=',
-                scopes: ['source.js', 'keyword.operator.assignment.js']
+                scopes: ['source.js', 'keyword.operator.assignment.js'],
               });
 
               // lines below deleted regions should be shifted upward
               expect(languageMode.tokenizedLines[2].tokens[1]).toEqual({
                 value: 'while',
-                scopes: ['source.js', 'keyword.control.js']
+                scopes: ['source.js', 'keyword.control.js'],
               });
               expect(languageMode.tokenizedLines[3].tokens[1]).toEqual({
                 value: '=',
-                scopes: ['source.js', 'keyword.operator.assignment.js']
+                scopes: ['source.js', 'keyword.operator.assignment.js'],
               });
               expect(languageMode.tokenizedLines[4].tokens[1]).toEqual({
                 value: '<',
-                scopes: ['source.js', 'keyword.operator.comparison.js']
+                scopes: ['source.js', 'keyword.operator.comparison.js'],
               });
             });
           });
@@ -274,24 +301,30 @@ describe('TextMateLanguageMode', () => {
           describe('when the change invalidates the tokenization of subsequent lines', () => {
             it('schedules the invalidated lines to be tokenized in the background', () => {
               buffer.insert([5, 30], '/* */');
-              buffer.setTextInRange([[2, 0], [3, 0]], '/*');
+              buffer.setTextInRange(
+                [
+                  [2, 0],
+                  [3, 0],
+                ],
+                '/*',
+              );
               expect(languageMode.tokenizedLines[2].tokens[0].scopes).toEqual([
                 'source.js',
                 'comment.block.js',
-                'punctuation.definition.comment.begin.js'
+                'punctuation.definition.comment.begin.js',
               ]);
               expect(languageMode.tokenizedLines[3].tokens[0].scopes).toEqual([
-                'source.js'
+                'source.js',
               ]);
 
               advanceClock();
               expect(languageMode.tokenizedLines[3].tokens[0].scopes).toEqual([
                 'source.js',
-                'comment.block.js'
+                'comment.block.js',
               ]);
               expect(languageMode.tokenizedLines[4].tokens[0].scopes).toEqual([
                 'source.js',
-                'comment.block.js'
+                'comment.block.js',
               ]);
             });
           });
@@ -299,14 +332,17 @@ describe('TextMateLanguageMode', () => {
           describe('when lines are both updated and inserted', () => {
             it('updates tokens to reflect the change', () => {
               buffer.setTextInRange(
-                [[1, 0], [2, 0]],
-                'foo()\nbar()\nbaz()\nquux()'
+                [
+                  [1, 0],
+                  [2, 0],
+                ],
+                'foo()\nbar()\nbaz()\nquux()',
               );
 
               // previous line 0 remains
               expect(languageMode.tokenizedLines[0].tokens[0]).toEqual({
                 value: 'var',
-                scopes: ['source.js', 'storage.type.var.js']
+                scopes: ['source.js', 'storage.type.var.js'],
               });
 
               // 3 new lines inserted
@@ -315,24 +351,24 @@ describe('TextMateLanguageMode', () => {
                 scopes: [
                   'source.js',
                   'meta.function-call.js',
-                  'entity.name.function.js'
-                ]
+                  'entity.name.function.js',
+                ],
               });
               expect(languageMode.tokenizedLines[2].tokens[0]).toEqual({
                 value: 'bar',
                 scopes: [
                   'source.js',
                   'meta.function-call.js',
-                  'entity.name.function.js'
-                ]
+                  'entity.name.function.js',
+                ],
               });
               expect(languageMode.tokenizedLines[3].tokens[0]).toEqual({
                 value: 'baz',
                 scopes: [
                   'source.js',
                   'meta.function-call.js',
-                  'entity.name.function.js'
-                ]
+                  'entity.name.function.js',
+                ],
               });
 
               // previous line 2 is joined with quux() on line 4
@@ -341,18 +377,18 @@ describe('TextMateLanguageMode', () => {
                 scopes: [
                   'source.js',
                   'meta.function-call.js',
-                  'entity.name.function.js'
-                ]
+                  'entity.name.function.js',
+                ],
               });
               expect(languageMode.tokenizedLines[4].tokens[4]).toEqual({
                 value: 'if',
-                scopes: ['source.js', 'keyword.control.js']
+                scopes: ['source.js', 'keyword.control.js'],
               });
 
               // previous line 3 is pushed down to become line 5
               expect(languageMode.tokenizedLines[5].tokens[3]).toEqual({
                 value: '=',
-                scopes: ['source.js', 'keyword.operator.assignment.js']
+                scopes: ['source.js', 'keyword.operator.assignment.js'],
               });
             });
           });
@@ -364,36 +400,36 @@ describe('TextMateLanguageMode', () => {
               expect(languageMode.tokenizedLines[2].tokens[0].scopes).toEqual([
                 'source.js',
                 'comment.block.js',
-                'punctuation.definition.comment.begin.js'
+                'punctuation.definition.comment.begin.js',
               ]);
               expect(languageMode.tokenizedLines[3].tokens[0].scopes).toEqual([
                 'source.js',
-                'comment.block.js'
+                'comment.block.js',
               ]);
               expect(languageMode.tokenizedLines[4].tokens[0].scopes).toEqual([
                 'source.js',
-                'comment.block.js'
+                'comment.block.js',
               ]);
               expect(languageMode.tokenizedLines[5].tokens[0].scopes).toEqual([
-                'source.js'
+                'source.js',
               ]);
 
               advanceClock(); // tokenize invalidated lines in background
               expect(languageMode.tokenizedLines[5].tokens[0].scopes).toEqual([
                 'source.js',
-                'comment.block.js'
+                'comment.block.js',
               ]);
               expect(languageMode.tokenizedLines[6].tokens[0].scopes).toEqual([
                 'source.js',
-                'comment.block.js'
+                'comment.block.js',
               ]);
               expect(languageMode.tokenizedLines[7].tokens[0].scopes).toEqual([
                 'source.js',
-                'comment.block.js'
+                'comment.block.js',
               ]);
               expect(languageMode.tokenizedLines[8].tokens[0].scopes).not.toBe([
                 'source.js',
-                'comment.block.js'
+                'comment.block.js',
               ]);
             });
           });
@@ -403,23 +439,23 @@ describe('TextMateLanguageMode', () => {
           it('tokenizes the initial chunk synchronously, then tokenizes the remaining lines in the background', () => {
             const commentBlock = _.multiplyString(
               '// a comment\n',
-              languageMode.chunkSize + 2
+              languageMode.chunkSize + 2,
             );
             buffer.insert([0, 0], commentBlock);
             expect(
-              languageMode.tokenizedLines[0].ruleStack != null
+              languageMode.tokenizedLines[0].ruleStack != null,
             ).toBeTruthy();
             expect(
-              languageMode.tokenizedLines[4].ruleStack != null
+              languageMode.tokenizedLines[4].ruleStack != null,
             ).toBeTruthy();
             expect(languageMode.tokenizedLines[5]).toBeUndefined();
 
             advanceClock();
             expect(
-              languageMode.tokenizedLines[5].ruleStack != null
+              languageMode.tokenizedLines[5].ruleStack != null,
             ).toBeTruthy();
             expect(
-              languageMode.tokenizedLines[6].ruleStack != null
+              languageMode.tokenizedLines[6].ruleStack != null,
             ).toBeTruthy();
           });
         });
@@ -434,7 +470,7 @@ describe('TextMateLanguageMode', () => {
         languageMode = new TextMateLanguageMode({
           buffer,
           config,
-          grammar: atom.grammars.grammarForScopeName('source.coffee')
+          grammar: atom.grammars.grammarForScopeName('source.coffee'),
         });
         languageMode.startTokenizing();
       });
@@ -497,12 +533,12 @@ describe('TextMateLanguageMode', () => {
         languageMode = new TextMateLanguageMode({
           buffer,
           config,
-          grammar: atom.grammars.selectGrammar('test.erb')
+          grammar: atom.grammars.selectGrammar('test.erb'),
         });
         fullyTokenize(languageMode);
         expect(languageMode.tokenizedLines[0].tokens[0]).toEqual({
           value: "<div class='name'>",
-          scopes: ['text.html.ruby']
+          scopes: ['text.html.ruby'],
         });
 
         await atom.packages.activatePackage('language-html');
@@ -512,8 +548,8 @@ describe('TextMateLanguageMode', () => {
           scopes: [
             'text.html.ruby',
             'meta.tag.block.div.html',
-            'punctuation.definition.tag.begin.html'
-          ]
+            'punctuation.definition.tag.begin.html',
+          ],
         });
       });
     });
@@ -522,7 +558,7 @@ describe('TextMateLanguageMode', () => {
       it('does not actually tokenize using the grammar', () => {
         spyOn(NullGrammar, 'tokenizeLine').andCallThrough();
         buffer = atom.project.bufferForPathSync(
-          'sample.will-use-the-null-grammar'
+          'sample.will-use-the-null-grammar',
         );
         buffer.setText('a\nb\nc');
         languageMode = new TextMateLanguageMode({ buffer, config });
@@ -556,18 +592,18 @@ describe('TextMateLanguageMode', () => {
       languageMode = new TextMateLanguageMode({
         buffer,
         config,
-        grammar: atom.grammars.grammarForScopeName('source.js')
+        grammar: atom.grammars.grammarForScopeName('source.js'),
       });
       fullyTokenize(languageMode);
       expect(languageMode.tokenForPosition([1, 0]).scopes).toEqual([
-        'source.js'
+        'source.js',
       ]);
       expect(languageMode.tokenForPosition([1, 1]).scopes).toEqual([
-        'source.js'
+        'source.js',
       ]);
       expect(languageMode.tokenForPosition([1, 2]).scopes).toEqual([
         'source.js',
-        'storage.type.var.js'
+        'storage.type.var.js',
       ]);
     });
   });
@@ -578,7 +614,7 @@ describe('TextMateLanguageMode', () => {
       languageMode = new TextMateLanguageMode({
         buffer,
         config,
-        grammar: atom.grammars.grammarForScopeName('source.js')
+        grammar: atom.grammars.grammarForScopeName('source.js'),
       });
       fullyTokenize(languageMode);
     });
@@ -586,31 +622,40 @@ describe('TextMateLanguageMode', () => {
     describe('when the selector does not match the token at the position', () =>
       it('returns a falsy value', () =>
         expect(
-          languageMode.bufferRangeForScopeAtPosition('.bogus', [0, 1])
+          languageMode.bufferRangeForScopeAtPosition('.bogus', [0, 1]),
         ).toBeUndefined()));
 
     describe('when the selector matches a single token at the position', () => {
       it('returns the range covered by the token', () => {
         expect(
-          languageMode.bufferRangeForScopeAtPosition('.storage.type.var.js', [
-            0,
-            1
-          ])
-        ).toEqual([[0, 0], [0, 3]]);
+          languageMode.bufferRangeForScopeAtPosition(
+            '.storage.type.var.js',
+            [0, 1],
+          ),
+        ).toEqual([
+          [0, 0],
+          [0, 3],
+        ]);
         expect(
-          languageMode.bufferRangeForScopeAtPosition('.storage.type.var.js', [
-            0,
-            3
-          ])
-        ).toEqual([[0, 0], [0, 3]]);
+          languageMode.bufferRangeForScopeAtPosition(
+            '.storage.type.var.js',
+            [0, 3],
+          ),
+        ).toEqual([
+          [0, 0],
+          [0, 3],
+        ]);
       });
     });
 
     describe('when the selector matches a run of multiple tokens at the position', () => {
       it('returns the range covered by all contiguous tokens (within a single line)', () => {
         expect(
-          languageMode.bufferRangeForScopeAtPosition('.function', [1, 18])
-        ).toEqual([[1, 6], [1, 28]]);
+          languageMode.bufferRangeForScopeAtPosition('.function', [1, 18]),
+        ).toEqual([
+          [1, 6],
+          [1, 28],
+        ]);
       });
     });
   });
@@ -630,7 +675,7 @@ describe('TextMateLanguageMode', () => {
       expect(languageMode.tokenizedLineForRow(0).tags).toEqual([
         jsScopeStartId,
         line0.length,
-        jsScopeEndId
+        jsScopeEndId,
       ]);
       advanceClock(1);
       expect(languageMode.tokenizedLines[0]).not.toBeUndefined();
@@ -638,7 +683,7 @@ describe('TextMateLanguageMode', () => {
       expect(languageMode.tokenizedLineForRow(0).tags).not.toEqual([
         jsScopeStartId,
         line0.length,
-        jsScopeEndId
+        jsScopeEndId,
       ]);
     });
 
@@ -659,7 +704,7 @@ describe('TextMateLanguageMode', () => {
       languageMode = new TextMateLanguageMode({
         buffer,
         config,
-        grammar: atom.grammars.grammarForScopeName('source.js')
+        grammar: atom.grammars.grammarForScopeName('source.js'),
       });
       fullyTokenize(languageMode);
 
@@ -672,105 +717,105 @@ describe('TextMateLanguageMode', () => {
           closeTags: [],
           openTags: [
             'syntax--source syntax--js',
-            'syntax--storage syntax--type syntax--var syntax--js'
-          ]
+            'syntax--storage syntax--type syntax--var syntax--js',
+          ],
         },
         {
           position: Point(0, 3),
           closeTags: ['syntax--storage syntax--type syntax--var syntax--js'],
-          openTags: []
+          openTags: [],
         },
         {
           position: Point(0, 8),
           closeTags: [],
           openTags: [
-            'syntax--keyword syntax--operator syntax--assignment syntax--js'
-          ]
+            'syntax--keyword syntax--operator syntax--assignment syntax--js',
+          ],
         },
         {
           position: Point(0, 9),
           closeTags: [
-            'syntax--keyword syntax--operator syntax--assignment syntax--js'
+            'syntax--keyword syntax--operator syntax--assignment syntax--js',
           ],
-          openTags: []
+          openTags: [],
         },
         {
           position: Point(0, 10),
           closeTags: [],
           openTags: [
-            'syntax--constant syntax--numeric syntax--decimal syntax--js'
-          ]
+            'syntax--constant syntax--numeric syntax--decimal syntax--js',
+          ],
         },
         {
           position: Point(0, 11),
           closeTags: [
-            'syntax--constant syntax--numeric syntax--decimal syntax--js'
+            'syntax--constant syntax--numeric syntax--decimal syntax--js',
           ],
-          openTags: []
+          openTags: [],
         },
         {
           position: Point(0, 12),
           closeTags: [],
           openTags: [
             'syntax--comment syntax--block syntax--js',
-            'syntax--punctuation syntax--definition syntax--comment syntax--begin syntax--js'
-          ]
+            'syntax--punctuation syntax--definition syntax--comment syntax--begin syntax--js',
+          ],
         },
         {
           position: Point(0, 14),
           closeTags: [
-            'syntax--punctuation syntax--definition syntax--comment syntax--begin syntax--js'
+            'syntax--punctuation syntax--definition syntax--comment syntax--begin syntax--js',
           ],
-          openTags: []
+          openTags: [],
         },
         {
           position: Point(1, 5),
           closeTags: [],
           openTags: [
-            'syntax--punctuation syntax--definition syntax--comment syntax--end syntax--js'
-          ]
+            'syntax--punctuation syntax--definition syntax--comment syntax--end syntax--js',
+          ],
         },
         {
           position: Point(1, 7),
           closeTags: [
             'syntax--punctuation syntax--definition syntax--comment syntax--end syntax--js',
-            'syntax--comment syntax--block syntax--js'
+            'syntax--comment syntax--block syntax--js',
           ],
-          openTags: ['syntax--storage syntax--type syntax--var syntax--js']
+          openTags: ['syntax--storage syntax--type syntax--var syntax--js'],
         },
         {
           position: Point(1, 10),
           closeTags: ['syntax--storage syntax--type syntax--var syntax--js'],
-          openTags: []
+          openTags: [],
         },
         {
           position: Point(1, 15),
           closeTags: [],
           openTags: [
-            'syntax--keyword syntax--operator syntax--assignment syntax--js'
-          ]
+            'syntax--keyword syntax--operator syntax--assignment syntax--js',
+          ],
         },
         {
           position: Point(1, 16),
           closeTags: [
-            'syntax--keyword syntax--operator syntax--assignment syntax--js'
+            'syntax--keyword syntax--operator syntax--assignment syntax--js',
           ],
-          openTags: []
+          openTags: [],
         },
         {
           position: Point(1, 17),
           closeTags: [],
           openTags: [
-            'syntax--constant syntax--numeric syntax--decimal syntax--js'
-          ]
+            'syntax--constant syntax--numeric syntax--decimal syntax--js',
+          ],
         },
         {
           position: Point(1, 18),
           closeTags: [
-            'syntax--constant syntax--numeric syntax--decimal syntax--js'
+            'syntax--constant syntax--numeric syntax--decimal syntax--js',
           ],
-          openTags: []
-        }
+          openTags: [],
+        },
       ];
 
       while (true) {
@@ -778,10 +823,10 @@ describe('TextMateLanguageMode', () => {
           position: iterator.getPosition(),
           closeTags: iterator
             .getCloseScopeIds()
-            .map(scopeId => languageMode.classNameForScopeId(scopeId)),
+            .map((scopeId) => languageMode.classNameForScopeId(scopeId)),
           openTags: iterator
             .getOpenScopeIds()
-            .map(scopeId => languageMode.classNameForScopeId(scopeId))
+            .map((scopeId) => languageMode.classNameForScopeId(scopeId)),
         };
 
         expect(boundary).toEqual(expectedBoundaries.shift());
@@ -793,41 +838,41 @@ describe('TextMateLanguageMode', () => {
       expect(
         iterator
           .seek(Point(0, 1))
-          .map(scopeId => languageMode.classNameForScopeId(scopeId))
+          .map((scopeId) => languageMode.classNameForScopeId(scopeId)),
       ).toEqual([
         'syntax--source syntax--js',
-        'syntax--storage syntax--type syntax--var syntax--js'
+        'syntax--storage syntax--type syntax--var syntax--js',
       ]);
       expect(iterator.getPosition()).toEqual(Point(0, 3));
       expect(
         iterator
           .seek(Point(0, 8))
-          .map(scopeId => languageMode.classNameForScopeId(scopeId))
+          .map((scopeId) => languageMode.classNameForScopeId(scopeId)),
       ).toEqual(['syntax--source syntax--js']);
       expect(iterator.getPosition()).toEqual(Point(0, 8));
       expect(
         iterator
           .seek(Point(1, 0))
-          .map(scopeId => languageMode.classNameForScopeId(scopeId))
+          .map((scopeId) => languageMode.classNameForScopeId(scopeId)),
       ).toEqual([
         'syntax--source syntax--js',
-        'syntax--comment syntax--block syntax--js'
+        'syntax--comment syntax--block syntax--js',
       ]);
       expect(iterator.getPosition()).toEqual(Point(1, 0));
       expect(
         iterator
           .seek(Point(1, 18))
-          .map(scopeId => languageMode.classNameForScopeId(scopeId))
+          .map((scopeId) => languageMode.classNameForScopeId(scopeId)),
       ).toEqual([
         'syntax--source syntax--js',
-        'syntax--constant syntax--numeric syntax--decimal syntax--js'
+        'syntax--constant syntax--numeric syntax--decimal syntax--js',
       ]);
       expect(iterator.getPosition()).toEqual(Point(1, 18));
 
       expect(
         iterator
           .seek(Point(2, 0))
-          .map(scopeId => languageMode.classNameForScopeId(scopeId))
+          .map((scopeId) => languageMode.classNameForScopeId(scopeId)),
       ).toEqual(['syntax--source syntax--js']);
       iterator.moveToSuccessor();
     }); // ensure we don't infinitely loop (regression test)
@@ -839,7 +884,7 @@ describe('TextMateLanguageMode', () => {
       languageMode = new TextMateLanguageMode({
         buffer,
         config,
-        grammar: atom.grammars.grammarForScopeName('source.coffee')
+        grammar: atom.grammars.grammarForScopeName('source.coffee'),
       });
       fullyTokenize(languageMode);
 
@@ -865,8 +910,8 @@ describe('TextMateLanguageMode', () => {
         name: 'Broken grammar',
         patterns: [
           { begin: 'start', end: '(?=end)', name: 'blue.broken' },
-          { match: '.', name: 'yellow.broken' }
-        ]
+          { match: '.', name: 'yellow.broken' },
+        ],
       });
 
       buffer = new TextBuffer({ text: 'start x\nend x\nx' });
@@ -880,29 +925,29 @@ describe('TextMateLanguageMode', () => {
       expect(
         iterator
           .getCloseScopeIds()
-          .map(scopeId => languageMode.classNameForScopeId(scopeId))
+          .map((scopeId) => languageMode.classNameForScopeId(scopeId)),
       ).toEqual(['syntax--blue syntax--broken']);
       expect(
         iterator
           .getOpenScopeIds()
-          .map(scopeId => languageMode.classNameForScopeId(scopeId))
+          .map((scopeId) => languageMode.classNameForScopeId(scopeId)),
       ).toEqual(['syntax--yellow syntax--broken']);
     });
 
-    describe('TextMateHighlightIterator.seek(position)', function() {
-      it('seeks to the leftmost tag boundary greater than or equal to the given position and returns the containing tags', function() {
+    describe('TextMateHighlightIterator.seek(position)', function () {
+      it('seeks to the leftmost tag boundary greater than or equal to the given position and returns the containing tags', function () {
         const languageMode = {
           tokenizedLineForRow(row) {
             if (row === 0) {
               return {
                 tags: [-1, -2, -3, -4, -5, 3, -3, -4, -6, -5, 4, -6, -3, -4],
                 text: 'foo bar',
-                openScopes: []
+                openScopes: [],
               };
             } else {
               return null;
             }
-          }
+          },
         };
 
         const iterator = new TextMateHighlightIterator(languageMode);
@@ -963,16 +1008,16 @@ describe('TextMateLanguageMode', () => {
       });
     });
 
-    describe('TextMateHighlightIterator.moveToSuccessor()', function() {
+    describe('TextMateHighlightIterator.moveToSuccessor()', function () {
       it('reports two boundaries at the same position when tags close, open, then close again without a non-negative integer separating them (regression)', () => {
         const languageMode = {
           tokenizedLineForRow() {
             return {
               tags: [-1, -2, -1, -2],
               text: '',
-              openScopes: []
+              openScopes: [],
             };
-          }
+          },
         };
 
         const iterator = new TextMateHighlightIterator(languageMode);
@@ -1049,7 +1094,7 @@ describe('TextMateLanguageMode', () => {
       languageMode = new TextMateLanguageMode({
         buffer,
         config,
-        grammar: atom.grammars.grammarForScopeName('source.js')
+        grammar: atom.grammars.grammarForScopeName('source.js'),
       });
       buffer.setLanguageMode(languageMode);
       fullyTokenize(languageMode);
@@ -1251,21 +1296,23 @@ describe('TextMateLanguageMode', () => {
 
       languageMode = new TextMateLanguageMode({ buffer, config });
 
-      expect(languageMode.getFoldableRanges(2).map(r => r.toString())).toEqual(
+      expect(
+        languageMode.getFoldableRanges(2).map((r) => r.toString()),
+      ).toEqual(
         [
           ...languageMode.getFoldableRangesAtIndentLevel(0, 2),
           ...languageMode.getFoldableRangesAtIndentLevel(1, 2),
-          ...languageMode.getFoldableRangesAtIndentLevel(2, 2)
+          ...languageMode.getFoldableRangesAtIndentLevel(2, 2),
         ]
           .sort((a, b) => a.start.row - b.start.row || a.end.row - b.end.row)
-          .map(r => r.toString())
+          .map((r) => r.toString()),
       );
     });
 
     it('works with multi-line comments', async () => {
       await atom.packages.activatePackage('language-javascript');
       const editor = await atom.workspace.open('sample-with-comments.js', {
-        autoIndent: false
+        autoIndent: false,
       });
       fullyTokenize(editor.getBuffer().getLanguageMode());
 
@@ -1306,7 +1353,7 @@ describe('TextMateLanguageMode', () => {
       languageMode = new TextMateLanguageMode({ buffer, config });
 
       expect(
-        languageMode.getFoldableRangeContainingPoint(Point(0, 5), 2)
+        languageMode.getFoldableRangeContainingPoint(Point(0, 5), 2),
       ).toBeNull();
 
       let range = languageMode.getFoldableRangeContainingPoint(Point(0, 10), 2);
@@ -1335,7 +1382,7 @@ describe('TextMateLanguageMode', () => {
 
       range = languageMode.getFoldableRangeContainingPoint(
         Point(1, Infinity),
-        2
+        2,
       );
       expect(simulateFold([range])).toBe(dedent`
         if (a) {⋯
@@ -1368,17 +1415,29 @@ describe('TextMateLanguageMode', () => {
       languageMode = editor.languageMode;
 
       expect(
-        languageMode.getFoldableRangeContainingPoint(Point(0, Infinity), 2)
-      ).toEqual([[0, Infinity], [20, Infinity]]);
+        languageMode.getFoldableRangeContainingPoint(Point(0, Infinity), 2),
+      ).toEqual([
+        [0, Infinity],
+        [20, Infinity],
+      ]);
       expect(
-        languageMode.getFoldableRangeContainingPoint(Point(1, Infinity), 2)
-      ).toEqual([[1, Infinity], [17, Infinity]]);
+        languageMode.getFoldableRangeContainingPoint(Point(1, Infinity), 2),
+      ).toEqual([
+        [1, Infinity],
+        [17, Infinity],
+      ]);
       expect(
-        languageMode.getFoldableRangeContainingPoint(Point(2, Infinity), 2)
-      ).toEqual([[1, Infinity], [17, Infinity]]);
+        languageMode.getFoldableRangeContainingPoint(Point(2, Infinity), 2),
+      ).toEqual([
+        [1, Infinity],
+        [17, Infinity],
+      ]);
       expect(
-        languageMode.getFoldableRangeContainingPoint(Point(19, Infinity), 2)
-      ).toEqual([[19, Infinity], [20, Infinity]]);
+        languageMode.getFoldableRangeContainingPoint(Point(19, Infinity), 2),
+      ).toEqual([
+        [19, Infinity],
+        [20, Infinity],
+      ]);
     });
 
     it('works for javascript', async () => {
@@ -1390,27 +1449,39 @@ describe('TextMateLanguageMode', () => {
       expect(
         editor.languageMode.getFoldableRangeContainingPoint(
           Point(0, Infinity),
-          2
-        )
-      ).toEqual([[0, Infinity], [12, Infinity]]);
+          2,
+        ),
+      ).toEqual([
+        [0, Infinity],
+        [12, Infinity],
+      ]);
       expect(
         editor.languageMode.getFoldableRangeContainingPoint(
           Point(1, Infinity),
-          2
-        )
-      ).toEqual([[1, Infinity], [9, Infinity]]);
+          2,
+        ),
+      ).toEqual([
+        [1, Infinity],
+        [9, Infinity],
+      ]);
       expect(
         editor.languageMode.getFoldableRangeContainingPoint(
           Point(2, Infinity),
-          2
-        )
-      ).toEqual([[1, Infinity], [9, Infinity]]);
+          2,
+        ),
+      ).toEqual([
+        [1, Infinity],
+        [9, Infinity],
+      ]);
       expect(
         editor.languageMode.getFoldableRangeContainingPoint(
           Point(4, Infinity),
-          2
-        )
-      ).toEqual([[4, Infinity], [7, Infinity]]);
+          2,
+        ),
+      ).toEqual([
+        [4, Infinity],
+        [7, Infinity],
+      ]);
     });
 
     it('searches upward and downward for surrounding comment lines and folds them as a single fold', async () => {
@@ -1418,7 +1489,7 @@ describe('TextMateLanguageMode', () => {
       const editor = await atom.workspace.open('sample-with-comments.js');
       editor.buffer.insert(
         [1, 0],
-        '  //this is a comment\n  // and\n  //more docs\n\n//second comment'
+        '  //this is a comment\n  // and\n  //more docs\n\n//second comment',
       );
       fullyTokenize(editor.getBuffer().getLanguageMode());
       editor.foldBufferRow(1);
@@ -1436,13 +1507,13 @@ describe('TextMateLanguageMode', () => {
           {
             begin: 'start',
             end: '(?=end)',
-            name: 'blue.broken'
+            name: 'blue.broken',
           },
           {
             match: '.',
-            name: 'yellow.broken'
-          }
-        ]
+            name: 'yellow.broken',
+          },
+        ],
       });
 
       const buffer = new TextBuffer({
@@ -1450,7 +1521,7 @@ describe('TextMateLanguageMode', () => {
         start x
         end x
         x
-      `
+      `,
       });
 
       const languageMode = new TextMateLanguageMode({
@@ -1459,7 +1530,7 @@ describe('TextMateLanguageMode', () => {
         config: atom.config,
         grammarRegistry: atom.grammars,
         packageManager: atom.packages,
-        assert: atom.assert
+        assert: atom.assert,
       });
 
       fullyTokenize(languageMode);
@@ -1473,7 +1544,7 @@ describe('TextMateLanguageMode', () => {
       expect(tokenIterator.getScopeEnds()).toEqual([]);
       expect(tokenIterator.getScopeStarts()).toEqual([
         'text.broken',
-        'yellow.broken'
+        'yellow.broken',
       ]);
     }));
 
@@ -1483,7 +1554,7 @@ describe('TextMateLanguageMode', () => {
         buffer.setTextInRange(range, '⋯');
       }
     });
-    let text = buffer.getText();
+    const text = buffer.getText();
     buffer.undo();
     return text;
   }

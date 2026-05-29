@@ -25,7 +25,7 @@ module.exports = class TitleBar {
     switch (
       this.applicationDelegate.getUserDefault(
         'AppleActionOnDoubleClick',
-        'string'
+        'string',
       )
     ) {
       case 'Minimize':

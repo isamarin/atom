@@ -6,7 +6,7 @@ const process = require('process');
 
 const CONFIG = require('../config');
 
-module.exports = async function() {
+module.exports = async function () {
   return new Promise((resolve, reject) => {
     const eslintArgs = ['--cache', '--format', 'json'];
 
@@ -15,24 +15,34 @@ module.exports = async function() {
     }
 
     const eslintBinary = process.platform === 'win32' ? 'eslint.cmd' : 'eslint';
+    const scriptNodeModules = path.join(
+      CONFIG.repositoryRootPath,
+      'script',
+      'node_modules',
+    );
     const eslint = spawn(
       path.join('script', 'node_modules', '.bin', eslintBinary),
       [...eslintArgs, '.'],
-      { cwd: CONFIG.repositoryRootPath }
+      {
+        cwd: CONFIG.repositoryRootPath,
+        env: Object.assign({}, process.env, {
+          NODE_PATH: scriptNodeModules,
+        }),
+      },
     );
 
     let output = '';
     let errorOutput = '';
-    eslint.stdout.on('data', data => {
+    eslint.stdout.on('data', (data) => {
       output += data.toString();
     });
 
-    eslint.stderr.on('data', data => {
+    eslint.stderr.on('data', (data) => {
       errorOutput += data.toString();
     });
 
-    eslint.on('error', error => reject(error));
-    eslint.on('close', exitCode => {
+    eslint.on('error', (error) => reject(error));
+    eslint.on('close', (exitCode) => {
       const errors = [];
       let files;
 
@@ -49,7 +59,7 @@ module.exports = async function() {
             path: file.filePath,
             message: error.message,
             lineNumber: error.line,
-            rule: error.ruleId
+            rule: error.ruleId,
           });
         }
       }

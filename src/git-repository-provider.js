@@ -2,7 +2,7 @@ const fs = require('fs');
 const { Directory } = require('pathwatcher');
 const GitRepository = require('./git-repository');
 
-const GIT_FILE_REGEX = RegExp('^gitdir: (.+)');
+const GIT_FILE_REGEX = /^gitdir: (.+)/;
 
 // Returns the .gitdir path in the agnostic Git symlink .git file given, or
 // null if the path is not a valid gitfile.
@@ -20,7 +20,7 @@ function pathFromGitFileSync(gitFile) {
 //
 // * `gitFile` {String} path of gitfile to parse
 function pathFromGitFile(gitFile) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     fs.readFile(gitFile, 'utf8', (err, gitFileBuff) => {
       if (err == null && gitFileBuff != null) {
         const result = gitFileBuff.toString().match(GIT_FILE_REGEX);
@@ -190,7 +190,7 @@ class GitRepositoryProvider {
     if (!repo) {
       repo = GitRepository.open(gitDirPath, {
         project: this.project,
-        config: this.config
+        config: this.config,
       });
       if (!repo) {
         return null;

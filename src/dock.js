@@ -20,17 +20,15 @@ const CURSOR_OVERLAY_VISIBLE_CLASS = 'atom-dock-cursor-overlay-visible';
 // or add an item to a dock via {Workspace::open}.
 module.exports = class Dock {
   constructor(params) {
-    this.handleResizeHandleDragStart = this.handleResizeHandleDragStart.bind(
-      this
-    );
+    this.handleResizeHandleDragStart =
+      this.handleResizeHandleDragStart.bind(this);
     this.handleResizeToFit = this.handleResizeToFit.bind(this);
     this.handleMouseMove = this.handleMouseMove.bind(this);
     this.handleMouseUp = this.handleMouseUp.bind(this);
     this.handleDrag = _.throttle(this.handleDrag.bind(this), 30);
     this.handleDragEnd = this.handleDragEnd.bind(this);
-    this.handleToggleButtonDragEnter = this.handleToggleButtonDragEnter.bind(
-      this
-    );
+    this.handleToggleButtonDragEnter =
+      this.handleToggleButtonDragEnter.bind(this);
     this.toggle = this.toggle.bind(this);
 
     this.location = params.location;
@@ -50,13 +48,13 @@ module.exports = class Dock {
       applicationDelegate: this.applicationDelegate,
       deserializerManager: this.deserializerManager,
       notificationManager: this.notificationManager,
-      viewRegistry: this.viewRegistry
+      viewRegistry: this.viewRegistry,
     });
 
     this.state = {
       size: null,
       visible: false,
-      shouldAnimate: false
+      shouldAnimate: false,
     };
 
     this.subscriptions = new CompositeDisposable(
@@ -65,19 +63,19 @@ module.exports = class Dock {
         this.show();
         this.didActivate(this);
       }),
-      this.paneContainer.observePanes(pane => {
+      this.paneContainer.observePanes((pane) => {
         pane.onDidAddItem(this.handleDidAddPaneItem.bind(this));
         pane.onDidRemoveItem(this.handleDidRemovePaneItem.bind(this));
       }),
-      this.paneContainer.onDidChangeActivePane(item =>
-        params.didChangeActivePane(this, item)
+      this.paneContainer.onDidChangeActivePane((item) =>
+        params.didChangeActivePane(this, item),
       ),
-      this.paneContainer.onDidChangeActivePaneItem(item =>
-        params.didChangeActivePaneItem(this, item)
+      this.paneContainer.onDidChangeActivePaneItem((item) =>
+        params.didChangeActivePaneItem(this, item),
       ),
-      this.paneContainer.onDidDestroyPaneItem(item =>
-        params.didDestroyPaneItem(item)
-      )
+      this.paneContainer.onDidDestroyPaneItem((item) =>
+        params.didDestroyPaneItem(item),
+      ),
     );
   }
 
@@ -201,7 +199,7 @@ module.exports = class Dock {
 
     const cursorOverlayElementClassList = [
       'atom-dock-cursor-overlay',
-      this.location
+      this.location,
     ];
     if (this.state.resizing)
       cursorOverlayElementClassList.push(CURSOR_OVERLAY_VISIBLE_CLASS);
@@ -212,12 +210,12 @@ module.exports = class Dock {
       this.state.size ||
         (this.state.draggingItem &&
           getPreferredSize(this.state.draggingItem, this.location)) ||
-        DEFAULT_INITIAL_SIZE
+        DEFAULT_INITIAL_SIZE,
     );
 
     // We need to change the size of the mask...
     const maskStyle = {
-      [this.widthOrHeight]: `${shouldBeVisible ? size : 0}px`
+      [this.widthOrHeight]: `${shouldBeVisible ? size : 0}px`,
     };
     // ...but the content needs to maintain a constant size.
     const wrapperStyle = { [this.widthOrHeight]: `${size}px` };
@@ -230,23 +228,23 @@ module.exports = class Dock {
         $.div(
           {
             className: maskElementClassList.join(' '),
-            style: maskStyle
+            style: maskStyle,
           },
           $.div(
             {
               ref: 'wrapperElement',
               className: `atom-dock-content-wrapper ${this.location}`,
-              style: wrapperStyle
+              style: wrapperStyle,
             },
             $(DockResizeHandle, {
               location: this.location,
               onResizeStart: this.handleResizeHandleDragStart,
               onResizeToFit: this.handleResizeToFit,
-              dockIsVisible: this.state.visible
+              dockIsVisible: this.state.visible,
             }),
             $(ElementComponent, { element: this.paneContainer.getElement() }),
-            $.div({ className: cursorOverlayElementClassList.join(' ') })
-          )
+            $.div({ className: cursorOverlayElementClassList.join(' ') }),
+          ),
         ),
         $(DockToggleButton, {
           ref: 'toggleButton',
@@ -263,9 +261,9 @@ module.exports = class Dock {
             // ...or if the item can't be dropped in that dock.
             (!shouldBeVisible &&
               this.state.draggingItem &&
-              isItemAllowed(this.state.draggingItem, this.location))
-        })
-      )
+              isItemAllowed(this.state.draggingItem, this.location)),
+        }),
+      ),
     );
   }
 
@@ -365,7 +363,7 @@ module.exports = class Dock {
       top: dockBounds.top,
       right: dockBounds.right,
       bottom: dockBounds.bottom,
-      left: dockBounds.left
+      left: dockBounds.left,
     };
 
     // To provide a minimum target, expand the area toward the center a bit.
@@ -450,20 +448,20 @@ module.exports = class Dock {
       deserializer: 'Dock',
       size: this.state.size,
       paneContainer: this.paneContainer.serialize(),
-      visible: this.state.visible
+      visible: this.state.visible,
     };
   }
 
   deserialize(serialized, deserializerManager) {
     this.paneContainer.deserialize(
       serialized.paneContainer,
-      deserializerManager
+      deserializerManager,
     );
     this.setState({
       size: serialized.size || this.getInitialSize(),
       // If no items could be deserialized, we don't want to show the dock (even if it was visible last time)
       visible:
-        serialized.visible && this.paneContainer.getPaneItems().length > 0
+        serialized.visible && this.paneContainer.getPaneItems().length > 0,
     });
   }
 
@@ -692,7 +690,7 @@ module.exports = class Dock {
   // {TextEditor}.
   getActiveTextEditor() {
     Grim.deprecate(
-      'Text editors are not allowed in docks. Use atom.workspace.getActiveTextEditor() instead.'
+      'Text editors are not allowed in docks. Use atom.workspace.getActiveTextEditor() instead.',
     );
 
     const activeItem = this.getActivePaneItem();
@@ -767,7 +765,7 @@ class DockResizeHandle {
 
     return $.div({
       className: classList.join(' '),
-      on: { mousedown: this.handleMouseDown }
+      on: { mousedown: this.handleMouseDown },
     });
   }
 
@@ -777,9 +775,10 @@ class DockResizeHandle {
 
   getSize() {
     if (!this.size) {
-      this.size = this.element.getBoundingClientRect()[
-        getWidthOrHeight(this.props.location)
-      ];
+      this.size =
+        this.element.getBoundingClientRect()[
+          getWidthOrHeight(this.props.location)
+        ];
     }
     return this.size;
   }
@@ -816,17 +815,17 @@ class DockToggleButton {
           className: `atom-dock-toggle-button-inner ${this.props.location}`,
           on: {
             click: this.handleClick,
-            dragenter: this.props.onDragEnter
-          }
+            dragenter: this.props.onDragEnter,
+          },
         },
         $.span({
           ref: 'iconElement',
           className: `icon ${getIconName(
             this.props.location,
-            this.props.dockIsVisible
-          )}`
-        })
-      )
+            this.props.dockIsVisible,
+          )}`,
+        }),
+      ),
     );
   }
 

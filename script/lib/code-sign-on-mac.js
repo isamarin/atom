@@ -9,17 +9,17 @@ const macEntitlementsPath = path.join(
   CONFIG.repositoryRootPath,
   'resources',
   'mac',
-  'entitlements.plist'
+  'entitlements.plist',
 );
 
-module.exports = async function(packagedAppPath) {
+module.exports = async function (packagedAppPath) {
   if (
     !process.env.ATOM_MAC_CODE_SIGNING_CERT_DOWNLOAD_URL &&
     !process.env.ATOM_MAC_CODE_SIGNING_CERT_PATH
   ) {
     console.log(
       'Skipping code signing because the ATOM_MAC_CODE_SIGNING_CERT_DOWNLOAD_URL environment variable is not defined'
-        .gray
+        .gray,
     );
     return;
   }
@@ -29,22 +29,22 @@ module.exports = async function(packagedAppPath) {
     certPath = path.join(os.tmpdir(), 'mac.p12');
     downloadFileFromGithub(
       process.env.ATOM_MAC_CODE_SIGNING_CERT_DOWNLOAD_URL,
-      certPath
+      certPath,
     );
   }
   try {
     console.log(
-      `Ensuring keychain ${process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN} exists`
+      `Ensuring keychain ${process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN} exists`,
     );
     try {
       spawnSync(
         'security',
         ['show-keychain-info', process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN],
-        { stdio: 'inherit' }
+        { stdio: 'inherit' },
       );
     } catch (err) {
       console.log(
-        `Creating keychain ${process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN}`
+        `Creating keychain ${process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN}`,
       );
       // The keychain doesn't exist, try to create it
       spawnSync(
@@ -53,9 +53,9 @@ module.exports = async function(packagedAppPath) {
           'create-keychain',
           '-p',
           process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN_PASSWORD,
-          process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN
+          process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN,
         ],
-        { stdio: 'inherit' }
+        { stdio: 'inherit' },
       );
 
       // List the keychain to "activate" it.  Somehow this seems
@@ -63,7 +63,7 @@ module.exports = async function(packagedAppPath) {
       spawnSync(
         'security',
         ['list-keychains', '-s', process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN],
-        { stdio: 'inherit' }
+        { stdio: 'inherit' },
       );
 
       // Make sure it doesn't time out before we use it
@@ -74,21 +74,21 @@ module.exports = async function(packagedAppPath) {
           '-t',
           '3600',
           '-u',
-          process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN
+          process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN,
         ],
-        { stdio: 'inherit' }
+        { stdio: 'inherit' },
       );
     }
 
     console.log(
-      `Unlocking keychain ${process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN}`
+      `Unlocking keychain ${process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN}`,
     );
     const unlockArgs = ['unlock-keychain'];
     // For signing on local workstations, password could be entered interactively
     if (process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN_PASSWORD) {
       unlockArgs.push(
         '-p',
-        process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN_PASSWORD
+        process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN_PASSWORD,
       );
     }
     unlockArgs.push(process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN);
@@ -97,7 +97,7 @@ module.exports = async function(packagedAppPath) {
     console.log(
       `Importing certificate at ${certPath} into ${
         process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN
-      } keychain`
+      } keychain`,
     );
     spawnSync('security', [
       'import',
@@ -107,11 +107,11 @@ module.exports = async function(packagedAppPath) {
       '-k',
       process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN,
       '-T',
-      '/usr/bin/codesign'
+      '/usr/bin/codesign',
     ]);
 
     console.log(
-      'Running incantation to suppress dialog when signing on macOS Sierra'
+      'Running incantation to suppress dialog when signing on macOS Sierra',
     );
     try {
       spawnSync('security', [
@@ -121,7 +121,7 @@ module.exports = async function(packagedAppPath) {
         '-s',
         '-k',
         process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN_PASSWORD,
-        process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN
+        process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN,
       ]);
     } catch (e) {
       console.log("Incantation failed... maybe this isn't Sierra?");
@@ -137,7 +137,7 @@ module.exports = async function(packagedAppPath) {
         identity: 'Developer ID Application: GitHub',
         keychain: process.env.ATOM_MAC_CODE_SIGNING_KEYCHAIN,
         platform: 'darwin',
-        hardenedRuntime: true
+        hardenedRuntime: true,
       });
       console.info('Application signing complete');
     } catch (err) {

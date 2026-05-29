@@ -8,8 +8,8 @@ export default class DiffListView {
     this.selectListView = new SelectListView({
       emptyMessage: 'No diffs in file',
       items: [],
-      filterKeyForItem: diff => diff.lineText,
-      elementForItem: diff => {
+      filterKeyForItem: (diff) => diff.lineText,
+      elementForItem: (diff) => {
         const li = document.createElement('li');
         li.classList.add('two-lines');
 
@@ -27,22 +27,22 @@ export default class DiffListView {
 
         return li;
       },
-      didConfirmSelection: diff => {
+      didConfirmSelection: (diff) => {
         this.cancel();
         const bufferRow = diff.newStart > 0 ? diff.newStart - 1 : diff.newStart;
         this.editor.setCursorBufferPosition([bufferRow, 0], {
-          autoscroll: true
+          autoscroll: true,
         });
         this.editor.moveToFirstCharacterOfLine();
       },
       didCancelSelection: () => {
         this.cancel();
-      }
+      },
     });
     this.selectListView.element.classList.add('diff-list-view');
     this.panel = atom.workspace.addModalPanel({
       item: this.selectListView,
-      visible: false
+      visible: false,
     });
   }
 
@@ -78,7 +78,7 @@ export default class DiffListView {
         ? repository.getLineDiffs(this.editor.getPath(), this.editor.getText())
         : [];
       if (!diffs) diffs = [];
-      for (let diff of diffs) {
+      for (const diff of diffs) {
         const bufferRow = diff.newStart > 0 ? diff.newStart - 1 : diff.newStart;
         const lineText = this.editor.lineTextForBufferRow(bufferRow);
         diff.lineText = lineText ? lineText.trim() : '';

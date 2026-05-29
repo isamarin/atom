@@ -8,7 +8,7 @@ const NullGrammar = require('./null-grammar');
 const { OnigRegExp } = require('oniguruma');
 const {
   toFirstMateScopeId,
-  fromFirstMateScopeId
+  fromFirstMateScopeId,
 } = require('./first-mate-helpers');
 const { selectorMatchesAnyScope } = require('./selectors');
 
@@ -37,10 +37,10 @@ class TextMateLanguageMode {
 
     this.grammar = params.grammar || NullGrammar;
     this.rootScopeDescriptor = new ScopeDescriptor({
-      scopes: [this.grammar.scopeName]
+      scopes: [this.grammar.scopeName],
     });
     this.disposables.add(
-      this.grammar.onDidUpdate(() => this.retokenizeLines())
+      this.grammar.onDidUpdate(() => this.retokenizeLines()),
     );
     this.retokenizeLines();
   }
@@ -88,14 +88,14 @@ class TextMateLanguageMode {
     const iterator = tokenizedLine.getTokenIterator();
     iterator.next();
     const scopeDescriptor = new ScopeDescriptor({
-      scopes: iterator.getScopes()
+      scopes: iterator.getScopes(),
     });
     return this._suggestedIndentForLineWithScopeAtBufferRow(
       bufferRow,
       line,
       scopeDescriptor,
       tabLength,
-      options
+      options,
     );
   }
 
@@ -108,18 +108,18 @@ class TextMateLanguageMode {
   suggestedIndentForLineAtBufferRow(bufferRow, line, tabLength) {
     const tokenizedLine = this.buildTokenizedLineForRowWithText(
       bufferRow,
-      line
+      line,
     );
     const iterator = tokenizedLine.getTokenIterator();
     iterator.next();
     const scopeDescriptor = new ScopeDescriptor({
-      scopes: iterator.getScopes()
+      scopes: iterator.getScopes(),
     });
     return this._suggestedIndentForLineWithScopeAtBufferRow(
       bufferRow,
       line,
       scopeDescriptor,
-      tabLength
+      tabLength,
     );
   }
 
@@ -137,11 +137,10 @@ class TextMateLanguageMode {
     if (currentIndentLevel === 0) return;
 
     const scopeDescriptor = this.scopeDescriptorForPosition(
-      new Point(bufferRow, 0)
+      new Point(bufferRow, 0),
     );
-    const decreaseIndentRegex = this.decreaseIndentRegexForScopeDescriptor(
-      scopeDescriptor
-    );
+    const decreaseIndentRegex =
+      this.decreaseIndentRegexForScopeDescriptor(scopeDescriptor);
     if (!decreaseIndentRegex) return;
 
     if (!decreaseIndentRegex.testSync(line)) return;
@@ -152,16 +151,14 @@ class TextMateLanguageMode {
     const precedingLine = this.buffer.lineForRow(precedingRow);
     let desiredIndentLevel = this.indentLevelForLine(precedingLine, tabLength);
 
-    const increaseIndentRegex = this.increaseIndentRegexForScopeDescriptor(
-      scopeDescriptor
-    );
+    const increaseIndentRegex =
+      this.increaseIndentRegexForScopeDescriptor(scopeDescriptor);
     if (increaseIndentRegex) {
       if (!increaseIndentRegex.testSync(precedingLine)) desiredIndentLevel -= 1;
     }
 
-    const decreaseNextIndentRegex = this.decreaseNextIndentRegexForScopeDescriptor(
-      scopeDescriptor
-    );
+    const decreaseNextIndentRegex =
+      this.decreaseNextIndentRegexForScopeDescriptor(scopeDescriptor);
     if (decreaseNextIndentRegex) {
       if (decreaseNextIndentRegex.testSync(precedingLine))
         desiredIndentLevel -= 1;
@@ -177,17 +174,14 @@ class TextMateLanguageMode {
     line,
     scopeDescriptor,
     tabLength,
-    options
+    options,
   ) {
-    const increaseIndentRegex = this.increaseIndentRegexForScopeDescriptor(
-      scopeDescriptor
-    );
-    const decreaseIndentRegex = this.decreaseIndentRegexForScopeDescriptor(
-      scopeDescriptor
-    );
-    const decreaseNextIndentRegex = this.decreaseNextIndentRegexForScopeDescriptor(
-      scopeDescriptor
-    );
+    const increaseIndentRegex =
+      this.increaseIndentRegexForScopeDescriptor(scopeDescriptor);
+    const decreaseIndentRegex =
+      this.decreaseIndentRegexForScopeDescriptor(scopeDescriptor);
+    const decreaseNextIndentRegex =
+      this.decreaseNextIndentRegexForScopeDescriptor(scopeDescriptor);
 
     let precedingRow;
     if (!options || options.skipBlankLines !== false) {
@@ -227,18 +221,18 @@ class TextMateLanguageMode {
   commentStringsForPosition(position) {
     const scope = this.scopeDescriptorForPosition(position);
     const commentStartEntries = this.config.getAll('editor.commentStart', {
-      scope
+      scope,
     });
     const commentEndEntries = this.config.getAll('editor.commentEnd', {
-      scope
+      scope,
     });
     const commentStartEntry = commentStartEntries[0];
-    const commentEndEntry = commentEndEntries.find(entry => {
+    const commentEndEntry = commentEndEntries.find((entry) => {
       return entry.scopeSelector === commentStartEntry.scopeSelector;
     });
     return {
       commentStartString: commentStartEntry && commentStartEntry.value,
-      commentEndString: commentEndEntry && commentEndEntry.value
+      commentEndString: commentEndEntry && commentEndEntry.value,
     };
   }
 
@@ -279,14 +273,17 @@ class TextMateLanguageMode {
   }
 
   getGrammarSelectionContent() {
-    return this.buffer.getTextInRange([[0, 0], [10, 0]]);
+    return this.buffer.getTextInRange([
+      [0, 0],
+      [10, 0],
+    ]);
   }
 
   updateForInjection(grammar) {
     if (!grammar.injectionSelector) return;
     for (const tokenizedLine of this.tokenizedLines) {
       if (tokenizedLine) {
-        for (let token of tokenizedLine.tokens) {
+        for (const token of tokenizedLine.tokens) {
           if (grammar.injectionSelector.matches(token.scopes)) {
             this.retokenizeLines();
             return;
@@ -340,7 +337,7 @@ class TextMateLanguageMode {
         this.tokenizedLines[row] = this.buildTokenizedLineForRow(
           row,
           this.stackForRow(row - 1),
-          this.openScopesForRow(row)
+          this.openScopesForRow(row),
         );
         if (--rowsRemaining === 0) {
           filledRegion = false;
@@ -363,7 +360,7 @@ class TextMateLanguageMode {
 
       this.emitter.emit(
         'did-change-highlighting',
-        Range(Point(startRow, 0), Point(endRow + 1, 0))
+        Range(Point(startRow, 0), Point(endRow + 1, 0)),
       );
     }
 
@@ -396,12 +393,12 @@ class TextMateLanguageMode {
   }
 
   updateInvalidRows(start, end, delta) {
-    this.invalidRows = this.invalidRows.map(row => {
+    this.invalidRows = this.invalidRows.map((row) => {
       if (row < start) {
         return row;
       } else if (start <= row && row <= end) {
         return end + delta + 1;
-      } else if (row > end) {
+      } else {
         return row + delta;
       }
     });
@@ -424,20 +421,20 @@ class TextMateLanguageMode {
         this.tokenizedLines,
         start,
         oldLineCount,
-        new Array(newLineCount)
+        new Array(newLineCount),
       );
     } else {
       const newTokenizedLines = this.buildTokenizedLinesForRows(
         start,
         end + delta,
         this.stackForRow(start - 1),
-        this.openScopesForRow(start)
+        this.openScopesForRow(start),
       );
       _.spliceWithArray(
         this.tokenizedLines,
         start,
         oldLineCount,
-        newTokenizedLines
+        newTokenizedLines,
       );
       const newEndStack = this.stackForRow(end + delta);
       if (newEndStack && !_.isEqual(newEndStack, previousEndStack)) {
@@ -456,7 +453,7 @@ class TextMateLanguageMode {
     startRow,
     endRow,
     startingStack,
-    startingopenScopes
+    startingopenScopes,
   ) {
     let ruleStack = startingStack;
     let openScopes = startingopenScopes;
@@ -468,7 +465,7 @@ class TextMateLanguageMode {
         tokenizedLine = this.buildTokenizedLineForRow(
           row,
           ruleStack,
-          openScopes
+          openScopes,
         );
         ruleStack = tokenizedLine.ruleStack;
         openScopes = this.scopesFromTags(openScopes, tokenizedLine.tags);
@@ -489,7 +486,7 @@ class TextMateLanguageMode {
       row,
       this.buffer.lineForRow(row),
       ruleStack,
-      openScopes
+      openScopes,
     );
   }
 
@@ -497,14 +494,14 @@ class TextMateLanguageMode {
     row,
     text,
     currentRuleStack = this.stackForRow(row - 1),
-    openScopes = this.openScopesForRow(row)
+    openScopes = this.openScopesForRow(row),
   ) {
     const lineEnding = this.buffer.lineEndingForRow(row);
     const { tags, ruleStack } = this.grammar.tokenizeLine(
       text,
       currentRuleStack,
       row === 0,
-      false
+      false,
     );
     return new TokenizedLine({
       openScopes,
@@ -513,7 +510,7 @@ class TextMateLanguageMode {
       ruleStack,
       lineEnding,
       tokenIterator: this.tokenIterator,
-      grammar: this.grammar
+      grammar: this.grammar,
     });
   }
 
@@ -528,7 +525,7 @@ class TextMateLanguageMode {
         const tags = [
           this.grammar.startIdForScope(this.grammar.scopeName),
           text.length,
-          this.grammar.endIdForScope(this.grammar.scopeName)
+          this.grammar.endIdForScope(this.grammar.scopeName),
         ];
         this.tokenizedLines[bufferRow] = new TokenizedLine({
           openScopes: [],
@@ -536,7 +533,7 @@ class TextMateLanguageMode {
           tags,
           lineEnding,
           tokenIterator: this.tokenIterator,
-          grammar: this.grammar
+          grammar: this.grammar,
         });
         return this.tokenizedLines[bufferRow];
       }
@@ -604,7 +601,7 @@ class TextMateLanguageMode {
   scopeDescriptorForPosition(position) {
     let scopes;
     const { row, column } = this.buffer.clipPosition(
-      Point.fromObject(position)
+      Point.fromObject(position),
     );
 
     const iterator = this.tokenizedLineForRow(row).getTokenIterator();
@@ -631,9 +628,8 @@ class TextMateLanguageMode {
 
   tokenStartPositionForPosition(position) {
     let { row, column } = Point.fromObject(position);
-    column = this.tokenizedLineForRow(row).tokenStartColumnForBufferColumn(
-      column
-    );
+    column =
+      this.tokenizedLineForRow(row).tokenStartColumnForBufferColumn(column);
     return new Point(row, column);
   }
 
@@ -642,7 +638,7 @@ class TextMateLanguageMode {
     position = Point.fromObject(position);
 
     const { openScopes, tags } = this.tokenizedLineForRow(position.row);
-    const scopes = openScopes.map(tag => this.grammar.scopeForId(tag));
+    const scopes = openScopes.map((tag) => this.grammar.scopeForId(tag));
 
     let startColumn = 0;
     for (tokenIndex = 0; tokenIndex < tags.length; tokenIndex++) {
@@ -709,7 +705,7 @@ class TextMateLanguageMode {
 
     return new Range(
       new Point(position.row, startColumn),
-      new Point(position.row, endColumn)
+      new Point(position.row, endColumn),
     );
   }
 
@@ -823,25 +819,25 @@ class TextMateLanguageMode {
 
   increaseIndentRegexForScopeDescriptor(scope) {
     return this.regexForPattern(
-      this.config.get('editor.increaseIndentPattern', { scope })
+      this.config.get('editor.increaseIndentPattern', { scope }),
     );
   }
 
   decreaseIndentRegexForScopeDescriptor(scope) {
     return this.regexForPattern(
-      this.config.get('editor.decreaseIndentPattern', { scope })
+      this.config.get('editor.decreaseIndentPattern', { scope }),
     );
   }
 
   decreaseNextIndentRegexForScopeDescriptor(scope) {
     return this.regexForPattern(
-      this.config.get('editor.decreaseNextIndentPattern', { scope })
+      this.config.get('editor.decreaseNextIndentPattern', { scope }),
     );
   }
 
   foldEndRegexForScopeDescriptor(scope) {
     return this.regexForPattern(
-      this.config.get('editor.foldEndPattern', { scope })
+      this.config.get('editor.foldEndPattern', { scope }),
     );
   }
 
@@ -879,8 +875,8 @@ class TextMateHighlightIterator {
     const currentLine = this.languageMode.tokenizedLineForRow(position.row);
     this.currentLineTags = currentLine.tags;
     this.currentLineLength = currentLine.text.length;
-    const containingScopeIds = currentLine.openScopes.map(id =>
-      fromFirstMateScopeId(id)
+    const containingScopeIds = currentLine.openScopes.map((id) =>
+      fromFirstMateScopeId(id),
     );
 
     let currentColumn = 0;
@@ -931,7 +927,7 @@ class TextMateHighlightIterator {
     }
     this.position = Point(
       position.row,
-      Math.min(this.currentLineLength, currentColumn)
+      Math.min(this.currentLineLength, currentColumn),
     );
     return containingScopeIds;
   }
@@ -956,8 +952,8 @@ class TextMateHighlightIterator {
               this.position.row,
               Math.min(
                 this.currentLineLength,
-                this.position.column + this.currentLineTags[this.tagIndex]
-              )
+                this.position.column + this.currentLineTags[this.tagIndex],
+              ),
             );
           }
         } else {
@@ -993,7 +989,7 @@ class TextMateHighlightIterator {
   moveToNextLine() {
     this.position = Point(this.position.row + 1, 0);
     const tokenizedLine = this.languageMode.tokenizedLineForRow(
-      this.position.row
+      this.position.row,
     );
     if (tokenizedLine == null) {
       return false;

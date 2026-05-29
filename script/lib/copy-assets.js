@@ -9,7 +9,7 @@ const CONFIG = require('../config');
 const glob = require('glob');
 const includePathInPackagedApp = require('./include-path-in-packaged-app');
 
-module.exports = function() {
+module.exports = function () {
   console.log(`Copying assets to ${CONFIG.intermediateAppPath}`);
   let srcPaths = [
     path.join(CONFIG.repositoryRootPath, 'benchmarks', 'benchmark-runner.js'),
@@ -18,16 +18,16 @@ module.exports = function() {
     path.join(CONFIG.repositoryRootPath, 'package.json'),
     path.join(CONFIG.repositoryRootPath, 'static'),
     path.join(CONFIG.repositoryRootPath, 'src'),
-    path.join(CONFIG.repositoryRootPath, 'vendor')
+    path.join(CONFIG.repositoryRootPath, 'vendor'),
   ];
   srcPaths = srcPaths.concat(
     glob.sync(path.join(CONFIG.repositoryRootPath, 'spec', '*.*'), {
-      ignore: path.join('**', '*-spec.*')
-    })
+      ignore: path.join('**', '*-spec.*'),
+    }),
   );
-  for (let srcPath of srcPaths) {
+  for (const srcPath of srcPaths) {
     fs.copySync(srcPath, computeDestinationPath(srcPath), {
-      filter: includePathInPackagedApp
+      filter: includePathInPackagedApp,
     });
   }
 
@@ -39,16 +39,16 @@ module.exports = function() {
   const nodeModulesPath = path.join(CONFIG.repositoryRootPath, 'node_modules');
   glob
     .sync(path.join(nodeModulesPath, '*'))
-    .map(p =>
+    .map((p) =>
       fs.lstatSync(p).isSymbolicLink()
         ? path.resolve(nodeModulesPath, fs.readlinkSync(p))
-        : p
+        : p,
     )
-    .forEach(modulePath => {
+    .forEach((modulePath) => {
       const destPath = path.join(
         CONFIG.intermediateAppPath,
         'node_modules',
-        path.basename(modulePath)
+        path.basename(modulePath),
       );
       fs.copySync(modulePath, destPath, { filter: includePathInPackagedApp });
     });
@@ -60,9 +60,9 @@ module.exports = function() {
       'app-icons',
       CONFIG.channel,
       'png',
-      '1024.png'
+      '1024.png',
     ),
-    path.join(CONFIG.intermediateAppPath, 'resources', 'atom.png')
+    path.join(CONFIG.intermediateAppPath, 'resources', 'atom.png'),
   );
 };
 

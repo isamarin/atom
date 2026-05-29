@@ -35,7 +35,7 @@ class WorkspaceElement extends HTMLElement {
 
   observeScrollbarStyle() {
     this.subscriptions.add(
-      scrollbarStyle.observePreferredScrollbarStyle(style => {
+      scrollbarStyle.observePreferredScrollbarStyle((style) => {
         switch (style) {
           case 'legacy':
             this.classList.remove('scrollbars-visible-when-scrolling');
@@ -46,7 +46,7 @@ class WorkspaceElement extends HTMLElement {
             this.classList.add('scrollbars-visible-when-scrolling');
             break;
         }
-      })
+      }),
     );
   }
 
@@ -55,20 +55,20 @@ class WorkspaceElement extends HTMLElement {
     this.subscriptions.add(
       this.config.onDidChange(
         'editor.fontSize',
-        this.updateGlobalTextEditorStyleSheet.bind(this)
-      )
+        this.updateGlobalTextEditorStyleSheet.bind(this),
+      ),
     );
     this.subscriptions.add(
       this.config.onDidChange(
         'editor.fontFamily',
-        this.updateGlobalTextEditorStyleSheet.bind(this)
-      )
+        this.updateGlobalTextEditorStyleSheet.bind(this),
+      ),
     );
     this.subscriptions.add(
       this.config.onDidChange(
         'editor.lineHeight',
-        this.updateGlobalTextEditorStyleSheet.bind(this)
-      )
+        this.updateGlobalTextEditorStyleSheet.bind(this),
+      ),
     );
   }
 
@@ -80,7 +80,7 @@ class WorkspaceElement extends HTMLElement {
 }`;
     this.styleManager.addStyleSheet(styleSheetSource, {
       sourcePath: 'global-text-editor-styles',
-      priority: -1
+      priority: -1,
     });
   }
 
@@ -89,7 +89,7 @@ class WorkspaceElement extends HTMLElement {
     this.handleCenterLeave = this.handleCenterLeave.bind(this);
     this.handleEdgesMouseMove = _.throttle(
       this.handleEdgesMouseMove.bind(this),
-      100
+      100,
     );
     this.handleDockDragEnd = this.handleDockDragEnd.bind(this);
     this.handleDragStart = this.handleDragStart.bind(this);
@@ -103,22 +103,22 @@ class WorkspaceElement extends HTMLElement {
     this.styleManager = styleManager;
     if (this.viewRegistry == null) {
       throw new Error(
-        'Must pass a viewRegistry parameter when initializing WorkspaceElements'
+        'Must pass a viewRegistry parameter when initializing WorkspaceElements',
       );
     }
     if (this.project == null) {
       throw new Error(
-        'Must pass a project parameter when initializing WorkspaceElements'
+        'Must pass a project parameter when initializing WorkspaceElements',
       );
     }
     if (this.config == null) {
       throw new Error(
-        'Must pass a config parameter when initializing WorkspaceElements'
+        'Must pass a config parameter when initializing WorkspaceElements',
       );
     }
     if (this.styleManager == null) {
       throw new Error(
-        'Must pass a styleManager parameter when initializing WorkspaceElements'
+        'Must pass a styleManager parameter when initializing WorkspaceElements',
       );
     }
 
@@ -126,11 +126,11 @@ class WorkspaceElement extends HTMLElement {
       new Disposable(() => {
         this.paneContainer.removeEventListener(
           'mouseenter',
-          this.handleCenterEnter
+          this.handleCenterEnter,
         );
         this.paneContainer.removeEventListener(
           'mouseleave',
-          this.handleCenterLeave
+          this.handleCenterLeave,
         );
         window.removeEventListener('mousemove', this.handleEdgesMouseMove);
         window.removeEventListener('dragend', this.handleDockDragEnd);
@@ -141,14 +141,14 @@ class WorkspaceElement extends HTMLElement {
       ...[
         this.model.getLeftDock(),
         this.model.getRightDock(),
-        this.model.getBottomDock()
-      ].map(dock =>
-        dock.onDidChangeHovered(hovered => {
+        this.model.getBottomDock(),
+      ].map((dock) =>
+        dock.onDidChangeHovered((hovered) => {
           if (hovered) this.hoveredDock = dock;
           else if (dock === this.hoveredDock) this.hoveredDock = null;
           this.checkCleanupDockHoverEvents();
-        })
-      )
+        }),
+      ),
     );
     this.initializeContent();
     this.observeScrollbarStyle();
@@ -159,7 +159,7 @@ class WorkspaceElement extends HTMLElement {
     this.addEventListener('focus', this.handleFocus.bind(this));
 
     this.addEventListener('mousewheel', this.handleMousewheel.bind(this), {
-      capture: true
+      capture: true,
     });
     window.addEventListener('dragstart', this.handleDragStart);
     window.addEventListener('mousemove', this.handleEdgesMouseMove);
@@ -171,18 +171,18 @@ class WorkspaceElement extends HTMLElement {
       bottom: this.model.panelContainers.bottom.getElement(),
       header: this.model.panelContainers.header.getElement(),
       footer: this.model.panelContainers.footer.getElement(),
-      modal: this.model.panelContainers.modal.getElement()
+      modal: this.model.panelContainers.modal.getElement(),
     };
 
     this.horizontalAxis.insertBefore(
       this.panelContainers.left,
-      this.verticalAxis
+      this.verticalAxis,
     );
     this.horizontalAxis.appendChild(this.panelContainers.right);
 
     this.verticalAxis.insertBefore(
       this.panelContainers.top,
-      this.paneContainer
+      this.paneContainer,
     );
     this.verticalAxis.appendChild(this.panelContainers.bottom);
 
@@ -262,13 +262,13 @@ class WorkspaceElement extends HTMLElement {
     const docks = [
       this.model.getLeftDock(),
       this.model.getRightDock(),
-      this.model.getBottomDock()
+      this.model.getBottomDock(),
     ];
     const nextHoveredDock = docks.find(
-      dock =>
-        dock !== this.hoveredDock && dock.pointWithinHoverArea(mousePosition)
+      (dock) =>
+        dock !== this.hoveredDock && dock.pointWithinHoverArea(mousePosition),
     );
-    docks.forEach(dock => {
+    docks.forEach((dock) => {
       dock.setHovered(dock === nextHoveredDock);
     });
   }
@@ -319,7 +319,7 @@ class WorkspaceElement extends HTMLElement {
     const activePane = this.model.getActivePane();
     const paneToFocus = this.nearestVisiblePaneInDirection(
       direction,
-      activePane
+      activePane,
     );
     paneToFocus && paneToFocus.focus();
   }
@@ -344,7 +344,7 @@ class WorkspaceElement extends HTMLElement {
     const activePane = this.model.getActivePane();
     const nearestPaneView = this.nearestVisiblePaneInDirection(
       direction,
-      activePane
+      activePane,
     );
     if (nearestPaneView == null) {
       return;
@@ -362,7 +362,7 @@ class WorkspaceElement extends HTMLElement {
   }
 
   nearestVisiblePaneInDirection(direction, pane) {
-    const distance = function(pointA, pointB) {
+    const distance = function (pointA, pointB) {
       const x = pointB.x - pointA.x;
       const y = pointB.y - pointA.y;
       return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
@@ -373,8 +373,8 @@ class WorkspaceElement extends HTMLElement {
 
     const paneViews = atom.workspace
       .getVisiblePanes()
-      .map(otherPane => otherPane.getElement())
-      .filter(otherPaneView => {
+      .map((otherPane) => otherPane.getElement())
+      .filter((otherPaneView) => {
         const otherBox = this.boundingBoxForPaneView(otherPaneView);
         switch (direction) {
           case 'left':
@@ -385,6 +385,8 @@ class WorkspaceElement extends HTMLElement {
             return otherBox.bottom.y <= box.top.y;
           case 'below':
             return otherBox.top.y >= box.bottom.y;
+          default:
+            return false;
         }
       })
       .sort((paneViewA, paneViewB) => {
@@ -407,6 +409,8 @@ class WorkspaceElement extends HTMLElement {
             return (
               distance(box.bottom, boxA.top) - distance(box.bottom, boxB.top)
             );
+          default:
+            return 0;
         }
       });
 
@@ -420,7 +424,7 @@ class WorkspaceElement extends HTMLElement {
       left: { x: boundingBox.left, y: boundingBox.top },
       right: { x: boundingBox.right, y: boundingBox.top },
       top: { x: boundingBox.left, y: boundingBox.top },
-      bottom: { x: boundingBox.left, y: boundingBox.bottom }
+      bottom: { x: boundingBox.left, y: boundingBox.bottom },
     };
   }
 
@@ -482,5 +486,5 @@ function createWorkspaceElement() {
 }
 
 module.exports = {
-  createWorkspaceElement
+  createWorkspaceElement,
 };

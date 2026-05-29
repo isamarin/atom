@@ -4,21 +4,18 @@ const crypto = require('crypto');
 const path = require('path');
 let CoffeeScript = null;
 
-exports.shouldCompile = function() {
+exports.shouldCompile = function () {
   return true;
 };
 
-exports.getCachePath = function(sourceCode) {
+exports.getCachePath = function (sourceCode) {
   return path.join(
     'coffee',
-    crypto
-      .createHash('sha1')
-      .update(sourceCode, 'utf8')
-      .digest('hex') + '.js'
+    crypto.createHash('sha1').update(sourceCode, 'utf8').digest('hex') + '.js',
   );
 };
 
-exports.compile = function(sourceCode, filePath) {
+exports.compile = function (sourceCode, filePath) {
   if (!CoffeeScript) {
     const previousPrepareStackTrace = Error.prepareStackTrace;
     CoffeeScript = require('coffee-script');
@@ -36,7 +33,7 @@ exports.compile = function(sourceCode, filePath) {
   const output = CoffeeScript.compile(sourceCode, {
     filename: filePath,
     sourceFiles: [filePath],
-    inlineMap: true
+    inlineMap: true,
   });
 
   // Strip sourceURL from output so there wouldn't be duplicate entries

@@ -1,10 +1,10 @@
 const spawnSync = require('./spawn-sync');
 
-module.exports = function(packagedAppPath) {
+module.exports = function (packagedAppPath) {
   const result = spawnSync('security', [
     'find-certificate',
     '-c',
-    'Mac Developer'
+    'Mac Developer',
   ]);
 
   const certMatch = (result.stdout || '')
@@ -12,7 +12,7 @@ module.exports = function(packagedAppPath) {
     .match(/"(Mac Developer.*\))"/);
   if (!certMatch || !certMatch[1]) {
     console.error(
-      'A "Mac Developer" certificate must be configured to perform test signing'
+      'A "Mac Developer" certificate must be configured to perform test signing',
     );
   } else {
     // This code-signs the application with a local certificate which won't be
@@ -28,9 +28,9 @@ module.exports = function(packagedAppPath) {
         '--verbose',
         '--sign',
         certMatch[1],
-        packagedAppPath
+        packagedAppPath,
       ],
-      { stdio: 'inherit' }
+      { stdio: 'inherit' },
     );
   }
 };

@@ -3,7 +3,7 @@
 const childProcess = require('child_process');
 const path = require('path');
 
-module.exports = function(ci) {
+module.exports = function (ci) {
   verifyNode();
   verifyPython();
 };
@@ -16,7 +16,7 @@ function verifyNode() {
     console.log(`Node:\tv${fullVersion}`);
   } else {
     throw new Error(
-      `node v10.12+ is required to build Atom. node v${fullVersion} is installed.`
+      `node v10.12+ is required to build Atom. node v${fullVersion} is installed.`,
     );
   }
 }
@@ -50,9 +50,9 @@ function verifyPython() {
       stdout = '';
       fullVersion = '';
 
-      let allFlags = [
+      const allFlags = [
         '-c',
-        'import platform\nprint(platform.python_version())'
+        'import platform\nprint(platform.python_version())',
       ];
       if (prependFlag) {
         // prependFlag is an optional argument,
@@ -67,7 +67,7 @@ function verifyPython() {
       try {
         stdout = childProcess.execFileSync(binary, allFlags, {
           env: process.env,
-          stdio: ['ignore', 'pipe', 'ignore']
+          stdio: ['ignore', 'pipe', 'ignore'],
         });
       } catch (e) {}
 
@@ -80,9 +80,9 @@ function verifyPython() {
       }
 
       if (fullVersion) {
-        let versionComponents = fullVersion.split('.');
-        let majorVersion = Number(versionComponents[0]);
-        let minorVersion = Number(versionComponents[1]);
+        const versionComponents = fullVersion.split('.');
+        const majorVersion = Number(versionComponents[0]);
+        const minorVersion = Number(versionComponents[1]);
         if (
           (majorVersion === 2 && minorVersion >= 6) ||
           (majorVersion === 3 && minorVersion >= 5)
@@ -98,7 +98,7 @@ function verifyPython() {
         binaryPlusFlag = binary;
       }
       triedLog = triedLog.concat(
-        `log message: tried to check version of "${binaryPlusFlag}", got: "${fullVersion}"\n`
+        `log message: tried to check version of "${binaryPlusFlag}", got: "${fullVersion}"\n`,
       );
     }
   }
@@ -110,7 +110,7 @@ function verifyPython() {
         throw new Error(
           `NODE_GYP_FORCE_PYTHON is set to: "${binary}", but this is not a valid Python.\n` +
             'Please set NODE_GYP_FORCE_PYTHON to something valid, or unset it entirely.\n' +
-            '(Python 2.6, 2.7 or 3.5+ is required to build Atom.)\n'
+            '(Python 2.6, 2.7 or 3.5+ is required to build Atom.)\n',
         );
       }
     }
@@ -127,10 +127,10 @@ function verifyPython() {
   if (process.platform === 'win32') {
     verifyBinary('py.exe', '-2');
     verifyBinary(
-      path.join(process.env.SystemDrive || 'C:', 'Python27', 'python.exe')
+      path.join(process.env.SystemDrive || 'C:', 'Python27', 'python.exe'),
     );
     verifyBinary(
-      path.join(process.env.SystemDrive || 'C:', 'Python37', 'python.exe')
+      path.join(process.env.SystemDrive || 'C:', 'Python37', 'python.exe'),
     );
   }
 
@@ -142,7 +142,7 @@ function verifyPython() {
         'Python 2.6, 2.7 or 3.5+ is required to build Atom.\n' +
         'verify-machine-requirements.js was unable to find such a version of Python.\n' +
         "Set the PYTHON env var to e.g. 'C:/path/to/Python27/python.exe'\n" +
-        'if your Python is installed in a non-default location.\n'
+        'if your Python is installed in a non-default location.\n',
     );
   }
 }

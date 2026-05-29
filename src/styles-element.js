@@ -46,22 +46,22 @@ class StylesElement extends HTMLElement {
     this.styleManager = styleManager;
     if (this.styleManager == null) {
       throw new Error(
-        'Must pass a styleManager parameter when initializing a StylesElement'
+        'Must pass a styleManager parameter when initializing a StylesElement',
       );
     }
 
     this.subscriptions.add(
-      this.styleManager.observeStyleElements(this.styleElementAdded.bind(this))
+      this.styleManager.observeStyleElements(this.styleElementAdded.bind(this)),
     );
     this.subscriptions.add(
       this.styleManager.onDidRemoveStyleElement(
-        this.styleElementRemoved.bind(this)
-      )
+        this.styleElementRemoved.bind(this),
+      ),
     );
     this.subscriptions.add(
       this.styleManager.onDidUpdateStyleElement(
-        this.styleElementUpdated.bind(this)
-      )
+        this.styleElementUpdated.bind(this),
+      ),
     );
   }
 
@@ -70,11 +70,13 @@ class StylesElement extends HTMLElement {
       return;
     }
 
-    for (let child of Array.from(Array.prototype.slice.call(this.children))) {
+    for (const child of Array.from(Array.prototype.slice.call(this.children))) {
       this.styleElementRemoved(child);
     }
     this.context = this.getAttribute('context');
-    for (let styleElement of Array.from(this.styleManager.getStyleElements())) {
+    for (const styleElement of Array.from(
+      this.styleManager.getStyleElements(),
+    )) {
       this.styleElementAdded(styleElement);
     }
   }
@@ -91,12 +93,12 @@ class StylesElement extends HTMLElement {
     styleElementClone.priority = styleElement.priority;
     this.styleElementClonesByOriginalElement.set(
       styleElement,
-      styleElementClone
+      styleElementClone,
     );
 
     const { priority } = styleElement;
     if (priority != null) {
-      for (let child of this.children) {
+      for (const child of this.children) {
         if (child.priority > priority) {
           insertBefore = child;
           break;
@@ -128,9 +130,8 @@ class StylesElement extends HTMLElement {
       return;
     }
 
-    const styleElementClone = this.styleElementClonesByOriginalElement.get(
-      styleElement
-    );
+    const styleElementClone =
+      this.styleElementClonesByOriginalElement.get(styleElement);
     styleElementClone.textContent = styleElement.textContent;
     this.emitter.emit('did-update-style-element', styleElementClone);
   }
@@ -147,5 +148,5 @@ function createStylesElement() {
 }
 
 module.exports = {
-  createStylesElement
+  createStylesElement,
 };

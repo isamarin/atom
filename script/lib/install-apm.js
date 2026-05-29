@@ -4,7 +4,7 @@ const childProcess = require('child_process');
 
 const CONFIG = require('../config');
 
-module.exports = function(ci) {
+module.exports = function (ci) {
   if (ci) {
     // Tell apm not to dedupe its own dependencies during its
     // postinstall script. (Deduping during `npm ci` runs is broken.)
@@ -14,6 +14,6 @@ module.exports = function(ci) {
   childProcess.execFileSync(
     CONFIG.getLocalNpmBinPath(),
     ['--global-style', '--loglevel=error', ci ? 'ci' : 'install'],
-    { env: process.env, cwd: CONFIG.apmRootPath }
+    { env: process.env, cwd: CONFIG.apmRootPath },
   );
 };

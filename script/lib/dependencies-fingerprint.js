@@ -6,33 +6,33 @@ const CONFIG = require('../config');
 const FINGERPRINT_PATH = path.join(
   CONFIG.repositoryRootPath,
   'node_modules',
-  '.dependencies-fingerprint'
+  '.dependencies-fingerprint',
 );
 
 module.exports = {
-  write: function() {
+  write: function () {
     const fingerprint = this.compute();
     fs.writeFileSync(FINGERPRINT_PATH, fingerprint);
     console.log(
       'Wrote Dependencies Fingerprint:',
       FINGERPRINT_PATH,
-      fingerprint
+      fingerprint,
     );
   },
-  read: function() {
+  read: function () {
     return fs.existsSync(FINGERPRINT_PATH)
       ? fs.readFileSync(FINGERPRINT_PATH, 'utf8')
       : null;
   },
-  isOutdated: function() {
+  isOutdated: function () {
     const fingerprint = this.read();
     return fingerprint ? fingerprint !== this.compute() : false;
   },
-  compute: function() {
+  compute: function () {
     // Include the electron minor version in the fingerprint since that changing requires a re-install
     const electronVersion = CONFIG.appMetadata.electronVersion.replace(
       /\.\d+$/,
-      ''
+      '',
     );
     const apmVersion = CONFIG.apmMetadata.dependencies['atom-package-manager'];
     const body =
@@ -41,9 +41,6 @@ module.exports = {
       process.platform +
       process.version +
       process.arch;
-    return crypto
-      .createHash('sha1')
-      .update(body)
-      .digest('hex');
-  }
+    return crypto.createHash('sha1').update(body).digest('hex');
+  },
 };

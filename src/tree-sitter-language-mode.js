@@ -16,11 +16,16 @@ const WORD_REGEX = /\w/;
 
 class TreeSitterLanguageMode {
   static _patchSyntaxNode() {
-    if (!Parser.SyntaxNode.prototype.hasOwnProperty('range')) {
+    if (
+      !Object.prototype.hasOwnProperty.call(
+        Parser.SyntaxNode.prototype,
+        'range',
+      )
+    ) {
       Object.defineProperty(Parser.SyntaxNode.prototype, 'range', {
         get() {
           return rangeForNode(this);
-        }
+        },
       });
     }
   }
@@ -40,7 +45,7 @@ class TreeSitterLanguageMode {
     }
 
     this.rootScopeDescriptor = new ScopeDescriptor({
-      scopes: [this.grammar.scopeName]
+      scopes: [this.grammar.scopeName],
     });
     this.emitter = new Emitter();
     this.isFoldableCache = [];
@@ -72,7 +77,7 @@ class TreeSitterLanguageMode {
           }
         }
       }
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 0));
     }
   }
 
@@ -91,7 +96,7 @@ class TreeSitterLanguageMode {
       oldRange.end,
       newRange.end,
       oldText,
-      newText
+      newText,
     );
     this.rootLanguageLayer.handleTextChange(edit, oldText, newText);
     for (const marker of this.injectionsMarkerLayer.getMarkers()) {
@@ -106,7 +111,7 @@ class TreeSitterLanguageMode {
         this.isFoldableCache,
         newRange.start.row,
         oldRange.end.row - oldRange.start.row,
-        { length: newRange.end.row - newRange.start.row }
+        { length: newRange.end.row - newRange.start.row },
       );
     }
     this.rootLanguageLayer.update(null);
@@ -117,11 +122,11 @@ class TreeSitterLanguageMode {
     parser.setLanguage(language);
     const result = parser.parseTextBuffer(this.buffer.buffer, oldTree, {
       syncTimeoutMicros: this.syncTimeoutMicros,
-      includedRanges: ranges
+      includedRanges: ranges,
     });
 
     if (result.then) {
-      return result.then(tree => {
+      return result.then((tree) => {
         PARSER_POOL.push(parser);
         return tree;
       });
@@ -190,7 +195,7 @@ class TreeSitterLanguageMode {
       row,
       line,
       this.rootScopeDescriptor,
-      tabLength
+      tabLength,
     );
   }
 
@@ -203,7 +208,7 @@ class TreeSitterLanguageMode {
       const indent = this.treeIndenter.suggestedIndentForBufferRow(
         row,
         tabLength,
-        options
+        options,
       );
       return indent;
     } else {
@@ -212,7 +217,7 @@ class TreeSitterLanguageMode {
         this.buffer.lineForRow(row),
         this.rootScopeDescriptor,
         tabLength,
-        options
+        options,
       );
     }
   }
@@ -254,8 +259,8 @@ class TreeSitterLanguageMode {
    * folds are only generated for the root language layer).
    */
   getFoldableRangesAtIndentLevel(goalLevel) {
-    let result = [];
-    let stack = [{ node: this.tree.rootNode, level: 0 }];
+    const result = [];
+    const stack = [{ node: this.tree.rootNode, level: 0 }];
     while (stack.length > 0) {
       const { node, level } = stack.pop();
 
@@ -291,7 +296,7 @@ class TreeSitterLanguageMode {
             childStart.row === parentStartRow &&
             childEnd.row === parentEndRow
           ) {
-            stack.push({ node: child, level: level });
+            stack.push({ node: child, level });
           } else {
             const childLevel =
               range &&
@@ -316,7 +321,7 @@ class TreeSitterLanguageMode {
     let smallestRange;
     this._forEachTreeWithRange(new Range(point, point), (tree, grammar) => {
       let node = tree.rootNode.descendantForPosition(
-        this.buffer.clipPosition(point)
+        this.buffer.clipPosition(point),
       );
       while (node) {
         if (existenceOnly && node.startPosition.row < point.row) return;
@@ -342,7 +347,7 @@ class TreeSitterLanguageMode {
     }
 
     const injectionMarkers = this.injectionsMarkerLayer.findMarkers({
-      intersectsRange: range
+      intersectsRange: range,
     });
 
     for (const injectionMarker of injectionMarkers) {
@@ -355,7 +360,7 @@ class TreeSitterLanguageMode {
     const { children } = node;
     const childCount = children.length;
 
-    for (var i = 0, { length } = grammar.folds; i < length; i++) {
+    for (let i = 0, { length } = grammar.folds; i < length; i++) {
       const foldSpec = grammar.folds[i];
 
       if (foldSpec.matchers && !hasMatchingFoldSpec(foldSpec.matchers, node))
@@ -374,8 +379,8 @@ class TreeSitterLanguageMode {
           )
             continue;
         } else {
-          foldStartNode = children.find(child =>
-            hasMatchingFoldSpec(startEntry.matchers, child)
+          foldStartNode = children.find((child) =>
+            hasMatchingFoldSpec(startEntry.matchers, child),
           );
           if (!foldStartNode) continue;
         }
@@ -398,8 +403,8 @@ class TreeSitterLanguageMode {
           )
             continue;
         } else {
-          foldEndNode = children.find(child =>
-            hasMatchingFoldSpec(endEntry.matchers, child)
+          foldEndNode = children.find((child) =>
+            hasMatchingFoldSpec(endEntry.matchers, child),
           );
           if (!foldEndNode) continue;
         }
@@ -410,7 +415,7 @@ class TreeSitterLanguageMode {
         if (
           this.buffer.findInRangeSync(
             WORD_REGEX,
-            new Range(foldEnd, new Point(foldEnd.row, Infinity))
+            new Range(foldEnd, new Point(foldEnd.row, Infinity)),
           )
         ) {
           foldEnd = new Point(foldEnd.row - 1, Infinity);
@@ -434,11 +439,11 @@ class TreeSitterLanguageMode {
   Section - Syntax Tree APIs
   */
 
-  getSyntaxNodeContainingRange(range, where = _ => true) {
+  getSyntaxNodeContainingRange(range, where = (_) => true) {
     return this.getSyntaxNodeAndGrammarContainingRange(range, where).node;
   }
 
-  getSyntaxNodeAndGrammarContainingRange(range, where = _ => true) {
+  getSyntaxNodeAndGrammarContainingRange(range, where = (_) => true) {
     const startIndex = this.buffer.characterIndexForPosition(range.start);
     const endIndex = this.buffer.characterIndexForPosition(range.end);
     const searchEndIndex = Math.max(0, endIndex - 1);
@@ -473,7 +478,7 @@ class TreeSitterLanguageMode {
   getSyntaxNodeAtPosition(position, where) {
     return this.getSyntaxNodeContainingRange(
       new Range(position, position),
-      where
+      where,
     );
   }
 
@@ -517,8 +522,8 @@ class TreeSitterLanguageMode {
         tokens.push(
           new Token({
             value: lineText.substring(start.column, end.column),
-            scopes: scopes.map(s => this.grammar.scopeNameForScopeId(s))
-          })
+            scopes: scopes.map((s) => this.grammar.scopeNameForScopeId(s)),
+          }),
         );
       }
 
@@ -543,7 +548,7 @@ class TreeSitterLanguageMode {
       ruleStack: [],
       lineEnding: this.buffer.lineEndingForRow(row),
       tokenIterator: null,
-      grammar: this.grammar
+      grammar: this.grammar,
     });
   }
 
@@ -561,7 +566,7 @@ class TreeSitterLanguageMode {
       point.column--;
     }
 
-    this._forEachTreeWithRange(new Range(point, point), tree => {
+    this._forEachTreeWithRange(new Range(point, point), (tree) => {
       let node = tree.rootNode.descendantForPosition(point);
       while (node) {
         nodes.push(node);
@@ -574,10 +579,10 @@ class TreeSitterLanguageMode {
     // nodes are separate. Sort the nodes from largest to smallest.
     nodes.reverse();
     nodes.sort(
-      (a, b) => a.startIndex - b.startIndex || b.endIndex - a.endIndex
+      (a, b) => a.startIndex - b.startIndex || b.endIndex - a.endIndex,
     );
 
-    const nodeTypes = nodes.map(node => node.type);
+    const nodeTypes = nodes.map((node) => node.type);
     nodeTypes.unshift(this.grammar.scopeName);
     return new ScopeDescriptor({ scopes: nodeTypes });
   }
@@ -628,13 +633,13 @@ class TreeSitterLanguageMode {
   firstNonWhitespaceRange(row) {
     return this.buffer.findInRangeSync(
       /\S/,
-      new Range(new Point(row, 0), new Point(row, Infinity))
+      new Range(new Point(row, 0), new Point(row, Infinity)),
     );
   }
 
   grammarForLanguageString(languageString) {
     return this.grammarRegistry.treeSitterGrammarForLanguageString(
-      languageString
+      languageString,
     );
   }
 
@@ -678,7 +683,7 @@ class LanguageLayer {
         }
         if (oldEndPosition.isLessThan(this.editedRange.end)) {
           this.editedRange.end = newEndPosition.traverse(
-            this.editedRange.end.traversalFrom(oldEndPosition)
+            this.editedRange.end.traversalFrom(oldEndPosition),
           );
         } else {
           this.editedRange.end = newEndPosition;
@@ -694,7 +699,7 @@ class LanguageLayer {
         oldEndPosition.traversalFrom(startPosition),
         newEndPosition.traversalFrom(startPosition),
         oldText,
-        newText
+        newText,
       );
     }
   }
@@ -755,7 +760,7 @@ class LanguageLayer {
     let tree = this.languageMode.parse(
       this.grammar.languageModule,
       this.tree,
-      includedRanges
+      includedRanges,
     );
     if (tree.then) {
       params.async = true;
@@ -770,7 +775,7 @@ class LanguageLayer {
       oldEnd,
       newEnd,
       oldText,
-      newText
+      newText,
     } of changes) {
       const newExtent = Point.fromObject(newEnd).traversalFrom(newStart);
       tree.edit(
@@ -779,8 +784,8 @@ class LanguageLayer {
           oldEnd,
           Point.fromObject(oldStart).traverse(newExtent),
           oldText,
-          newText
-        )
+          newText,
+        ),
       );
     }
 
@@ -795,7 +800,7 @@ class LanguageLayer {
 
         const combinedRangeWithSyntaxChange = new Range(
           rangesWithSyntaxChanges[0].startPosition,
-          last(rangesWithSyntaxChanges).endPosition
+          last(rangesWithSyntaxChanges).endPosition,
         );
 
         if (affectedRange) {
@@ -811,7 +816,7 @@ class LanguageLayer {
       if (includedRanges) {
         affectedRange = new Range(
           includedRanges[0].startPosition,
-          last(includedRanges).endPosition
+          last(includedRanges).endPosition,
         );
       } else {
         affectedRange = MAX_RANGE;
@@ -821,7 +826,7 @@ class LanguageLayer {
     if (affectedRange) {
       const injectionPromise = this._populateInjections(
         affectedRange,
-        nodeRangeSet
+        nodeRangeSet,
       );
       if (injectionPromise) {
         params.async = true;
@@ -833,14 +838,14 @@ class LanguageLayer {
   _populateInjections(range, nodeRangeSet) {
     const existingInjectionMarkers = this.languageMode.injectionsMarkerLayer
       .findMarkers({ intersectsRange: range })
-      .filter(marker => marker.parentLanguageLayer === this);
+      .filter((marker) => marker.parentLanguageLayer === this);
 
     if (existingInjectionMarkers.length > 0) {
       range = range.union(
         new Range(
           existingInjectionMarkers[0].getRange().start,
-          last(existingInjectionMarkers).getRange().end
-        )
+          last(existingInjectionMarkers).getRange().end,
+        ),
       );
     }
 
@@ -848,7 +853,7 @@ class LanguageLayer {
     const nodes = this.tree.rootNode.descendantsOfType(
       Object.keys(this.grammar.injectionPointsByType),
       range.start,
-      range.end
+      range.end,
     );
 
     let existingInjectionMarkerIndex = 0;
@@ -859,9 +864,8 @@ class LanguageLayer {
         const languageName = injectionPoint.language(node);
         if (!languageName) continue;
 
-        const grammar = this.languageMode.grammarForLanguageString(
-          languageName
-        );
+        const grammar =
+          this.languageMode.grammarForLanguageString(languageName);
         if (!grammar) continue;
 
         const contentNodes = injectionPoint.content(node);
@@ -895,14 +899,13 @@ class LanguageLayer {
         }
 
         if (!marker) {
-          marker = this.languageMode.injectionsMarkerLayer.markRange(
-            injectionRange
-          );
+          marker =
+            this.languageMode.injectionsMarkerLayer.markRange(injectionRange);
           marker.languageLayer = new LanguageLayer(
             marker,
             this.languageMode,
             grammar,
-            this.depth + 1
+            this.depth + 1,
           );
           marker.parentLanguageLayer = this;
         }
@@ -913,8 +916,8 @@ class LanguageLayer {
             nodeRangeSet,
             injectionNodes,
             injectionPoint.newlinesBetween,
-            injectionPoint.includeChildren
-          )
+            injectionPoint.includeChildren,
+          ),
         );
       }
     }
@@ -936,16 +939,15 @@ class LanguageLayer {
   }
 
   _treeEditForBufferChange(start, oldEnd, newEnd, oldText, newText) {
-    const startIndex = this.languageMode.buffer.characterIndexForPosition(
-      start
-    );
+    const startIndex =
+      this.languageMode.buffer.characterIndexForPosition(start);
     return {
       startIndex,
       oldEndIndex: startIndex + oldText.length,
       newEndIndex: startIndex + newText.length,
       startPosition: start,
       oldEndPosition: oldEnd,
-      newEndPosition: newEnd
+      newEndPosition: newEnd,
     };
   }
 }
@@ -957,20 +959,19 @@ class HighlightIterator {
   }
 
   seek(targetPosition, endRow) {
-    const injectionMarkers = this.languageMode.injectionsMarkerLayer.findMarkers(
-      {
-        intersectsRange: new Range(targetPosition, new Point(endRow + 1, 0))
-      }
-    );
+    const injectionMarkers =
+      this.languageMode.injectionsMarkerLayer.findMarkers({
+        intersectsRange: new Range(targetPosition, new Point(endRow + 1, 0)),
+      });
 
     const containingTags = [];
     const containingTagStartIndices = [];
-    const targetIndex = this.languageMode.buffer.characterIndexForPosition(
-      targetPosition
-    );
+    const targetIndex =
+      this.languageMode.buffer.characterIndexForPosition(targetPosition);
 
     this.iterators = [];
-    const iterator = this.languageMode.rootLanguageLayer.buildHighlightIterator();
+    const iterator =
+      this.languageMode.rootLanguageLayer.buildHighlightIterator();
     if (iterator.seek(targetIndex, containingTags, containingTagStartIndices)) {
       this.iterators.push(iterator);
     }
@@ -996,7 +997,7 @@ class HighlightIterator {
 
   moveToSuccessor() {
     // Advance the earliest layer iterator to its next scope boundary.
-    let leader = last(this.iterators);
+    const leader = last(this.iterators);
 
     // Maintain the sorting of the iterators by their position in the document.
     if (leader.moveToSuccessor()) {
@@ -1070,23 +1071,23 @@ class HighlightIterator {
         `depth=${iterator.languageLayer.depth}`,
         new Range(
           iterator.languageLayer.tree.rootNode.startPosition,
-          iterator.languageLayer.tree.rootNode.endPosition
-        ).toString()
+          iterator.languageLayer.tree.rootNode.endPosition,
+        ).toString(),
       );
       if (this.currentScopeIsCovered) {
         console.log('covered');
       } else {
         console.log(
           'close',
-          iterator.closeTags.map(id =>
-            this.languageMode.grammar.scopeNameForScopeId(id)
-          )
+          iterator.closeTags.map((id) =>
+            this.languageMode.grammar.scopeNameForScopeId(id),
+          ),
         );
         console.log(
           'open',
-          iterator.openTags.map(id =>
-            this.languageMode.grammar.scopeNameForScopeId(id)
-          )
+          iterator.openTags.map((id) =>
+            this.languageMode.grammar.scopeNameForScopeId(id),
+          ),
         );
       }
     }
@@ -1119,7 +1120,9 @@ class LayerHighlightIterator {
   }
 
   seek(targetIndex, containingTags, containingTagStartIndices) {
-    while (this.treeCursor.gotoParent()) {}
+    while (this.treeCursor.gotoParent()) {
+      /* traverse to root */
+    }
 
     this.atEnd = true;
     this.closeTags.length = 0;
@@ -1147,7 +1150,7 @@ class LayerHighlightIterator {
             scopeId,
             this.treeCursor.startIndex,
             containingTags,
-            containingTagStartIndices
+            containingTagStartIndices,
           );
           containingTagEndIndices.push(this.treeCursor.endIndex);
         } else {
@@ -1305,14 +1308,14 @@ class LayerHighlightIterator {
     const value = this.languageLayer.grammar.scopeMap.get(
       this.containingNodeTypes,
       this.containingNodeChildIndices,
-      this.treeCursor.nodeIsNamed
+      this.treeCursor.nodeIsNamed,
     );
     const scopeName = applyLeafRules(value, this.treeCursor);
     const node = this.treeCursor.currentNode;
     if (!node.childCount) {
       return this.languageLayer.languageMode.grammar.idForScope(
         scopeName,
-        node.text
+        node.text,
       );
     } else if (scopeName) {
       return this.languageLayer.languageMode.grammar.idForScope(scopeName);
@@ -1353,16 +1356,20 @@ class NullLanguageModeHighlightIterator {
   seek() {
     return [];
   }
+
   compare() {
     return 1;
   }
+
   moveToSuccessor() {}
   getPosition() {
     return Point.INFINITY;
   }
+
   getOpenScopeIds() {
     return [];
   }
+
   getCloseScopeIds() {
     return [];
   }
@@ -1372,16 +1379,20 @@ class NullLayerHighlightIterator {
   seek() {
     return null;
   }
+
   compare() {
     return 1;
   }
+
   moveToSuccessor() {}
   getPosition() {
     return Point.INFINITY;
   }
+
   getOpenScopeIds() {
     return [];
   }
+
   getCloseScopeIds() {
     return [];
   }
@@ -1411,7 +1422,7 @@ class NodeRangeSet {
               startIndex: index,
               endIndex: nextIndex,
               startPosition: position,
-              endPosition: child.startPosition
+              endPosition: child.startPosition,
             });
           }
           position = child.endPosition;
@@ -1424,7 +1435,7 @@ class NodeRangeSet {
           startIndex: index,
           endIndex: node.endIndex,
           startPosition: position,
-          endPosition: node.endPosition
+          endPosition: node.endPosition,
         });
       }
     }
@@ -1447,16 +1458,16 @@ class NodeRangeSet {
       if (previousRange.startIndex >= newRange.endIndex) break;
       const startIndex = Math.max(
         previousRange.startIndex,
-        newRange.startIndex
+        newRange.startIndex,
       );
       const endIndex = Math.min(previousRange.endIndex, newRange.endIndex);
       const startPosition = Point.max(
         previousRange.startPosition,
-        newRange.startPosition
+        newRange.startPosition,
       );
       const endPosition = Point.min(
         previousRange.endPosition,
-        newRange.endPosition
+        newRange.endPosition,
       );
       if (this.newlinesBetween) {
         this._ensureNewline(buffer, newRanges, startIndex, startPosition);
@@ -1473,18 +1484,18 @@ class NodeRangeSet {
       newRanges.push({
         startPosition: new Point(
           startPosition.row - 1,
-          buffer.lineLengthForRow(startPosition.row - 1)
+          buffer.lineLengthForRow(startPosition.row - 1),
         ),
         endPosition: new Point(startPosition.row, 0),
         startIndex: startIndex - startPosition.column - 1,
-        endIndex: startIndex - startPosition.column
+        endIndex: startIndex - startPosition.column,
       });
     }
   }
 }
 
 function insertContainingTag(tag, index, tags, indices) {
-  const i = indices.findIndex(existingIndex => existingIndex > index);
+  const i = indices.findIndex((existingIndex) => existingIndex > index);
   if (i === -1) {
     tags.push(tag);
     indices.push(index);
@@ -1532,7 +1543,7 @@ function last(array) {
 
 function hasMatchingFoldSpec(specs, node) {
   return specs.some(
-    ({ type, named }) => type === node.type && named === node.isNamed
+    ({ type, named }) => type === node.type && named === node.isNamed,
   );
 }
 
@@ -1544,8 +1555,8 @@ function hasMatchingFoldSpec(specs, node) {
   'decreaseIndentRegexForScopeDescriptor',
   'decreaseNextIndentRegexForScopeDescriptor',
   'regexForPattern',
-  'getNonWordCharacters'
-].forEach(methodName => {
+  'getNonWordCharacters',
+].forEach((methodName) => {
   TreeSitterLanguageMode.prototype[methodName] =
     TextMateLanguageMode.prototype[methodName];
 });

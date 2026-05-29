@@ -9,11 +9,11 @@ const argv = yargs
   .help('help')
   .describe(
     'crash-report-path',
-    'The local path of a directory containing crash reports to upload'
+    'The local path of a directory containing crash reports to upload',
   )
   .describe(
     'azure-blob-path',
-    'Indicates the azure blob storage path in which the crash reports should be uploaded'
+    'Indicates the azure blob storage path in which the crash reports should be uploaded',
   )
   .wrap(yargs.terminalWidth()).argv;
 
@@ -26,21 +26,21 @@ async function uploadCrashReports() {
     console.log(
       `Uploading ${
         crashes.length
-      } private crash reports to Azure Blob Storage under '${azureBlobPath}'`
+      } private crash reports to Azure Blob Storage under '${azureBlobPath}'`,
     );
 
     await uploadToAzure(
       process.env.ATOM_RELEASES_AZURE_CONN_STRING,
       azureBlobPath,
       crashes,
-      'private'
+      'private',
     );
   }
 }
 
 // Wrap the call the async function and catch errors from its promise because
 // Node.js doesn't yet allow use of await at the script scope
-uploadCrashReports().catch(err => {
+uploadCrashReports().catch((err) => {
   console.error('An error occurred while uploading crash reports:\n\n', err);
   process.exit(1);
 });

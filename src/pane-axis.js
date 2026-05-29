@@ -5,8 +5,8 @@ const { createPaneAxisElement } = require('./pane-axis-element');
 
 class PaneAxis extends Model {
   static deserialize(state, { deserializers, views }) {
-    state.children = state.children.map(childState =>
-      deserializers.deserialize(childState)
+    state.children = state.children.map((childState) =>
+      deserializers.deserialize(childState),
     );
     return new PaneAxis(state, views);
   }
@@ -23,7 +23,7 @@ class PaneAxis extends Model {
     this.flexScale = flexScale != null ? flexScale : 1;
     this.children = [];
     if (children) {
-      for (let child of children) {
+      for (const child of children) {
         this.addChild(child);
       }
     }
@@ -32,9 +32,9 @@ class PaneAxis extends Model {
   serialize() {
     return {
       deserializer: 'PaneAxis',
-      children: this.children.map(child => child.serialize()),
+      children: this.children.map((child) => child.serialize()),
       orientation: this.orientation,
-      flexScale: this.flexScale
+      flexScale: this.flexScale,
     };
   }
 
@@ -42,7 +42,7 @@ class PaneAxis extends Model {
     if (!this.element) {
       this.element = createPaneAxisElement().initialize(
         this,
-        this.viewRegistry
+        this.viewRegistry,
       );
     }
     return this.element;
@@ -74,7 +74,7 @@ class PaneAxis extends Model {
   setContainer(container) {
     if (container && container !== this.container) {
       this.container = container;
-      this.children.forEach(child => child.setContainer(container));
+      this.children.forEach((child) => child.setContainer(container));
     }
   }
 
@@ -87,11 +87,11 @@ class PaneAxis extends Model {
   }
 
   getPanes() {
-    return flatten(this.children.map(child => child.getPanes()));
+    return flatten(this.children.map((child) => child.getPanes()));
   }
 
   getItems() {
-    return flatten(this.children.map(child => child.getItems()));
+    return flatten(this.children.map((child) => child.getItems()));
   }
 
   onDidAddChild(fn) {
@@ -130,13 +130,13 @@ class PaneAxis extends Model {
   adjustFlexScale() {
     // get current total flex scale of children
     let total = 0;
-    for (var child of this.children) {
+    for (const child of this.children) {
       total += child.getFlexScale();
     }
 
     const needTotal = this.children.length;
     // set every child's flex scale by the ratio
-    for (child of this.children) {
+    for (const child of this.children) {
       child.setFlexScale((needTotal * child.getFlexScale()) / total);
     }
   }

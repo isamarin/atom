@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 
-module.exports = function(packagePath) {
+module.exports = function (packagePath) {
   const nodeModulesPath = path.join(packagePath, 'node_modules');
   const nodeModulesBackupPath = path.join(packagePath, 'node_modules.bak');
 
@@ -11,7 +11,7 @@ module.exports = function(packagePath) {
         nodeModulesPath +
         '; ' +
         nodeModulesBackupPath +
-        ' already exists'
+        ' already exists',
     );
   }
 
@@ -40,7 +40,7 @@ module.exports = function(packagePath) {
           nodeModulesPath +
           '; ' +
           nodeModulesBackupPath +
-          ' does not exist'
+          ' does not exist',
       );
     }
 

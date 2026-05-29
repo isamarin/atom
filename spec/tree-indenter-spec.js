@@ -4,9 +4,8 @@ const TreeSitterGrammar = require('../src/tree-sitter-grammar');
 const TreeSitterLanguageMode = require('../src/tree-sitter-language-mode');
 const TreeIndenter = require('../src/tree-indenter');
 
-const jsGrammarPath = require.resolve(
-  'language-javascript/grammars/tree-sitter-javascript.cson'
-);
+const jsGrammarPath =
+  require.resolve('language-javascript/grammars/tree-sitter-javascript.cson');
 
 const TAB_LENGTH = 2;
 
@@ -22,7 +21,7 @@ const jsScopes = {
     jsx_opening_element: true,
     jsx_expression: true,
     switch_body: true,
-    comment: true
+    comment: true,
   },
   indentExceptFirst: {
     member_expression: true,
@@ -31,18 +30,18 @@ const jsScopes = {
     variable_declarator: true,
     lexical_declaration: true,
     binary_expression: true,
-    jsx_self_closing_element: true
+    jsx_self_closing_element: true,
   },
   indentExceptFirstOrBlock: {
     if_statement: true,
-    while_statement: true
+    while_statement: true,
   },
   types: {
     indent: {},
     outdent: {
-      else: true
-    }
-  }
+      else: true,
+    },
+  },
 };
 
 describe('TreeIndenter', () => {
@@ -55,7 +54,7 @@ describe('TreeIndenter', () => {
     editor.displayLayer.reset({ foldCharacter: '…' });
 
     grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
-      parser: 'tree-sitter-javascript'
+      parser: 'tree-sitter-javascript',
     });
   });
 
@@ -72,21 +71,22 @@ describe('TreeIndenter', () => {
       const line = buffer.lineForRow(row);
       const currentIndentation = languageMode.indentLevelForLine(
         line,
-        TAB_LENGTH
+        TAB_LENGTH,
       );
 
       // get suggested indentation
       const indent = treeIndenter.suggestedIndentForBufferRow(
         row,
         TAB_LENGTH,
-        {}
+        {},
       );
 
       // verify
       if (indent !== currentIndentation) {
         throw Error(
-          `failure in file row ${row +
-            1}: suggested ${indent} but ${currentIndentation} is correct (${line})`
+          `failure in file row ${
+            row + 1
+          }: suggested ${indent} but ${currentIndentation} is correct (${line})`,
         );
       } else {
         expect(indent).toEqual(currentIndentation);
@@ -112,7 +112,7 @@ describe('TreeIndenter', () => {
         const indent = treeIndenter.suggestedIndentForBufferRow(
           row,
           TAB_LENGTH,
-          {}
+          {},
         );
 
         // verify
@@ -121,7 +121,7 @@ describe('TreeIndenter', () => {
           throw Error(
             `failure in row ${row}: suggested ${indent} but ${
               correct[row]
-            } is correct (${line})`
+            } is correct (${line})`,
           );
         } else {
           expect(indent).toEqual(correct[row]);
@@ -130,10 +130,10 @@ describe('TreeIndenter', () => {
     });
 
     const fixtures = fs.readdirSync(
-      path.join(__dirname, 'fixtures', 'indentation')
+      path.join(__dirname, 'fixtures', 'indentation'),
     );
 
-    fixtures.forEach(filename => {
+    fixtures.forEach((filename) => {
       it(`suggests correct indentations for ${filename}`, () => {
         compareFile(path.join(__dirname, 'fixtures', 'indentation', filename));
       });

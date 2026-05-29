@@ -4,7 +4,7 @@ module.exports = class SyntaxScopeMap {
   constructor(resultsBySelector) {
     this.namedScopeTable = {};
     this.anonymousScopeTable = {};
-    for (let selector in resultsBySelector) {
+    for (const selector in resultsBySelector) {
       this.addSelector(selector, resultsBySelector[selector]);
     }
     setTableDefaults(this.namedScopeTable, true);
@@ -12,8 +12,8 @@ module.exports = class SyntaxScopeMap {
   }
 
   addSelector(selector, result) {
-    parser(parseResult => {
-      for (let selectorNode of parseResult.nodes) {
+    parser((parseResult) => {
+      for (const selectorNode of parseResult.nodes) {
         let currentTable = null;
         let currentIndexValue = null;
 
@@ -35,7 +35,7 @@ module.exports = class SyntaxScopeMap {
               }
               break;
 
-            case 'string':
+            case 'string': {
               if (!currentTable) currentTable = this.anonymousScopeTable;
               const value = termNode.value.slice(1, -1).replace(/\\"/g, '"');
               if (!currentTable[value]) currentTable[value] = {};
@@ -48,6 +48,7 @@ module.exports = class SyntaxScopeMap {
                 currentIndexValue = null;
               }
               break;
+            }
 
             case 'universal':
               if (currentTable) {
@@ -55,9 +56,8 @@ module.exports = class SyntaxScopeMap {
                 currentTable = currentTable['*'];
               } else {
                 if (!this.namedScopeTable['*']) {
-                  this.namedScopeTable['*'] = this.anonymousScopeTable[
-                    '*'
-                  ] = {};
+                  this.namedScopeTable['*'] = this.anonymousScopeTable['*'] =
+                    {};
                 }
                 currentTable = this.namedScopeTable['*'];
               }
@@ -133,8 +133,8 @@ module.exports = class SyntaxScopeMap {
 function setTableDefaults(table, allowWildcardSelector) {
   const defaultTypeTable = allowWildcardSelector ? table['*'] : null;
 
-  for (let type in table) {
-    let typeTable = table[type];
+  for (const type in table) {
+    const typeTable = table[type];
     if (typeTable === defaultTypeTable) continue;
 
     if (defaultTypeTable) {
@@ -145,7 +145,7 @@ function setTableDefaults(table, allowWildcardSelector) {
       setTableDefaults(typeTable.parents, true);
     }
 
-    for (let key in typeTable.indices) {
+    for (const key in typeTable.indices) {
       const indexTable = typeTable.indices[key];
       mergeTable(indexTable, typeTable, false);
       if (indexTable.parents) {
@@ -158,7 +158,7 @@ function setTableDefaults(table, allowWildcardSelector) {
 function mergeTable(table, defaultTable, mergeIndices = true) {
   if (mergeIndices && defaultTable.indices) {
     if (!table.indices) table.indices = {};
-    for (let key in defaultTable.indices) {
+    for (const key in defaultTable.indices) {
       if (!table.indices[key]) table.indices[key] = {};
       mergeTable(table.indices[key], defaultTable.indices[key]);
     }
@@ -166,7 +166,7 @@ function mergeTable(table, defaultTable, mergeIndices = true) {
 
   if (defaultTable.parents) {
     if (!table.parents) table.parents = {};
-    for (let key in defaultTable.parents) {
+    for (const key in defaultTable.parents) {
       if (!table.parents[key]) table.parents[key] = {};
       mergeTable(table.parents[key], defaultTable.parents[key]);
     }

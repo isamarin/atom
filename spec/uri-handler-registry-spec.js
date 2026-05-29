@@ -24,14 +24,14 @@ describe('URIHandlerRegistry', () => {
     await registry.handleURI('atom://test-package/path');
     expect(testPackageSpy).toHaveBeenCalledWith(
       url.parse('atom://test-package/path', true),
-      'atom://test-package/path'
+      'atom://test-package/path',
     );
     expect(otherPackageSpy).not.toHaveBeenCalled();
 
     await registry.handleURI('atom://other-package/path');
     expect(otherPackageSpy).toHaveBeenCalledWith(
       url.parse('atom://other-package/path', true),
-      'atom://other-package/path'
+      'atom://other-package/path',
     );
   });
 
@@ -48,7 +48,7 @@ describe('URIHandlerRegistry', () => {
       'atom://fake/nothing',
       'atom://two/other/stuff',
       'atom://one/more/thing',
-      'atom://two/more/stuff'
+      'atom://two/more/stuff',
     ];
 
     for (const u of uris) {
@@ -63,10 +63,10 @@ describe('URIHandlerRegistry', () => {
             id: idx + 1,
             uri: u,
             handled: !u.match(/fake/),
-            host: url.parse(u).host
+            host: url.parse(u).host,
           };
         })
-        .reverse()
+        .reverse(),
     );
 
     await registry.handleURI('atom://another/url');
@@ -82,7 +82,7 @@ describe('URIHandlerRegistry', () => {
       'atom:package/path',
       'atom:8080://package/path',
       'user:pass@atom://package/path',
-      'smth://package/path'
+      'smth://package/path',
     ];
 
     let numErrors = 0;

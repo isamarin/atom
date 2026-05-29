@@ -18,7 +18,7 @@ module.exports = class FileRecoveryService {
 
     const recoveryPath = Path.join(
       this.recoveryDirectory,
-      RecoveryFile.fileNameForPath(path)
+      RecoveryFile.fileNameForPath(path),
     );
     const recoveryFile =
       this.recoveryFilesByFilePath.get(path) ||
@@ -30,7 +30,7 @@ module.exports = class FileRecoveryService {
       console.log(
         `Couldn't retain ${recoveryFile.recoveryPath}. Code: ${
           err.code
-        }. Message: ${err.message}`
+        }. Message: ${err.message}`,
       );
       return;
     }
@@ -56,7 +56,7 @@ module.exports = class FileRecoveryService {
         console.log(
           `Couldn't release ${recoveryFile.recoveryPath}. Code: ${
             err.code
-          }. Message: ${err.message}`
+          }. Message: ${err.message}`,
         );
       }
       if (recoveryFile.isReleased()) this.recoveryFilesByFilePath.delete(path);
@@ -73,7 +73,7 @@ module.exports = class FileRecoveryService {
       promises.push(
         recoveryFile
           .recover()
-          .catch(error => {
+          .catch((error) => {
             const message = 'A file that Atom was saving could be corrupted';
             const detail =
               `Error ${error.code}. There was a crash while saving "${
@@ -87,16 +87,16 @@ module.exports = class FileRecoveryService {
               type: 'info',
               buttons: ['OK'],
               message,
-              detail
+              detail,
             });
           })
           .then(() => {
-            for (let window of this.windowsByRecoveryFile.get(recoveryFile)) {
+            for (const window of this.windowsByRecoveryFile.get(recoveryFile)) {
               this.recoveryFilesByWindow.get(window).delete(recoveryFile);
             }
             this.windowsByRecoveryFile.delete(recoveryFile);
             this.recoveryFilesByFilePath.delete(recoveryFile.originalPath);
-          })
+          }),
       );
     }
 
@@ -106,7 +106,7 @@ module.exports = class FileRecoveryService {
   didCloseWindow(window) {
     if (!this.recoveryFilesByWindow.has(window)) return;
 
-    for (let recoveryFile of this.recoveryFilesByWindow.get(window)) {
+    for (const recoveryFile of this.recoveryFilesByWindow.get(window)) {
       this.windowsByRecoveryFile.get(recoveryFile).delete(window);
     }
     this.recoveryFilesByWindow.delete(window);
@@ -139,9 +139,9 @@ class RecoveryFile {
 
   async remove() {
     return new Promise((resolve, reject) =>
-      fs.unlink(this.recoveryPath, error =>
-        error && error.code !== 'ENOENT' ? reject(error) : resolve()
-      )
+      fs.unlink(this.recoveryPath, (error) =>
+        error && error.code !== 'ENOENT' ? reject(error) : resolve(),
+      ),
     );
   }
 
@@ -162,13 +162,13 @@ class RecoveryFile {
 
 async function tryStatFile(path) {
   return new Promise((resolve, reject) =>
-    fs.stat(path, (error, result) => resolve(error == null && result))
+    fs.stat(path, (error, result) => resolve(error == null && result)),
   );
 }
 
 async function copyFile(source, destination, mode) {
   return new Promise((resolve, reject) => {
-    mkdirp(Path.dirname(destination), error => {
+    mkdirp(Path.dirname(destination), (error) => {
       if (error) return reject(error);
       const readStream = fs.createReadStream(source);
       readStream.on('error', reject).once('open', () => {

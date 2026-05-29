@@ -15,13 +15,13 @@ module.exports = class StorageFolder {
         this.pathForKey(name),
         JSON.stringify(object),
         'utf8',
-        error => (error ? reject(error) : resolve())
+        (error) => (error ? reject(error) : resolve()),
       );
     });
   }
 
   load(name) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       if (!this.path) return resolve(null);
       const statePath = this.pathForKey(name);
       fs.readFile(statePath, 'utf8', (error, stateString) => {
@@ -29,7 +29,7 @@ module.exports = class StorageFolder {
           console.warn(
             `Error reading state file: ${statePath}`,
             error.stack,
-            error
+            error,
           );
         }
 
@@ -41,7 +41,7 @@ module.exports = class StorageFolder {
           console.warn(
             `Error parsing state file: ${statePath}`,
             error.stack,
-            error
+            error,
           );
           resolve(null);
         }

@@ -14,7 +14,7 @@ describe('GrammarSelector', () => {
     await atom.packages.activatePackage('language-text');
     await atom.packages.activatePackage('language-javascript');
     await atom.packages.activatePackage(
-      path.join(__dirname, 'fixtures', 'language-with-no-name')
+      path.join(__dirname, 'fixtures', 'language-with-no-name'),
     );
 
     editor = await atom.workspace.open('sample.js');
@@ -35,16 +35,16 @@ describe('GrammarSelector', () => {
       expect(grammarView.querySelectorAll('li').length).toBe(
         atom.grammars
           .getGrammars({ includeTreeSitter: true })
-          .filter(g => g.name).length
+          .filter((g) => g.name).length,
       );
       expect(grammarView.querySelectorAll('li')[0].textContent).toBe(
-        'Auto Detect'
+        'Auto Detect',
       );
       expect(grammarView.textContent.includes('source.a')).toBe(false);
       grammarView
         .querySelectorAll('li')
-        .forEach(li =>
-          expect(li.textContent).not.toBe(atom.grammars.nullGrammar.name)
+        .forEach((li) =>
+          expect(li.textContent).not.toBe(atom.grammars.nullGrammar.name),
         );
       expect(grammarView.textContent.includes('Tree-sitter')).toBe(true); // check we are showing and labelling Tree-sitter grammars
     }));
@@ -72,7 +72,7 @@ describe('GrammarSelector', () => {
       editor.setGrammar(atom.grammars.nullGrammar);
       const grammarView = (await getGrammarView(editor)).element;
       expect(grammarView.querySelector('li.active').textContent).toBe(
-        'Auto Detect'
+        'Auto Detect',
       );
     }));
 
@@ -104,7 +104,7 @@ describe('GrammarSelector', () => {
     it('displays the name of the current grammar', () => {
       expect(grammarStatus.querySelector('a').textContent).toBe('JavaScript');
       expect(getTooltipText(grammarStatus)).toBe(
-        'File uses the JavaScript grammar'
+        'File uses the JavaScript grammar',
       );
     });
 
@@ -115,7 +115,7 @@ describe('GrammarSelector', () => {
       expect(grammarStatus.querySelector('a').textContent).toBe('Plain Text');
       expect(grammarStatus).toBeVisible();
       expect(getTooltipText(grammarStatus)).toBe(
-        'File uses the Plain Text grammar'
+        'File uses the Plain Text grammar',
       );
 
       editor.setGrammar(atom.grammars.grammarForScopeName('source.js'));
@@ -135,29 +135,29 @@ describe('GrammarSelector', () => {
 
     describe('when the grammar-selector.showOnRightSideOfStatusBar setting changes', () =>
       it('moves the item to the preferred side of the status bar', () => {
-        expect(statusBar.getLeftTiles().map(tile => tile.getItem())).toContain(
-          grammarStatus
-        );
         expect(
-          statusBar.getRightTiles().map(tile => tile.getItem())
+          statusBar.getLeftTiles().map((tile) => tile.getItem()),
+        ).toContain(grammarStatus);
+        expect(
+          statusBar.getRightTiles().map((tile) => tile.getItem()),
         ).not.toContain(grammarStatus);
 
         atom.config.set('grammar-selector.showOnRightSideOfStatusBar', true);
 
         expect(
-          statusBar.getLeftTiles().map(tile => tile.getItem())
+          statusBar.getLeftTiles().map((tile) => tile.getItem()),
         ).not.toContain(grammarStatus);
-        expect(statusBar.getRightTiles().map(tile => tile.getItem())).toContain(
-          grammarStatus
-        );
+        expect(
+          statusBar.getRightTiles().map((tile) => tile.getItem()),
+        ).toContain(grammarStatus);
 
         atom.config.set('grammar-selector.showOnRightSideOfStatusBar', false);
 
-        expect(statusBar.getLeftTiles().map(tile => tile.getItem())).toContain(
-          grammarStatus
-        );
         expect(
-          statusBar.getRightTiles().map(tile => tile.getItem())
+          statusBar.getLeftTiles().map((tile) => tile.getItem()),
+        ).toContain(grammarStatus);
+        expect(
+          statusBar.getRightTiles().map((tile) => tile.getItem()),
         ).not.toContain(grammarStatus);
       }));
 
@@ -168,7 +168,7 @@ describe('GrammarSelector', () => {
 
         expect(grammarStatus.querySelector('a').textContent).toBe('Plain Text');
         expect(getTooltipText(grammarStatus)).toBe(
-          'File uses the Plain Text grammar'
+          'File uses the Plain Text grammar',
         );
 
         editor.setGrammar(atom.grammars.grammarForScopeName('source.a'));
@@ -176,7 +176,7 @@ describe('GrammarSelector', () => {
 
         expect(grammarStatus.querySelector('a').textContent).toBe('source.a');
         expect(getTooltipText(grammarStatus)).toBe(
-          'File uses the source.a grammar'
+          'File uses the source.a grammar',
         );
       }));
 
@@ -186,7 +186,7 @@ describe('GrammarSelector', () => {
         atom.config.set('grammar-selector.hideDuplicateTextMateGrammars', true);
         const grammarView = await getGrammarView(editor);
         const observedNames = new Set();
-        grammarView.element.querySelectorAll('li').forEach(li => {
+        grammarView.element.querySelectorAll('li').forEach((li) => {
           const name = li.getAttribute('data-grammar');
           expect(observedNames.has(name)).toBe(false);
           observedNames.add(name);
@@ -205,7 +205,7 @@ describe('GrammarSelector', () => {
         await atom.packages.activatePackage('language-c'); // punctuation making it sort wrong
         atom.config.set(
           'grammar-selector.hideDuplicateTextMateGrammars',
-          false
+          false,
         );
         await getGrammarView(editor);
         let cppCount = 0;
@@ -239,8 +239,8 @@ describe('GrammarSelector', () => {
           if (listItems[i].constructor.name === 'TreeSitterGrammar') {
             expect(
               elements[i].childNodes[1].childNodes[0].className.startsWith(
-                'grammar-selector-parser'
-              )
+                'grammar-selector-parser',
+              ),
             ).toBe(true);
           }
         }
@@ -253,7 +253,7 @@ describe('GrammarSelector', () => {
         atom.commands.add(
           editor.getElement(),
           'grammar-selector:show',
-          eventHandler
+          eventHandler,
         );
         grammarStatus.click();
         expect(eventHandler).toHaveBeenCalled();

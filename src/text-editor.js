@@ -21,7 +21,7 @@ const {
   isDoubleWidthCharacter,
   isHalfWidthCharacter,
   isKoreanCharacter,
-  isWrapBoundary
+  isWrapBoundary,
 } = require('./text-utils');
 
 const SERIALIZATION_VERSION = 1;
@@ -103,7 +103,7 @@ module.exports = class TextEditor {
   static deserialize(state, atomEnvironment) {
     if (state.version !== SERIALIZATION_VERSION) return null;
 
-    let bufferId = state.tokenizedBuffer
+    const bufferId = state.tokenizedBuffer
       ? state.tokenizedBuffer.bufferId
       : state.bufferId;
 
@@ -137,7 +137,7 @@ module.exports = class TextEditor {
   constructor(params = {}) {
     if (this.constructor.clipboard == null) {
       throw new Error(
-        'Must call TextEditor.setClipboard at least once before creating TextEditor instances'
+        'Must call TextEditor.setClipboard at least once before creating TextEditor instances',
       );
     }
 
@@ -156,7 +156,7 @@ module.exports = class TextEditor {
     this.readOnly = params.readOnly != null ? params.readOnly : false;
     this.placeholderText = params.placeholderText;
     this.showLineNumbers = params.showLineNumbers;
-    this.assert = params.assert || (condition => condition);
+    this.assert = params.assert || ((condition) => condition);
     this.showInvisibles =
       params.showInvisibles != null ? params.showInvisibles : true;
     this.autoHeight = params.autoHeight;
@@ -222,10 +222,10 @@ module.exports = class TextEditor {
       this.buffer = new TextBuffer({
         shouldDestroyOnFileDelete() {
           return atom.config.get('core.closeDeletedFileTabs');
-        }
+        },
       });
       this.buffer.setLanguageMode(
-        new TextMateLanguageMode({ buffer: this.buffer, config: atom.config })
+        new TextMateLanguageMode({ buffer: this.buffer, config: atom.config }),
       );
     }
 
@@ -254,14 +254,14 @@ module.exports = class TextEditor {
         softWrapHangingIndent:
           params.softWrapHangingIndentLength != null
             ? params.softWrapHangingIndentLength
-            : 0
+            : 0,
       };
 
       this.displayLayer = this.buffer.getDisplayLayer(params.displayLayerId);
       if (this.displayLayer) {
         this.displayLayer.reset(displayLayerParams);
         this.selectionsMarkerLayer = this.displayLayer.getMarkerLayer(
-          params.selectionsMarkerLayerId
+          params.selectionsMarkerLayerId,
         );
       } else {
         this.displayLayer = this.buffer.addDisplayLayer(displayLayerParams);
@@ -273,7 +273,7 @@ module.exports = class TextEditor {
       new Disposable(() => {
         if (this.backgroundWorkHandle != null)
           return cancelIdleCallback(this.backgroundWorkHandle);
-      })
+      }),
     );
 
     this.defaultMarkerLayer = this.displayLayer.addMarkerLayer();
@@ -281,7 +281,7 @@ module.exports = class TextEditor {
       this.selectionsMarkerLayer = this.addMarkerLayer({
         maintainHistory: true,
         persistent: true,
-        role: 'selections'
+        role: 'selections',
       });
     }
 
@@ -291,10 +291,10 @@ module.exports = class TextEditor {
 
     this.decorateMarkerLayer(this.displayLayer.foldsMarkerLayer, {
       type: 'line-number',
-      class: 'folded'
+      class: 'folded',
     });
 
-    for (let marker of this.selectionsMarkerLayer.getMarkers()) {
+    for (const marker of this.selectionsMarkerLayer.getMarkers()) {
       this.addSelection(marker);
     }
 
@@ -312,7 +312,7 @@ module.exports = class TextEditor {
       name: 'line-number',
       type: 'line-number',
       priority: 0,
-      visible: params.lineNumberGutterVisible
+      visible: params.lineNumberGutterVisible,
     });
   }
 
@@ -358,18 +358,18 @@ module.exports = class TextEditor {
       this.decorateMarkerLayer(this.selectionsMarkerLayer, {
         type: 'line',
         class: 'cursor-line',
-        onlyEmpty: true
+        onlyEmpty: true,
       }),
       this.decorateMarkerLayer(this.selectionsMarkerLayer, {
         type: 'line-number',
-        class: 'cursor-line'
+        class: 'cursor-line',
       }),
       this.decorateMarkerLayer(this.selectionsMarkerLayer, {
         type: 'line-number',
         class: 'cursor-line-no-selection',
         onlyHead: true,
-        onlyEmpty: true
-      })
+        onlyEmpty: true,
+      }),
     ];
   }
 
@@ -392,7 +392,7 @@ module.exports = class TextEditor {
   update(params) {
     const displayLayerParams = {};
 
-    for (let param of Object.keys(params)) {
+    for (const param of Object.keys(params)) {
       const value = params[param];
 
       switch (param) {
@@ -436,7 +436,7 @@ module.exports = class TextEditor {
           this.updateSoftWrapHangingIndentLength(
             value,
             false,
-            displayLayerParams
+            displayLayerParams,
           );
           break;
 
@@ -444,7 +444,7 @@ module.exports = class TextEditor {
           this.updateSoftWrapAtPreferredLineLength(
             value,
             false,
-            displayLayerParams
+            displayLayerParams,
           );
           break;
 
@@ -630,7 +630,7 @@ module.exports = class TextEditor {
       displayLayerParams.softWrapColumn = this.getSoftWrapColumn();
       displayLayerParams.showIndentGuides = this.doesShowIndentGuide();
       if (this.mini) {
-        for (let decoration of this.cursorLineDecorations) {
+        for (const decoration of this.cursorLineDecorations) {
           decoration.destroy();
         }
         this.cursorLineDecorations = null;
@@ -681,7 +681,7 @@ module.exports = class TextEditor {
       }
       this.emitter.emit(
         'did-change-line-number-gutter-visible',
-        this.lineNumberGutter.isVisible()
+        this.lineNumberGutter.isVisible(),
       );
     }
     if (finish) this.finishUpdate();
@@ -803,7 +803,7 @@ module.exports = class TextEditor {
       showInvisibles: this.showInvisibles,
       showIndentGuide: this.showIndentGuide,
       autoHeight: this.autoHeight,
-      autoWidth: this.autoWidth
+      autoWidth: this.autoWidth,
     };
   }
 
@@ -811,26 +811,26 @@ module.exports = class TextEditor {
     this.buffer.retain();
     this.disposables.add(
       this.buffer.onDidChangeLanguageMode(
-        this.handleLanguageModeChange.bind(this)
-      )
+        this.handleLanguageModeChange.bind(this),
+      ),
     );
     this.disposables.add(
       this.buffer.onDidChangePath(() => {
         this.emitter.emit('did-change-title', this.getTitle());
         this.emitter.emit('did-change-path', this.getPath());
-      })
+      }),
     );
     this.disposables.add(
       this.buffer.onDidChangeEncoding(() => {
         this.emitter.emit('did-change-encoding', this.getEncoding());
-      })
+      }),
     );
     this.disposables.add(this.buffer.onDidDestroy(() => this.destroy()));
     this.disposables.add(
       this.buffer.onDidChangeModified(() => {
         if (!this.hasTerminatedPendingState && this.buffer.isModified())
           this.terminatePendingState();
-      })
+      }),
     );
   }
 
@@ -846,31 +846,33 @@ module.exports = class TextEditor {
 
   subscribeToDisplayLayer() {
     this.disposables.add(
-      this.displayLayer.onDidChange(changes => {
+      this.displayLayer.onDidChange((changes) => {
         this.mergeIntersectingSelections();
         if (this.component) this.component.didChangeDisplayLayer(changes);
         this.emitter.emit(
           'did-change',
-          changes.map(change => new ChangeEvent(change))
+          changes.map((change) => new ChangeEvent(change)),
         );
-      })
+      }),
     );
     this.disposables.add(
       this.displayLayer.onDidReset(() => {
         this.mergeIntersectingSelections();
         if (this.component) this.component.didResetDisplayLayer();
         this.emitter.emit('did-change', {});
-      })
+      }),
     );
     this.disposables.add(
-      this.selectionsMarkerLayer.onDidCreateMarker(this.addSelection.bind(this))
+      this.selectionsMarkerLayer.onDidCreateMarker(
+        this.addSelection.bind(this),
+      ),
     );
     return this.disposables.add(
       this.selectionsMarkerLayer.onDidUpdate(() =>
         this.component != null
           ? this.component.didUpdateSelections()
-          : undefined
-      )
+          : undefined,
+      ),
     );
   }
 
@@ -879,7 +881,7 @@ module.exports = class TextEditor {
     this.alive = false;
     this.disposables.dispose();
     this.displayLayer.destroy();
-    for (let selection of this.selections.slice()) {
+    for (const selection of this.selections.slice()) {
       selection.destroy();
     }
     this.buffer.release();
@@ -1198,14 +1200,14 @@ module.exports = class TextEditor {
 
   onDidChangeScrollTop(callback) {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::onDidChangeScrollTop instead.'
+      'This is now a view method. Call TextEditorElement::onDidChangeScrollTop instead.',
     );
     return this.getElement().onDidChangeScrollTop(callback);
   }
 
   onDidChangeScrollLeft(callback) {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::onDidChangeScrollLeft instead.'
+      'This is now a view method. Call TextEditorElement::onDidChangeScrollLeft instead.',
     );
     return this.getElement().onDidChangeScrollLeft(callback);
   }
@@ -1232,7 +1234,7 @@ module.exports = class TextEditor {
   copy() {
     const displayLayer = this.displayLayer.copy();
     const selectionsMarkerLayer = displayLayer.getMarkerLayer(
-      this.buffer.getMarkerLayer(this.selectionsMarkerLayer.id).copy().id
+      this.buffer.getMarkerLayer(this.selectionsMarkerLayer.id).copy().id,
     );
     const softTabs = this.getSoftTabs();
     return new TextEditor({
@@ -1248,7 +1250,7 @@ module.exports = class TextEditor {
       grammar: this.getGrammar(),
       autoWidth: this.autoWidth,
       autoHeight: this.autoHeight,
-      showCursorOnSelection: this.showCursorOnSelection
+      showCursorOnSelection: this.showCursorOnSelection,
     });
   }
 
@@ -1298,7 +1300,7 @@ module.exports = class TextEditor {
 
   anyLineNumberGutterVisible() {
     return this.getGutters().some(
-      gutter => gutter.type === 'line-number' && gutter.visible
+      (gutter) => gutter.type === 'line-number' && gutter.visible,
     );
   }
 
@@ -1416,8 +1418,8 @@ module.exports = class TextEditor {
         const myPathSegment = myPathSegments[i];
         if (
           openEditorPathSegmentsWithSameFilename.some(
-            segments =>
-              segments.length === i + 1 || segments[i] !== myPathSegment
+            (segments) =>
+              segments.length === i + 1 || segments[i] !== myPathSegment,
           )
         ) {
           commonPathSegmentCount = i;
@@ -1426,7 +1428,7 @@ module.exports = class TextEditor {
       }
 
       return `${fileName} \u2014 ${path.join(
-        ...myPathSegments.slice(commonPathSegmentCount)
+        ...myPathSegments.slice(commonPathSegmentCount),
       )}`;
     } else {
       return 'untitled';
@@ -1594,7 +1596,7 @@ module.exports = class TextEditor {
       } else {
         tokens.push({
           text: lineText.substr(lineTextIndex, tag),
-          scopes: currentTokenScopes.slice()
+          scopes: currentTokenScopes.slice(),
         });
         lineTextIndex += tag;
       }
@@ -1613,7 +1615,7 @@ module.exports = class TextEditor {
   bufferRowsForScreenRows(startScreenRow, endScreenRow) {
     return this.displayLayer.bufferRowsForScreenRows(
       startScreenRow,
-      endScreenRow + 1
+      endScreenRow + 1,
     );
   }
 
@@ -1736,7 +1738,7 @@ module.exports = class TextEditor {
       options.autoIndentNewline = this.shouldAutoIndent();
     if (options.autoDecreaseIndent == null)
       options.autoDecreaseIndent = this.shouldAutoIndent();
-    const result = this.mutateSelectedText(selection => {
+    const result = this.mutateSelectedText((selection) => {
       const range = selection.insertText(text, options);
       const didInsertEvent = { text, range };
       this.emitter.emit('did-insert-text', didInsertEvent);
@@ -1761,7 +1763,7 @@ module.exports = class TextEditor {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor. (default: false)
   delete(options = {}) {
     if (!this.ensureWritable('delete', options)) return;
-    return this.mutateSelectedText(selection => selection.delete(options));
+    return this.mutateSelectedText((selection) => selection.delete(options));
   }
 
   // Essential: For each selection, if the selection is empty, delete the character
@@ -1771,7 +1773,7 @@ module.exports = class TextEditor {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor. (default: false)
   backspace(options = {}) {
     if (!this.ensureWritable('backspace', options)) return;
-    return this.mutateSelectedText(selection => selection.backspace(options));
+    return this.mutateSelectedText((selection) => selection.backspace(options));
   }
 
   // Extended: Mutate the text of all the selections in a single transaction.
@@ -1786,7 +1788,7 @@ module.exports = class TextEditor {
     return this.mergeIntersectingSelections(() => {
       return this.transact(groupingInterval, () => {
         return this.getSelectionsOrderedByBufferPosition().map(
-          (selection, index) => fn(selection, index)
+          (selection, index) => fn(selection, index),
         );
       });
     });
@@ -1801,7 +1803,7 @@ module.exports = class TextEditor {
     if (!this.ensureWritable('moveLineUp', options)) return;
 
     const selections = this.getSelectedBufferRanges().sort((a, b) =>
-      a.compare(b)
+      a.compare(b),
     );
 
     if (selections[0].start.row === 0) return;
@@ -1847,7 +1849,7 @@ module.exports = class TextEditor {
         // If selected line range is preceded by a fold, one line above on screen
         // could be multiple lines in the buffer.
         const precedingRow = this.displayLayer.findBoundaryPrecedingBufferRow(
-          startRow - 1
+          startRow - 1,
         );
         const insertDelta = linesRange.start.row - precedingRow;
 
@@ -1855,7 +1857,7 @@ module.exports = class TextEditor {
         // It includes the folds that were intersecting with the selection.
         const rangesToRefold = this.displayLayer
           .destroyFoldsIntersectingBufferRange(linesRange)
-          .map(range => range.translate([-insertDelta, 0]));
+          .map((range) => range.translate([-insertDelta, 0]));
 
         // Delete lines spanned by selection and insert them on the preceding buffer row
         let lines = this.buffer.getTextInRange(linesRange);
@@ -1866,7 +1868,7 @@ module.exports = class TextEditor {
         this.buffer.insert([precedingRow, 0], lines);
 
         // Restore folds that existed before the lines were moved
-        for (let rangeToRefold of rangesToRefold) {
+        for (const rangeToRefold of rangesToRefold) {
           this.displayLayer.foldBufferRange(rangeToRefold);
         }
 
@@ -1877,7 +1879,7 @@ module.exports = class TextEditor {
 
       this.setSelectedBufferRanges(newSelectionRanges, {
         autoscroll: false,
-        preserveFolds: true
+        preserveFolds: true,
       });
       if (this.shouldAutoIndent()) this.autoIndentSelectedRows();
       this.scrollToBufferPosition([newSelectionRanges[0].start.row, 0]);
@@ -1936,7 +1938,7 @@ module.exports = class TextEditor {
         // screen rows.
         const followingRow = Math.min(
           this.buffer.getLineCount(),
-          this.displayLayer.findBoundaryFollowingBufferRow(endRow + 1)
+          this.displayLayer.findBoundaryFollowingBufferRow(endRow + 1),
         );
         const insertDelta = followingRow - linesRange.end.row;
 
@@ -1944,7 +1946,7 @@ module.exports = class TextEditor {
         // It includes the folds that were intersecting with the selection.
         const rangesToRefold = this.displayLayer
           .destroyFoldsIntersectingBufferRange(linesRange)
-          .map(range => range.translate([insertDelta, 0]));
+          .map((range) => range.translate([insertDelta, 0]));
 
         // Delete lines spanned by selection and insert them on the following correct buffer row
         let lines = this.buffer.getTextInRange(linesRange);
@@ -1956,7 +1958,7 @@ module.exports = class TextEditor {
         this.buffer.delete(linesRange);
 
         // Restore folds that existed before the lines were moved
-        for (let rangeToRefold of rangesToRefold) {
+        for (const rangeToRefold of rangesToRefold) {
           this.displayLayer.foldBufferRange(rangeToRefold);
         }
 
@@ -1967,7 +1969,7 @@ module.exports = class TextEditor {
 
       this.setSelectedBufferRanges(newSelectionRanges, {
         autoscroll: false,
-        preserveFolds: true
+        preserveFolds: true,
       });
       if (this.shouldAutoIndent()) this.autoIndentSelectedRows();
       this.scrollToBufferPosition([newSelectionRanges[0].start.row - 1, 0]);
@@ -1982,7 +1984,7 @@ module.exports = class TextEditor {
     if (!this.ensureWritable('moveSelectionLeft', options)) return;
     const selections = this.getSelectedBufferRanges();
     const noSelectionAtStartOfLine = selections.every(
-      selection => selection.start.column !== 0
+      (selection) => selection.start.column !== 0,
     );
 
     const translationDelta = [0, -1];
@@ -1990,13 +1992,13 @@ module.exports = class TextEditor {
 
     if (noSelectionAtStartOfLine) {
       this.transact(() => {
-        for (let selection of selections) {
+        for (const selection of selections) {
           const charToLeftOfSelection = new Range(
             selection.start.translate(translationDelta),
-            selection.start
+            selection.start,
           );
           const charTextToLeftOfSelection = this.buffer.getTextInRange(
-            charToLeftOfSelection
+            charToLeftOfSelection,
           );
 
           this.buffer.insert(selection.end, charTextToLeftOfSelection);
@@ -2016,7 +2018,7 @@ module.exports = class TextEditor {
   moveSelectionRight(options = {}) {
     if (!this.ensureWritable('moveSelectionRight', options)) return;
     const selections = this.getSelectedBufferRanges();
-    const noSelectionAtEndOfLine = selections.every(selection => {
+    const noSelectionAtEndOfLine = selections.every((selection) => {
       return (
         selection.end.column !== this.buffer.lineLengthForRow(selection.end.row)
       );
@@ -2027,13 +2029,13 @@ module.exports = class TextEditor {
 
     if (noSelectionAtEndOfLine) {
       this.transact(() => {
-        for (let selection of selections) {
+        for (const selection of selections) {
           const charToRightOfSelection = new Range(
             selection.end,
-            selection.end.translate(translationDelta)
+            selection.end.translate(translationDelta),
           );
           const charTextToRightOfSelection = this.buffer.getTextInRange(
-            charToRightOfSelection
+            charToRightOfSelection,
           );
 
           this.buffer.delete(charToRightOfSelection);
@@ -2062,17 +2064,21 @@ module.exports = class TextEditor {
         previousSelectionRanges[i] = selections[i].getBufferRange();
         if (selections[i].isEmpty()) {
           const { start } = selections[i].getScreenRange();
-          selections[i].setScreenRange([[start.row, 0], [start.row + 1, 0]], {
-            preserveFolds: true
-          });
+          selections[i].setScreenRange(
+            [
+              [start.row, 0],
+              [start.row + 1, 0],
+            ],
+            {
+              preserveFolds: true,
+            },
+          );
         }
         let [startRow, endRow] = selections[i].getBufferRowRange();
         endRow++;
         while (i > 0) {
-          const [
-            previousSelectionStartRow,
-            previousSelectionEndRow
-          ] = selections[i - 1].getBufferRowRange();
+          const [previousSelectionStartRow, previousSelectionEndRow] =
+            selections[i - 1].getBufferRowRange();
           if (previousSelectionEndRow === startRow) {
             startRow = previousSelectionStartRow;
             previousSelectionRanges[i - 1] = selections[i - 1].getBufferRange();
@@ -2082,12 +2088,14 @@ module.exports = class TextEditor {
           }
         }
 
-        const intersectingFolds = this.displayLayer.foldsIntersectingBufferRange(
-          [[startRow, 0], [endRow, 0]]
-        );
+        const intersectingFolds =
+          this.displayLayer.foldsIntersectingBufferRange([
+            [startRow, 0],
+            [endRow, 0],
+          ]);
         let textToDuplicate = this.getTextInBufferRange([
           [startRow, 0],
-          [endRow, 0]
+          [endRow, 0],
         ]);
         if (endRow > this.getLastBufferRow())
           textToDuplicate = `\n${textToDuplicate}`;
@@ -2097,14 +2105,14 @@ module.exports = class TextEditor {
 
         for (let k = i; k <= j; k++) {
           selections[k].setBufferRange(
-            previousSelectionRanges[k].translate([insertedRowCount, 0])
+            previousSelectionRanges[k].translate([insertedRowCount, 0]),
           );
         }
 
         for (const fold of intersectingFolds) {
           const foldRange = this.displayLayer.bufferRangeForFold(fold);
           this.displayLayer.foldBufferRange(
-            foldRange.translate([insertedRowCount, 0])
+            foldRange.translate([insertedRowCount, 0]),
           );
         }
 
@@ -2114,7 +2122,7 @@ module.exports = class TextEditor {
   }
 
   replaceSelectedText(options, fn) {
-    this.mutateSelectedText(selection => {
+    this.mutateSelectedText((selection) => {
       selection.getBufferRange();
       if (options && options.selectWordIfEmpty && selection.isEmpty()) {
         selection.selectWord();
@@ -2141,12 +2149,15 @@ module.exports = class TextEditor {
         this.addSelectionForBufferRange([start, [start.row, Infinity]]);
         let { row } = start;
         while (++row < end.row) {
-          this.addSelectionForBufferRange([[row, 0], [row, Infinity]]);
+          this.addSelectionForBufferRange([
+            [row, 0],
+            [row, Infinity],
+          ]);
         }
         if (end.column !== 0)
           this.addSelectionForBufferRange([
             [end.row, 0],
-            [end.row, end.column]
+            [end.row, end.column],
           ]);
         selection.destroy();
       }
@@ -2162,7 +2173,7 @@ module.exports = class TextEditor {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor. (default: false)
   transpose(options = {}) {
     if (!this.ensureWritable('transpose', options)) return;
-    this.mutateSelectedText(selection => {
+    this.mutateSelectedText((selection) => {
       if (selection.isEmpty()) {
         selection.selectRight();
         const text = selection.getText();
@@ -2170,13 +2181,7 @@ module.exports = class TextEditor {
         selection.cursor.moveLeft();
         selection.insertText(text);
       } else {
-        selection.insertText(
-          selection
-            .getText()
-            .split('')
-            .reverse()
-            .join('')
-        );
+        selection.insertText(selection.getText().split('').reverse().join(''));
       }
     });
   }
@@ -2190,8 +2195,8 @@ module.exports = class TextEditor {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor. (default: false)
   upperCase(options = {}) {
     if (!this.ensureWritable('upperCase', options)) return;
-    this.replaceSelectedText({ selectWordIfEmpty: true }, text =>
-      text.toUpperCase(options)
+    this.replaceSelectedText({ selectWordIfEmpty: true }, (text) =>
+      text.toUpperCase(options),
     );
   }
 
@@ -2204,8 +2209,8 @@ module.exports = class TextEditor {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor. (default: false)
   lowerCase(options = {}) {
     if (!this.ensureWritable('lowerCase', options)) return;
-    this.replaceSelectedText({ selectWordIfEmpty: true }, text =>
-      text.toLowerCase(options)
+    this.replaceSelectedText({ selectWordIfEmpty: true }, (text) =>
+      text.toLowerCase(options),
     );
   }
 
@@ -2217,7 +2222,9 @@ module.exports = class TextEditor {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor. (default: false)
   toggleLineCommentsInSelection(options = {}) {
     if (!this.ensureWritable('toggleLineCommentsInSelection', options)) return;
-    this.mutateSelectedText(selection => selection.toggleLineComments(options));
+    this.mutateSelectedText((selection) =>
+      selection.toggleLineComments(options),
+    );
   }
 
   // Convert multiple lines to a single line.
@@ -2233,7 +2240,7 @@ module.exports = class TextEditor {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor. (default: false)
   joinLines(options = {}) {
     if (!this.ensureWritable('joinLines', options)) return;
-    this.mutateSelectedText(selection => selection.joinLines());
+    this.mutateSelectedText((selection) => selection.joinLines());
   }
 
   // Extended: For each cursor, insert a newline at beginning the following line.
@@ -2285,8 +2292,8 @@ module.exports = class TextEditor {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor. (default: false)
   deleteToBeginningOfWord(options = {}) {
     if (!this.ensureWritable('deleteToBeginningOfWord', options)) return;
-    this.mutateSelectedText(selection =>
-      selection.deleteToBeginningOfWord(options)
+    this.mutateSelectedText((selection) =>
+      selection.deleteToBeginningOfWord(options),
     );
   }
 
@@ -2297,8 +2304,8 @@ module.exports = class TextEditor {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor. (default: false)
   deleteToPreviousWordBoundary(options = {}) {
     if (!this.ensureWritable('deleteToPreviousWordBoundary', options)) return;
-    this.mutateSelectedText(selection =>
-      selection.deleteToPreviousWordBoundary(options)
+    this.mutateSelectedText((selection) =>
+      selection.deleteToPreviousWordBoundary(options),
     );
   }
 
@@ -2309,8 +2316,8 @@ module.exports = class TextEditor {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor. (default: false)
   deleteToNextWordBoundary(options = {}) {
     if (!this.ensureWritable('deleteToNextWordBoundary', options)) return;
-    this.mutateSelectedText(selection =>
-      selection.deleteToNextWordBoundary(options)
+    this.mutateSelectedText((selection) =>
+      selection.deleteToNextWordBoundary(options),
     );
   }
 
@@ -2322,8 +2329,8 @@ module.exports = class TextEditor {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor. (default: false)
   deleteToBeginningOfSubword(options = {}) {
     if (!this.ensureWritable('deleteToBeginningOfSubword', options)) return;
-    this.mutateSelectedText(selection =>
-      selection.deleteToBeginningOfSubword(options)
+    this.mutateSelectedText((selection) =>
+      selection.deleteToBeginningOfSubword(options),
     );
   }
 
@@ -2335,8 +2342,8 @@ module.exports = class TextEditor {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor. (default: false)
   deleteToEndOfSubword(options = {}) {
     if (!this.ensureWritable('deleteToEndOfSubword', options)) return;
-    this.mutateSelectedText(selection =>
-      selection.deleteToEndOfSubword(options)
+    this.mutateSelectedText((selection) =>
+      selection.deleteToEndOfSubword(options),
     );
   }
 
@@ -2348,8 +2355,8 @@ module.exports = class TextEditor {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor. (default: false)
   deleteToBeginningOfLine(options = {}) {
     if (!this.ensureWritable('deleteToBeginningOfLine', options)) return;
-    this.mutateSelectedText(selection =>
-      selection.deleteToBeginningOfLine(options)
+    this.mutateSelectedText((selection) =>
+      selection.deleteToBeginningOfLine(options),
     );
   }
 
@@ -2362,7 +2369,9 @@ module.exports = class TextEditor {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor. (default: false)
   deleteToEndOfLine(options = {}) {
     if (!this.ensureWritable('deleteToEndOfLine', options)) return;
-    this.mutateSelectedText(selection => selection.deleteToEndOfLine(options));
+    this.mutateSelectedText((selection) =>
+      selection.deleteToEndOfLine(options),
+    );
   }
 
   // Extended: For each selection, if the selection is empty, delete all characters
@@ -2373,7 +2382,9 @@ module.exports = class TextEditor {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor. (default: false)
   deleteToEndOfWord(options = {}) {
     if (!this.ensureWritable('deleteToEndOfWord', options)) return;
-    this.mutateSelectedText(selection => selection.deleteToEndOfWord(options));
+    this.mutateSelectedText((selection) =>
+      selection.deleteToEndOfWord(options),
+    );
   }
 
   // Extended: Delete all lines intersecting selections.
@@ -2383,7 +2394,7 @@ module.exports = class TextEditor {
   deleteLine(options = {}) {
     if (!this.ensureWritable('deleteLine', options)) return;
     this.mergeSelectionsOnSameRows();
-    this.mutateSelectedText(selection => selection.deleteLine(options));
+    this.mutateSelectedText((selection) => selection.deleteLine(options));
   }
 
   // Private: Ensure that this editor is not marked read-only before allowing a buffer modification to occur. If
@@ -2416,7 +2427,7 @@ module.exports = class TextEditor {
   undo(options = {}) {
     if (!this.ensureWritable('undo', options)) return;
     this.avoidMergingSelections(() =>
-      this.buffer.undo({ selectionsMarkerLayer: this.selectionsMarkerLayer })
+      this.buffer.undo({ selectionsMarkerLayer: this.selectionsMarkerLayer }),
     );
     this.getLastSelection().autoscroll();
   }
@@ -2428,7 +2439,7 @@ module.exports = class TextEditor {
   redo(options = {}) {
     if (!this.ensureWritable('redo', options)) return;
     this.avoidMergingSelections(() =>
-      this.buffer.redo({ selectionsMarkerLayer: this.selectionsMarkerLayer })
+      this.buffer.redo({ selectionsMarkerLayer: this.selectionsMarkerLayer }),
     );
     this.getLastSelection().autoscroll();
   }
@@ -2467,7 +2478,7 @@ module.exports = class TextEditor {
   // Returns a checkpoint value.
   createCheckpoint() {
     return this.buffer.createCheckpoint({
-      selectionsMarkerLayer: this.selectionsMarkerLayer
+      selectionsMarkerLayer: this.selectionsMarkerLayer,
     });
   }
 
@@ -2497,7 +2508,7 @@ module.exports = class TextEditor {
   // Returns a {Boolean} indicating whether the operation succeeded.
   groupChangesSinceCheckpoint(checkpoint) {
     return this.buffer.groupChangesSinceCheckpoint(checkpoint, {
-      selectionsMarkerLayer: this.selectionsMarkerLayer
+      selectionsMarkerLayer: this.selectionsMarkerLayer,
     });
   }
 
@@ -2518,13 +2529,13 @@ module.exports = class TextEditor {
   screenPositionForBufferPosition(bufferPosition, options) {
     if (options && options.clip) {
       Grim.deprecate(
-        'The `clip` parameter has been deprecated and will be removed soon. Please, use `clipDirection` instead.'
+        'The `clip` parameter has been deprecated and will be removed soon. Please, use `clipDirection` instead.',
       );
       if (options.clipDirection) options.clipDirection = options.clip;
     }
     if (options && options.wrapAtSoftNewlines != null) {
       Grim.deprecate(
-        "The `wrapAtSoftNewlines` parameter has been deprecated and will be removed soon. Please, use `clipDirection: 'forward'` instead."
+        "The `wrapAtSoftNewlines` parameter has been deprecated and will be removed soon. Please, use `clipDirection: 'forward'` instead.",
       );
       if (options.clipDirection)
         options.clipDirection = options.wrapAtSoftNewlines
@@ -2533,7 +2544,7 @@ module.exports = class TextEditor {
     }
     if (options && options.wrapBeyondNewlines != null) {
       Grim.deprecate(
-        "The `wrapBeyondNewlines` parameter has been deprecated and will be removed soon. Please, use `clipDirection: 'forward'` instead."
+        "The `wrapBeyondNewlines` parameter has been deprecated and will be removed soon. Please, use `clipDirection: 'forward'` instead.",
       );
       if (options.clipDirection)
         options.clipDirection = options.wrapBeyondNewlines
@@ -2555,13 +2566,13 @@ module.exports = class TextEditor {
   bufferPositionForScreenPosition(screenPosition, options) {
     if (options && options.clip) {
       Grim.deprecate(
-        'The `clip` parameter has been deprecated and will be removed soon. Please, use `clipDirection` instead.'
+        'The `clip` parameter has been deprecated and will be removed soon. Please, use `clipDirection` instead.',
       );
       if (options.clipDirection) options.clipDirection = options.clip;
     }
     if (options && options.wrapAtSoftNewlines != null) {
       Grim.deprecate(
-        "The `wrapAtSoftNewlines` parameter has been deprecated and will be removed soon. Please, use `clipDirection: 'forward'` instead."
+        "The `wrapAtSoftNewlines` parameter has been deprecated and will be removed soon. Please, use `clipDirection: 'forward'` instead.",
       );
       if (options.clipDirection)
         options.clipDirection = options.wrapAtSoftNewlines
@@ -2570,7 +2581,7 @@ module.exports = class TextEditor {
     }
     if (options && options.wrapBeyondNewlines != null) {
       Grim.deprecate(
-        "The `wrapBeyondNewlines` parameter has been deprecated and will be removed soon. Please, use `clipDirection: 'forward'` instead."
+        "The `wrapBeyondNewlines` parameter has been deprecated and will be removed soon. Please, use `clipDirection: 'forward'` instead.",
       );
       if (options.clipDirection)
         options.clipDirection = options.wrapBeyondNewlines
@@ -2590,7 +2601,7 @@ module.exports = class TextEditor {
     bufferRange = Range.fromObject(bufferRange);
     const start = this.screenPositionForBufferPosition(
       bufferRange.start,
-      options
+      options,
     );
     const end = this.screenPositionForBufferPosition(bufferRange.end, options);
     return new Range(start, end);
@@ -2669,13 +2680,13 @@ module.exports = class TextEditor {
   clipScreenPosition(screenPosition, options) {
     if (options && options.clip) {
       Grim.deprecate(
-        'The `clip` parameter has been deprecated and will be removed soon. Please, use `clipDirection` instead.'
+        'The `clip` parameter has been deprecated and will be removed soon. Please, use `clipDirection` instead.',
       );
       if (options.clipDirection) options.clipDirection = options.clip;
     }
     if (options && options.wrapAtSoftNewlines != null) {
       Grim.deprecate(
-        "The `wrapAtSoftNewlines` parameter has been deprecated and will be removed soon. Please, use `clipDirection: 'forward'` instead."
+        "The `wrapAtSoftNewlines` parameter has been deprecated and will be removed soon. Please, use `clipDirection: 'forward'` instead.",
       );
       if (options.clipDirection)
         options.clipDirection = options.wrapAtSoftNewlines
@@ -2684,7 +2695,7 @@ module.exports = class TextEditor {
     }
     if (options && options.wrapBeyondNewlines != null) {
       Grim.deprecate(
-        "The `wrapBeyondNewlines` parameter has been deprecated and will be removed soon. Please, use `clipDirection: 'forward'` instead."
+        "The `wrapBeyondNewlines` parameter has been deprecated and will be removed soon. Please, use `clipDirection: 'forward'` instead.",
       );
       if (options.clipDirection)
         options.clipDirection = options.wrapBeyondNewlines
@@ -2706,7 +2717,7 @@ module.exports = class TextEditor {
     screenRange = Range.fromObject(screenRange);
     const start = this.displayLayer.clipScreenPosition(
       screenRange.start,
-      options
+      options,
     );
     const end = this.displayLayer.clipScreenPosition(screenRange.end, options);
     return Range(start, end);
@@ -2809,7 +2820,7 @@ module.exports = class TextEditor {
   decorateMarkerLayer(markerLayer, decorationParams) {
     return this.decorationManager.decorateMarkerLayer(
       markerLayer,
-      decorationParams
+      decorationParams,
     );
   }
 
@@ -2827,14 +2838,14 @@ module.exports = class TextEditor {
   decorationsForScreenRowRange(startScreenRow, endScreenRow) {
     return this.decorationManager.decorationsForScreenRowRange(
       startScreenRow,
-      endScreenRow
+      endScreenRow,
     );
   }
 
   decorationsStateForScreenRowRange(startScreenRow, endScreenRow) {
     return this.decorationManager.decorationsStateForScreenRowRange(
       startScreenRow,
-      endScreenRow
+      endScreenRow,
     );
   }
 
@@ -3121,7 +3132,7 @@ module.exports = class TextEditor {
   //
   // Returns {Array} of {Point}s in the order they were added
   getCursorBufferPositions() {
-    return this.getCursors().map(cursor => cursor.getBufferPosition());
+    return this.getCursors().map((cursor) => cursor.getBufferPosition());
   }
 
   // Essential: Move the cursor to the given position in buffer coordinates.
@@ -3133,8 +3144,8 @@ module.exports = class TextEditor {
   //   * `autoscroll` Determines whether the editor scrolls to the new cursor's
   //     position. Defaults to true.
   setCursorBufferPosition(position, options) {
-    return this.moveCursors(cursor =>
-      cursor.setBufferPosition(position, options)
+    return this.moveCursors((cursor) =>
+      cursor.setBufferPosition(position, options),
     );
   }
 
@@ -3162,7 +3173,7 @@ module.exports = class TextEditor {
   //
   // Returns {Array} of {Point}s in the order the cursors were added
   getCursorScreenPositions() {
-    return this.getCursors().map(cursor => cursor.getScreenPosition());
+    return this.getCursors().map((cursor) => cursor.getScreenPosition());
   }
 
   // Essential: Move the cursor to the given position in screen coordinates.
@@ -3176,13 +3187,13 @@ module.exports = class TextEditor {
   setCursorScreenPosition(position, options) {
     if (options && options.clip) {
       Grim.deprecate(
-        'The `clip` parameter has been deprecated and will be removed soon. Please, use `clipDirection` instead.'
+        'The `clip` parameter has been deprecated and will be removed soon. Please, use `clipDirection` instead.',
       );
       if (options.clipDirection) options.clipDirection = options.clip;
     }
     if (options && options.wrapAtSoftNewlines != null) {
       Grim.deprecate(
-        "The `wrapAtSoftNewlines` parameter has been deprecated and will be removed soon. Please, use `clipDirection: 'forward'` instead."
+        "The `wrapAtSoftNewlines` parameter has been deprecated and will be removed soon. Please, use `clipDirection: 'forward'` instead.",
       );
       if (options.clipDirection)
         options.clipDirection = options.wrapAtSoftNewlines
@@ -3191,7 +3202,7 @@ module.exports = class TextEditor {
     }
     if (options && options.wrapBeyondNewlines != null) {
       Grim.deprecate(
-        "The `wrapBeyondNewlines` parameter has been deprecated and will be removed soon. Please, use `clipDirection: 'forward'` instead."
+        "The `wrapBeyondNewlines` parameter has been deprecated and will be removed soon. Please, use `clipDirection: 'forward'` instead.",
       );
       if (options.clipDirection)
         options.clipDirection = options.wrapBeyondNewlines
@@ -3199,8 +3210,8 @@ module.exports = class TextEditor {
           : 'backward';
     }
 
-    return this.moveCursors(cursor =>
-      cursor.setScreenPosition(position, options)
+    return this.moveCursors((cursor) =>
+      cursor.setScreenPosition(position, options),
     );
   }
 
@@ -3211,7 +3222,7 @@ module.exports = class TextEditor {
   // Returns a {Cursor}.
   addCursorAtBufferPosition(bufferPosition, options) {
     this.selectionsMarkerLayer.markBufferPosition(bufferPosition, {
-      invalidate: 'never'
+      invalidate: 'never',
     });
     if (!options || options.autoscroll !== false)
       this.getLastSelection().cursor.autoscroll();
@@ -3225,7 +3236,7 @@ module.exports = class TextEditor {
   // Returns a {Cursor}.
   addCursorAtScreenPosition(screenPosition, options) {
     this.selectionsMarkerLayer.markScreenPosition(screenPosition, {
-      invalidate: 'never'
+      invalidate: 'never',
     });
     if (!options || options.autoscroll !== false)
       this.getLastSelection().cursor.autoscroll();
@@ -3241,8 +3252,8 @@ module.exports = class TextEditor {
   //
   // * `lineCount` (optional) {Number} number of lines to move
   moveUp(lineCount) {
-    return this.moveCursors(cursor =>
-      cursor.moveUp(lineCount, { moveToEndOfSelection: true })
+    return this.moveCursors((cursor) =>
+      cursor.moveUp(lineCount, { moveToEndOfSelection: true }),
     );
   }
 
@@ -3250,8 +3261,8 @@ module.exports = class TextEditor {
   //
   // * `lineCount` (optional) {Number} number of lines to move
   moveDown(lineCount) {
-    return this.moveCursors(cursor =>
-      cursor.moveDown(lineCount, { moveToEndOfSelection: true })
+    return this.moveCursors((cursor) =>
+      cursor.moveDown(lineCount, { moveToEndOfSelection: true }),
     );
   }
 
@@ -3259,8 +3270,8 @@ module.exports = class TextEditor {
   //
   // * `columnCount` (optional) {Number} number of columns to move (default: 1)
   moveLeft(columnCount) {
-    return this.moveCursors(cursor =>
-      cursor.moveLeft(columnCount, { moveToEndOfSelection: true })
+    return this.moveCursors((cursor) =>
+      cursor.moveLeft(columnCount, { moveToEndOfSelection: true }),
     );
   }
 
@@ -3268,44 +3279,44 @@ module.exports = class TextEditor {
   //
   // * `columnCount` (optional) {Number} number of columns to move (default: 1)
   moveRight(columnCount) {
-    return this.moveCursors(cursor =>
-      cursor.moveRight(columnCount, { moveToEndOfSelection: true })
+    return this.moveCursors((cursor) =>
+      cursor.moveRight(columnCount, { moveToEndOfSelection: true }),
     );
   }
 
   // Essential: Move every cursor to the beginning of its line in buffer coordinates.
   moveToBeginningOfLine() {
-    return this.moveCursors(cursor => cursor.moveToBeginningOfLine());
+    return this.moveCursors((cursor) => cursor.moveToBeginningOfLine());
   }
 
   // Essential: Move every cursor to the beginning of its line in screen coordinates.
   moveToBeginningOfScreenLine() {
-    return this.moveCursors(cursor => cursor.moveToBeginningOfScreenLine());
+    return this.moveCursors((cursor) => cursor.moveToBeginningOfScreenLine());
   }
 
   // Essential: Move every cursor to the first non-whitespace character of its line.
   moveToFirstCharacterOfLine() {
-    return this.moveCursors(cursor => cursor.moveToFirstCharacterOfLine());
+    return this.moveCursors((cursor) => cursor.moveToFirstCharacterOfLine());
   }
 
   // Essential: Move every cursor to the end of its line in buffer coordinates.
   moveToEndOfLine() {
-    return this.moveCursors(cursor => cursor.moveToEndOfLine());
+    return this.moveCursors((cursor) => cursor.moveToEndOfLine());
   }
 
   // Essential: Move every cursor to the end of its line in screen coordinates.
   moveToEndOfScreenLine() {
-    return this.moveCursors(cursor => cursor.moveToEndOfScreenLine());
+    return this.moveCursors((cursor) => cursor.moveToEndOfScreenLine());
   }
 
   // Essential: Move every cursor to the beginning of its surrounding word.
   moveToBeginningOfWord() {
-    return this.moveCursors(cursor => cursor.moveToBeginningOfWord());
+    return this.moveCursors((cursor) => cursor.moveToBeginningOfWord());
   }
 
   // Essential: Move every cursor to the end of its surrounding word.
   moveToEndOfWord() {
-    return this.moveCursors(cursor => cursor.moveToEndOfWord());
+    return this.moveCursors((cursor) => cursor.moveToEndOfWord());
   }
 
   // Cursor Extended
@@ -3314,50 +3325,52 @@ module.exports = class TextEditor {
   //
   // If there are multiple cursors, they will be merged into a single cursor.
   moveToTop() {
-    return this.moveCursors(cursor => cursor.moveToTop());
+    return this.moveCursors((cursor) => cursor.moveToTop());
   }
 
   // Extended: Move every cursor to the bottom of the buffer.
   //
   // If there are multiple cursors, they will be merged into a single cursor.
   moveToBottom() {
-    return this.moveCursors(cursor => cursor.moveToBottom());
+    return this.moveCursors((cursor) => cursor.moveToBottom());
   }
 
   // Extended: Move every cursor to the beginning of the next word.
   moveToBeginningOfNextWord() {
-    return this.moveCursors(cursor => cursor.moveToBeginningOfNextWord());
+    return this.moveCursors((cursor) => cursor.moveToBeginningOfNextWord());
   }
 
   // Extended: Move every cursor to the previous word boundary.
   moveToPreviousWordBoundary() {
-    return this.moveCursors(cursor => cursor.moveToPreviousWordBoundary());
+    return this.moveCursors((cursor) => cursor.moveToPreviousWordBoundary());
   }
 
   // Extended: Move every cursor to the next word boundary.
   moveToNextWordBoundary() {
-    return this.moveCursors(cursor => cursor.moveToNextWordBoundary());
+    return this.moveCursors((cursor) => cursor.moveToNextWordBoundary());
   }
 
   // Extended: Move every cursor to the previous subword boundary.
   moveToPreviousSubwordBoundary() {
-    return this.moveCursors(cursor => cursor.moveToPreviousSubwordBoundary());
+    return this.moveCursors((cursor) => cursor.moveToPreviousSubwordBoundary());
   }
 
   // Extended: Move every cursor to the next subword boundary.
   moveToNextSubwordBoundary() {
-    return this.moveCursors(cursor => cursor.moveToNextSubwordBoundary());
+    return this.moveCursors((cursor) => cursor.moveToNextSubwordBoundary());
   }
 
   // Extended: Move every cursor to the beginning of the next paragraph.
   moveToBeginningOfNextParagraph() {
-    return this.moveCursors(cursor => cursor.moveToBeginningOfNextParagraph());
+    return this.moveCursors((cursor) =>
+      cursor.moveToBeginningOfNextParagraph(),
+    );
   }
 
   // Extended: Move every cursor to the beginning of the previous paragraph.
   moveToBeginningOfPreviousParagraph() {
-    return this.moveCursors(cursor =>
-      cursor.moveToBeginningOfPreviousParagraph()
+    return this.moveCursors((cursor) =>
+      cursor.moveToBeginningOfPreviousParagraph(),
     );
   }
 
@@ -3372,7 +3385,7 @@ module.exports = class TextEditor {
   // * `options` (optional) See {Cursor::getBeginningOfCurrentWordBufferPosition}.
   getWordUnderCursor(options) {
     return this.getTextInBufferRange(
-      this.getLastCursor().getCurrentWordBufferRange(options)
+      this.getLastCursor().getCurrentWordBufferRange(options),
     );
   }
 
@@ -3392,8 +3405,8 @@ module.exports = class TextEditor {
 
   cursorsForScreenRowRange(startScreenRow, endScreenRow) {
     const cursors = [];
-    for (let marker of this.selectionsMarkerLayer.findMarkers({
-      intersectsScreenRowRange: [startScreenRow, endScreenRow]
+    for (const marker of this.selectionsMarkerLayer.findMarkers({
+      intersectsScreenRowRange: [startScreenRow, endScreenRow],
     })) {
       const cursor = this.cursorsByMarkerId.get(marker.id);
       if (cursor) cursors.push(cursor);
@@ -3406,7 +3419,7 @@ module.exports = class TextEditor {
     const cursor = new Cursor({
       editor: this,
       marker,
-      showCursorOnSelection: this.showCursorOnSelection
+      showCursorOnSelection: this.showCursorOnSelection,
     });
     this.cursors.push(cursor);
     this.cursorsByMarkerId.set(marker.id, cursor);
@@ -3427,9 +3440,9 @@ module.exports = class TextEditor {
   // Merge cursors that have the same screen position
   mergeCursors() {
     const positions = {};
-    for (let cursor of this.getCursors()) {
+    for (const cursor of this.getCursors()) {
       const position = cursor.getBufferPosition().toString();
-      if (positions.hasOwnProperty(position)) {
+      if (Object.prototype.hasOwnProperty.call(positions, position)) {
         cursor.destroy();
       } else {
         positions[position] = true;
@@ -3462,7 +3475,7 @@ module.exports = class TextEditor {
   //
   // Returns an {Array} of {Range}s.
   getSelectedBufferRanges() {
-    return this.getSelections().map(selection => selection.getBufferRange());
+    return this.getSelections().map((selection) => selection.getBufferRange());
   }
 
   // Essential: Set the selected range in buffer coordinates. If there are multiple
@@ -3492,7 +3505,7 @@ module.exports = class TextEditor {
       throw new Error('Passed an empty array to setSelectedBufferRanges');
 
     const selections = this.getSelections();
-    for (let selection of selections.slice(bufferRanges.length)) {
+    for (const selection of selections.slice(bufferRanges.length)) {
       selection.destroy();
     }
 
@@ -3523,7 +3536,7 @@ module.exports = class TextEditor {
   //
   // Returns an {Array} of {Range}s.
   getSelectedScreenRanges() {
-    return this.getSelections().map(selection => selection.getScreenRange());
+    return this.getSelections().map((selection) => selection.getScreenRange());
   }
 
   // Essential: Set the selected range in screen coordinates. If there are multiple
@@ -3536,7 +3549,7 @@ module.exports = class TextEditor {
   setSelectedScreenRange(screenRange, options) {
     return this.setSelectedBufferRange(
       this.bufferRangeForScreenRange(screenRange, options),
-      options
+      options,
     );
   }
 
@@ -3552,7 +3565,7 @@ module.exports = class TextEditor {
       throw new Error('Passed an empty array to setSelectedScreenRanges');
 
     const selections = this.getSelections();
-    for (let selection of selections.slice(screenRanges.length)) {
+    for (const selection of selections.slice(screenRanges.length)) {
       selection.destroy();
     }
 
@@ -3584,12 +3597,12 @@ module.exports = class TextEditor {
     if (!options.preserveFolds) {
       this.displayLayer.destroyFoldsContainingBufferPositions(
         [bufferRange.start, bufferRange.end],
-        true
+        true,
       );
     }
     this.selectionsMarkerLayer.markBufferRange(bufferRange, {
       invalidate: 'never',
-      reversed: options.reversed != null ? options.reversed : false
+      reversed: options.reversed != null ? options.reversed : false,
     });
     if (options.autoscroll !== false) this.getLastSelection().autoscroll();
     return this.getLastSelection();
@@ -3607,7 +3620,7 @@ module.exports = class TextEditor {
   addSelectionForScreenRange(screenRange, options = {}) {
     return this.addSelectionForBufferRange(
       this.bufferRangeForScreenRange(screenRange),
-      options
+      options,
     );
   }
 
@@ -3621,7 +3634,7 @@ module.exports = class TextEditor {
     const lastSelection = this.getLastSelection();
     lastSelection.selectToBufferPosition(position);
     return this.mergeIntersectingSelections({
-      reversed: lastSelection.isReversed()
+      reversed: lastSelection.isReversed(),
     });
   }
 
@@ -3636,7 +3649,7 @@ module.exports = class TextEditor {
     lastSelection.selectToScreenPosition(position, options);
     if (!options || !options.suppressSelectionMerge) {
       return this.mergeIntersectingSelections({
-        reversed: lastSelection.isReversed()
+        reversed: lastSelection.isReversed(),
       });
     }
   }
@@ -3648,8 +3661,8 @@ module.exports = class TextEditor {
   //
   // This method may merge selections that end up intersecting.
   selectUp(rowCount) {
-    return this.expandSelectionsBackward(selection =>
-      selection.selectUp(rowCount)
+    return this.expandSelectionsBackward((selection) =>
+      selection.selectUp(rowCount),
     );
   }
 
@@ -3660,8 +3673,8 @@ module.exports = class TextEditor {
   //
   // This method may merge selections that end up intersecting.
   selectDown(rowCount) {
-    return this.expandSelectionsForward(selection =>
-      selection.selectDown(rowCount)
+    return this.expandSelectionsForward((selection) =>
+      selection.selectDown(rowCount),
     );
   }
 
@@ -3672,8 +3685,8 @@ module.exports = class TextEditor {
   //
   // This method may merge selections that end up intersecting.
   selectLeft(columnCount) {
-    return this.expandSelectionsBackward(selection =>
-      selection.selectLeft(columnCount)
+    return this.expandSelectionsBackward((selection) =>
+      selection.selectLeft(columnCount),
     );
   }
 
@@ -3684,8 +3697,8 @@ module.exports = class TextEditor {
   //
   // This method may merge selections that end up intersecting.
   selectRight(columnCount) {
-    return this.expandSelectionsForward(selection =>
-      selection.selectRight(columnCount)
+    return this.expandSelectionsForward((selection) =>
+      selection.selectRight(columnCount),
     );
   }
 
@@ -3694,7 +3707,9 @@ module.exports = class TextEditor {
   //
   // This method merges multiple selections into a single selection.
   selectToTop() {
-    return this.expandSelectionsBackward(selection => selection.selectToTop());
+    return this.expandSelectionsBackward((selection) =>
+      selection.selectToTop(),
+    );
   }
 
   // Essential: Selects from the top of the first selection in the buffer to the end
@@ -3702,8 +3717,8 @@ module.exports = class TextEditor {
   //
   // This method merges multiple selections into a single selection.
   selectToBottom() {
-    return this.expandSelectionsForward(selection =>
-      selection.selectToBottom()
+    return this.expandSelectionsForward((selection) =>
+      selection.selectToBottom(),
     );
   }
 
@@ -3711,7 +3726,7 @@ module.exports = class TextEditor {
   //
   // This method merges multiple selections into a single selection.
   selectAll() {
-    return this.expandSelectionsForward(selection => selection.selectAll());
+    return this.expandSelectionsForward((selection) => selection.selectAll());
   }
 
   // Essential: Move the cursor of each selection to the beginning of its line
@@ -3719,8 +3734,8 @@ module.exports = class TextEditor {
   //
   // This method may merge selections that end up intersecting.
   selectToBeginningOfLine() {
-    return this.expandSelectionsBackward(selection =>
-      selection.selectToBeginningOfLine()
+    return this.expandSelectionsBackward((selection) =>
+      selection.selectToBeginningOfLine(),
     );
   }
 
@@ -3731,8 +3746,8 @@ module.exports = class TextEditor {
   //
   // This method may merge selections that end up intersecting.
   selectToFirstCharacterOfLine() {
-    return this.expandSelectionsBackward(selection =>
-      selection.selectToFirstCharacterOfLine()
+    return this.expandSelectionsBackward((selection) =>
+      selection.selectToFirstCharacterOfLine(),
     );
   }
 
@@ -3741,8 +3756,8 @@ module.exports = class TextEditor {
   //
   // This method may merge selections that end up intersecting.
   selectToEndOfLine() {
-    return this.expandSelectionsForward(selection =>
-      selection.selectToEndOfLine()
+    return this.expandSelectionsForward((selection) =>
+      selection.selectToEndOfLine(),
     );
   }
 
@@ -3751,8 +3766,8 @@ module.exports = class TextEditor {
   // Operates on all selections. Moves the cursor to the beginning of the
   // containing word while preserving the selection's tail position.
   selectToBeginningOfWord() {
-    return this.expandSelectionsBackward(selection =>
-      selection.selectToBeginningOfWord()
+    return this.expandSelectionsBackward((selection) =>
+      selection.selectToBeginningOfWord(),
     );
   }
 
@@ -3761,8 +3776,8 @@ module.exports = class TextEditor {
   // Operates on all selections. Moves the cursor to the end of the containing
   // word while preserving the selection's tail position.
   selectToEndOfWord() {
-    return this.expandSelectionsForward(selection =>
-      selection.selectToEndOfWord()
+    return this.expandSelectionsForward((selection) =>
+      selection.selectToEndOfWord(),
     );
   }
 
@@ -3771,8 +3786,8 @@ module.exports = class TextEditor {
   //
   // This method may merge selections that end up intersecting.
   selectToPreviousSubwordBoundary() {
-    return this.expandSelectionsBackward(selection =>
-      selection.selectToPreviousSubwordBoundary()
+    return this.expandSelectionsBackward((selection) =>
+      selection.selectToPreviousSubwordBoundary(),
     );
   }
 
@@ -3781,8 +3796,8 @@ module.exports = class TextEditor {
   //
   // This method may merge selections that end up intersecting.
   selectToNextSubwordBoundary() {
-    return this.expandSelectionsForward(selection =>
-      selection.selectToNextSubwordBoundary()
+    return this.expandSelectionsForward((selection) =>
+      selection.selectToNextSubwordBoundary(),
     );
   }
 
@@ -3790,12 +3805,12 @@ module.exports = class TextEditor {
   //
   // This method merges selections on successive lines.
   selectLinesContainingCursors() {
-    return this.expandSelectionsForward(selection => selection.selectLine());
+    return this.expandSelectionsForward((selection) => selection.selectLine());
   }
 
   // Essential: Select the word surrounding each cursor.
   selectWordsContainingCursors() {
-    return this.expandSelectionsForward(selection => selection.selectWord());
+    return this.expandSelectionsForward((selection) => selection.selectWord());
   }
 
   // Selection Extended
@@ -3805,8 +3820,8 @@ module.exports = class TextEditor {
   //
   // This method may merge selections that end up intersecting.
   selectToPreviousWordBoundary() {
-    return this.expandSelectionsBackward(selection =>
-      selection.selectToPreviousWordBoundary()
+    return this.expandSelectionsBackward((selection) =>
+      selection.selectToPreviousWordBoundary(),
     );
   }
 
@@ -3815,8 +3830,8 @@ module.exports = class TextEditor {
   //
   // This method may merge selections that end up intersecting.
   selectToNextWordBoundary() {
-    return this.expandSelectionsForward(selection =>
-      selection.selectToNextWordBoundary()
+    return this.expandSelectionsForward((selection) =>
+      selection.selectToNextWordBoundary(),
     );
   }
 
@@ -3825,8 +3840,8 @@ module.exports = class TextEditor {
   // Operates on all selections. Moves the cursor to the beginning of the next
   // word while preserving the selection's tail position.
   selectToBeginningOfNextWord() {
-    return this.expandSelectionsForward(selection =>
-      selection.selectToBeginningOfNextWord()
+    return this.expandSelectionsForward((selection) =>
+      selection.selectToBeginningOfNextWord(),
     );
   }
 
@@ -3835,8 +3850,8 @@ module.exports = class TextEditor {
   // Operates on all selections. Moves the cursor to the beginning of the next
   // paragraph while preserving the selection's tail position.
   selectToBeginningOfNextParagraph() {
-    return this.expandSelectionsForward(selection =>
-      selection.selectToBeginningOfNextParagraph()
+    return this.expandSelectionsForward((selection) =>
+      selection.selectToBeginningOfNextParagraph(),
     );
   }
 
@@ -3845,8 +3860,8 @@ module.exports = class TextEditor {
   // Operates on all selections. Moves the cursor to the beginning of the next
   // paragraph while preserving the selection's tail position.
   selectToBeginningOfPreviousParagraph() {
-    return this.expandSelectionsBackward(selection =>
-      selection.selectToBeginningOfPreviousParagraph()
+    return this.expandSelectionsBackward((selection) =>
+      selection.selectToBeginningOfPreviousParagraph(),
     );
   }
 
@@ -3856,11 +3871,10 @@ module.exports = class TextEditor {
     const languageMode = this.buffer.getLanguageMode();
     if (!languageMode.getRangeForSyntaxNodeContainingRange) return;
 
-    this.expandSelectionsForward(selection => {
+    this.expandSelectionsForward((selection) => {
       const currentRange = selection.getBufferRange();
-      const newRange = languageMode.getRangeForSyntaxNodeContainingRange(
-        currentRange
-      );
+      const newRange =
+        languageMode.getRangeForSyntaxNodeContainingRange(currentRange);
       if (newRange) {
         if (!selection._rangeStack) selection._rangeStack = [];
         selection._rangeStack.push(currentRange);
@@ -3871,7 +3885,7 @@ module.exports = class TextEditor {
 
   // Extended: Undo the effect a preceding call to {::selectLargerSyntaxNode}.
   selectSmallerSyntaxNode() {
-    this.expandSelectionsForward(selection => {
+    this.expandSelectionsForward((selection) => {
       if (selection._rangeStack) {
         const lastRange =
           selection._rangeStack[selection._rangeStack.length - 1];
@@ -3906,7 +3920,7 @@ module.exports = class TextEditor {
 
   getSelectionAtScreenPosition(position) {
     const markers = this.selectionsMarkerLayer.findMarkers({
-      containsScreenPosition: position
+      containsScreenPosition: position,
     });
     if (markers.length > 0)
       return this.cursorsByMarkerId.get(markers[0].id).selection;
@@ -3935,8 +3949,8 @@ module.exports = class TextEditor {
   //
   // Returns a {Boolean}.
   selectionIntersectsBufferRange(bufferRange) {
-    return this.getSelections().some(selection =>
-      selection.intersectsBufferRange(bufferRange)
+    return this.getSelections().some((selection) =>
+      selection.intersectsBufferRange(bufferRange),
     );
   }
 
@@ -3951,8 +3965,8 @@ module.exports = class TextEditor {
   // selection to the next line that is long enough for a non-empty selection
   // starting at the same column as the current selection to be added to it.
   addSelectionBelow() {
-    return this.expandSelectionsForward(selection =>
-      selection.addSelectionBelow()
+    return this.expandSelectionsForward((selection) =>
+      selection.addSelectionBelow(),
     );
   }
 
@@ -3965,8 +3979,8 @@ module.exports = class TextEditor {
   // selection to the next line that is long enough for a non-empty selection
   // starting at the same column as the current selection to be added to it.
   addSelectionAbove() {
-    return this.expandSelectionsBackward(selection =>
-      selection.addSelectionAbove()
+    return this.expandSelectionsBackward((selection) =>
+      selection.addSelectionAbove(),
     );
   }
 
@@ -3979,19 +3993,19 @@ module.exports = class TextEditor {
   // reversed orientation
   expandSelectionsBackward(fn) {
     this.mergeIntersectingSelections({ reversed: true }, () =>
-      this.getSelections().forEach(fn)
+      this.getSelections().forEach(fn),
     );
   }
 
   finalizeSelections() {
-    for (let selection of this.getSelections()) {
+    for (const selection of this.getSelections()) {
       selection.finalize();
     }
   }
 
   selectionsForScreenRows(startRow, endRow) {
-    return this.getSelections().filter(selection =>
-      selection.intersectsScreenRowRange(startRow, endRow)
+    return this.getSelections().filter((selection) =>
+      selection.intersectsScreenRowRange(startRow, endRow),
     );
   }
 
@@ -4005,7 +4019,7 @@ module.exports = class TextEditor {
         const exclusive =
           !currentSelection.isEmpty() && !previousSelection.isEmpty();
         return previousSelection.intersectsWith(currentSelection, exclusive);
-      }
+      },
     );
   }
 
@@ -4016,9 +4030,9 @@ module.exports = class TextEditor {
         const screenRange = currentSelection.getScreenRange();
         return previousSelection.intersectsScreenRowRange(
           screenRange.start.row,
-          screenRange.end.row
+          screenRange.end.row,
         );
-      }
+      },
     );
   }
 
@@ -4063,7 +4077,7 @@ module.exports = class TextEditor {
   addSelection(marker, options = {}) {
     const cursor = this.addCursor(marker);
     let selection = new Selection(
-      Object.assign({ editor: this, marker, cursor }, options)
+      Object.assign({ editor: this, marker, cursor }, options),
     );
     this.selections.push(selection);
     const selectionBufferRange = selection.getBufferRange();
@@ -4101,7 +4115,7 @@ module.exports = class TextEditor {
   consolidateSelections() {
     const selections = this.getSelections();
     if (selections.length > 1) {
-      for (let selection of selections.slice(1, selections.length)) {
+      for (const selection of selections.slice(1, selections.length)) {
         selection.destroy();
       }
       selections[0].autoscroll({ center: true });
@@ -4119,10 +4133,16 @@ module.exports = class TextEditor {
 
   createLastSelectionIfNeeded() {
     if (this.selections.length === 0) {
-      this.addSelectionForBufferRange([[0, 0], [0, 0]], {
-        autoscroll: false,
-        preserveFolds: true
-      });
+      this.addSelectionForBufferRange(
+        [
+          [0, 0],
+          [0, 0],
+        ],
+        {
+          autoscroll: false,
+          preserveFolds: true,
+        },
+      );
     }
   }
 
@@ -4295,7 +4315,7 @@ module.exports = class TextEditor {
       return;
     }
     return this.scanInBufferRange(/\t/g, bufferRange, ({ replace }) =>
-      replace(this.getTabText())
+      replace(this.getTabText()),
     );
   }
 
@@ -4377,7 +4397,7 @@ module.exports = class TextEditor {
   setIndentationForBufferRow(
     bufferRow,
     newLevel,
-    { preserveLeadingWhitespace } = {}
+    { preserveLeadingWhitespace } = {},
   ) {
     let endColumn;
     if (preserveLeadingWhitespace) {
@@ -4387,8 +4407,11 @@ module.exports = class TextEditor {
     }
     const newIndentString = this.buildIndentString(newLevel);
     return this.buffer.setTextInRange(
-      [[bufferRow, 0], [bufferRow, endColumn]],
-      newIndentString
+      [
+        [bufferRow, 0],
+        [bufferRow, endColumn],
+      ],
+      newIndentString,
     );
   }
 
@@ -4398,8 +4421,8 @@ module.exports = class TextEditor {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor.
   indentSelectedRows(options = {}) {
     if (!this.ensureWritable('indentSelectedRows', options)) return;
-    return this.mutateSelectedText(selection =>
-      selection.indentSelectedRows(options)
+    return this.mutateSelectedText((selection) =>
+      selection.indentSelectedRows(options),
     );
   }
 
@@ -4409,8 +4432,8 @@ module.exports = class TextEditor {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor.
   outdentSelectedRows(options = {}) {
     if (!this.ensureWritable('outdentSelectedRows', options)) return;
-    return this.mutateSelectedText(selection =>
-      selection.outdentSelectedRows(options)
+    return this.mutateSelectedText((selection) =>
+      selection.outdentSelectedRows(options),
     );
   }
 
@@ -4447,8 +4470,8 @@ module.exports = class TextEditor {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor.
   autoIndentSelectedRows(options = {}) {
     if (!this.ensureWritable('autoIndentSelectedRows', options)) return;
-    return this.mutateSelectedText(selection =>
-      selection.autoIndentSelectedRows(options)
+    return this.mutateSelectedText((selection) =>
+      selection.autoIndentSelectedRows(options),
     );
   }
 
@@ -4461,7 +4484,7 @@ module.exports = class TextEditor {
     if (!this.ensureWritable('indent', options)) return;
     if (options.autoIndent == null)
       options.autoIndent = this.shouldAutoIndent();
-    this.mutateSelectedText(selection => selection.indent(options));
+    this.mutateSelectedText((selection) => selection.indent(options));
   }
 
   // Constructs the string used for indents.
@@ -4470,12 +4493,12 @@ module.exports = class TextEditor {
       const tabStopViolation = column % this.getTabLength();
       return _.multiplyString(
         ' ',
-        Math.floor(level * this.getTabLength()) - tabStopViolation
+        Math.floor(level * this.getTabLength()) - tabStopViolation,
       );
     } else {
       const excessWhitespace = _.multiplyString(
         ' ',
-        Math.round((level - Math.floor(level)) * this.getTabLength())
+        Math.round((level - Math.floor(level)) * this.getTabLength()),
       );
       return _.multiplyString('\t', Math.floor(level)) + excessWhitespace;
     }
@@ -4502,7 +4525,7 @@ module.exports = class TextEditor {
   setGrammar(grammar) {
     const buffer = this.getBuffer();
     buffer.setLanguageMode(
-      atom.grammars.languageModeForGrammarAndBuffer(grammar, buffer)
+      atom.grammars.languageModeForGrammarAndBuffer(grammar, buffer),
     );
   }
 
@@ -4574,7 +4597,7 @@ module.exports = class TextEditor {
   bufferRangeForScopeAtCursor(scopeSelector) {
     return this.bufferRangeForScopeAtPosition(
       scopeSelector,
-      this.getCursorBufferPosition()
+      this.getCursorBufferPosition(),
     );
   }
 
@@ -4601,7 +4624,7 @@ module.exports = class TextEditor {
       if (!this.commentScopeSelector)
         this.commentScopeSelector = new TextMateScopeSelector('comment.*');
       return this.commentScopeSelector.matches(
-        this.scopeDescriptorForBufferPosition([bufferRow, match.index]).scopes
+        this.scopeDescriptorForBufferPosition([bufferRow, match.index]).scopes,
       );
     }
   }
@@ -4627,7 +4650,7 @@ module.exports = class TextEditor {
   // Essential: For each selection, copy the selected text.
   copySelectedText() {
     let maintainClipboard = false;
-    for (let selection of this.getSelectionsOrderedByBufferPosition()) {
+    for (const selection of this.getSelectionsOrderedByBufferPosition()) {
       if (selection.isEmpty()) {
         const previousRange = selection.getBufferRange();
         selection.selectLine();
@@ -4643,7 +4666,7 @@ module.exports = class TextEditor {
   // Private: For each selection, only copy highlighted text.
   copyOnlySelectedText() {
     let maintainClipboard = false;
-    for (let selection of this.getSelectionsOrderedByBufferPosition()) {
+    for (const selection of this.getSelectionsOrderedByBufferPosition()) {
       if (!selection.isEmpty()) {
         selection.copy(maintainClipboard, false);
         maintainClipboard = true;
@@ -4658,7 +4681,7 @@ module.exports = class TextEditor {
   cutSelectedText(options = {}) {
     if (!this.ensureWritable('cutSelectedText', options)) return;
     let maintainClipboard = false;
-    this.mutateSelectedText(selection => {
+    this.mutateSelectedText((selection) => {
       if (selection.isEmpty()) {
         selection.selectLine();
         selection.cut(maintainClipboard, true, options.bypassReadOnly);
@@ -4680,10 +4703,8 @@ module.exports = class TextEditor {
   pasteText(options = {}) {
     if (!this.ensureWritable('parseText', options)) return;
     options = Object.assign({}, options);
-    let {
-      text: clipboardText,
-      metadata
-    } = this.constructor.clipboard.readWithMetadata();
+    let { text: clipboardText, metadata } =
+      this.constructor.clipboard.readWithMetadata();
     if (!this.emitWillInsertTextEvent(clipboardText)) return false;
 
     if (!metadata) metadata = {};
@@ -4715,7 +4736,10 @@ module.exports = class TextEditor {
       let range;
       if (fullLine && selection.isEmpty()) {
         const oldPosition = selection.getBufferRange().start;
-        selection.setBufferRange([[oldPosition.row, 0], [oldPosition.row, 0]]);
+        selection.setBufferRange([
+          [oldPosition.row, 0],
+          [oldPosition.row, 0],
+        ]);
         range = selection.insertText(text, options);
         const newPosition = oldPosition.translate([1, 0]);
         selection.setBufferRange([newPosition, newPosition]);
@@ -4736,7 +4760,7 @@ module.exports = class TextEditor {
   cutToEndOfLine(options = {}) {
     if (!this.ensureWritable('cutToEndOfLine', options)) return;
     let maintainClipboard = false;
-    this.mutateSelectedText(selection => {
+    this.mutateSelectedText((selection) => {
       selection.cutToEndOfLine(maintainClipboard, options);
       maintainClipboard = true;
     });
@@ -4751,7 +4775,7 @@ module.exports = class TextEditor {
   cutToEndOfBufferLine(options = {}) {
     if (!this.ensureWritable('cutToEndOfBufferLine', options)) return;
     let maintainClipboard = false;
-    this.mutateSelectedText(selection => {
+    this.mutateSelectedText((selection) => {
       selection.cutToEndOfBufferLine(maintainClipboard, options);
       maintainClipboard = true;
     });
@@ -4773,7 +4797,7 @@ module.exports = class TextEditor {
       languageMode.getFoldableRangeContainingPoint &&
       languageMode.getFoldableRangeContainingPoint(
         Point(row, Infinity),
-        this.getTabLength()
+        this.getTabLength(),
       );
     if (range) return this.displayLayer.foldBufferRange(range);
   }
@@ -4783,7 +4807,7 @@ module.exports = class TextEditor {
     const { row } = this.getCursorBufferPosition();
     return this.displayLayer.destroyFoldsContainingBufferPositions(
       [Point(row, Infinity)],
-      false
+      false,
     );
   }
 
@@ -4802,17 +4826,17 @@ module.exports = class TextEditor {
         languageMode.getFoldableRangeContainingPoint &&
         languageMode.getFoldableRangeContainingPoint(
           position,
-          this.getTabLength()
+          this.getTabLength(),
         );
       if (foldableRange) {
         const existingFolds = this.displayLayer.foldsIntersectingBufferRange(
-          Range(foldableRange.start, foldableRange.start)
+          Range(foldableRange.start, foldableRange.start),
         );
         if (existingFolds.length === 0) {
           this.displayLayer.foldBufferRange(foldableRange);
         } else {
           const firstExistingFoldRange = this.displayLayer.bufferRangeForFold(
-            existingFolds[0]
+            existingFolds[0],
           );
           if (firstExistingFoldRange.start.isLessThan(position)) {
             position = Point(firstExistingFoldRange.start.row, 0);
@@ -4834,7 +4858,7 @@ module.exports = class TextEditor {
 
   // Extended: For each selection, fold the rows it intersects.
   foldSelectedLines() {
-    for (let selection of this.selections) {
+    for (const selection of this.selections) {
       selection.fold();
     }
   }
@@ -4846,7 +4870,7 @@ module.exports = class TextEditor {
       languageMode.getFoldableRanges &&
       languageMode.getFoldableRanges(this.getTabLength());
     this.displayLayer.destroyAllFolds();
-    for (let range of foldableRanges || []) {
+    for (const range of foldableRanges || []) {
       this.displayLayer.foldBufferRange(range);
     }
   }
@@ -4867,7 +4891,7 @@ module.exports = class TextEditor {
       languageMode.getFoldableRangesAtIndentLevel &&
       languageMode.getFoldableRangesAtIndentLevel(level, this.getTabLength());
     this.displayLayer.destroyAllFolds();
-    for (let range of foldableRanges || []) {
+    for (const range of foldableRanges || []) {
       this.displayLayer.foldBufferRange(range);
     }
   }
@@ -4922,7 +4946,7 @@ module.exports = class TextEditor {
   isFoldedAtBufferRow(bufferRow) {
     const range = Range(
       Point(bufferRow, 0),
-      Point(bufferRow, this.buffer.lineLengthForRow(bufferRow))
+      Point(bufferRow, this.buffer.lineLengthForRow(bufferRow)),
     );
     return this.displayLayer.foldsIntersectingBufferRange(range).length > 0;
   }
@@ -4944,7 +4968,7 @@ module.exports = class TextEditor {
   // Returns the new {Fold}.
   foldBufferRowRange(startRow, endRow) {
     return this.foldBufferRange(
-      Range(Point(startRow, Infinity), Point(endRow, Infinity))
+      Range(Point(startRow, Infinity), Point(endRow, Infinity)),
     );
   }
 
@@ -4961,7 +4985,7 @@ module.exports = class TextEditor {
   destroyFoldsContainingBufferPositions(bufferPositions, excludeEndpoints) {
     return this.displayLayer.destroyFoldsContainingBufferPositions(
       bufferPositions,
-      excludeEndpoints
+      excludeEndpoints,
     );
   }
 
@@ -5036,7 +5060,7 @@ module.exports = class TextEditor {
   //   * `center` Center the editor around the cursor if possible. (default: true)
   scrollToCursorPosition(options) {
     this.getLastCursor().autoscroll({
-      center: options && options.center !== false
+      center: options && options.center !== false,
     });
   }
 
@@ -5049,7 +5073,7 @@ module.exports = class TextEditor {
   scrollToBufferPosition(bufferPosition, options) {
     return this.scrollToScreenPosition(
       this.screenPositionForBufferPosition(bufferPosition),
-      options
+      options,
     );
   }
 
@@ -5062,20 +5086,20 @@ module.exports = class TextEditor {
   scrollToScreenPosition(screenPosition, options) {
     this.scrollToScreenRange(
       new Range(screenPosition, screenPosition),
-      options
+      options,
     );
   }
 
   scrollToTop() {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::scrollToTop instead.'
+      'This is now a view method. Call TextEditorElement::scrollToTop instead.',
     );
     this.getElement().scrollToTop();
   }
 
   scrollToBottom() {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::scrollToTop instead.'
+      'This is now a view method. Call TextEditorElement::scrollToTop instead.',
     );
     this.getElement().scrollToBottom();
   }
@@ -5089,14 +5113,14 @@ module.exports = class TextEditor {
 
   getHorizontalScrollbarHeight() {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::getHorizontalScrollbarHeight instead.'
+      'This is now a view method. Call TextEditorElement::getHorizontalScrollbarHeight instead.',
     );
     return this.getElement().getHorizontalScrollbarHeight();
   }
 
   getVerticalScrollbarWidth() {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::getVerticalScrollbarWidth instead.'
+      'This is now a view method. Call TextEditorElement::getVerticalScrollbarWidth instead.',
     );
     return this.getElement().getVerticalScrollbarWidth();
   }
@@ -5244,7 +5268,7 @@ module.exports = class TextEditor {
         model: this,
         updatedSynchronously: TextEditorElement.prototype.updatedSynchronously,
         initialScrollTopRow: this.initialScrollTopRow,
-        initialScrollLeftColumn: this.initialScrollLeftColumn
+        initialScrollLeftColumn: this.initialScrollLeftColumn,
       });
     }
     return this.component.element;
@@ -5271,21 +5295,21 @@ module.exports = class TextEditor {
 
   pixelPositionForBufferPosition(bufferPosition) {
     Grim.deprecate(
-      'This method is deprecated on the model layer. Use `TextEditorElement::pixelPositionForBufferPosition` instead'
+      'This method is deprecated on the model layer. Use `TextEditorElement::pixelPositionForBufferPosition` instead',
     );
     return this.getElement().pixelPositionForBufferPosition(bufferPosition);
   }
 
   pixelPositionForScreenPosition(screenPosition) {
     Grim.deprecate(
-      'This method is deprecated on the model layer. Use `TextEditorElement::pixelPositionForScreenPosition` instead'
+      'This method is deprecated on the model layer. Use `TextEditorElement::pixelPositionForScreenPosition` instead',
     );
     return this.getElement().pixelPositionForScreenPosition(screenPosition);
   }
 
   getVerticalScrollMargin() {
     const maxScrollMargin = Math.floor(
-      (this.height / this.getLineHeightInPixels() - 1) / 2
+      (this.height / this.getLineHeightInPixels() - 1) / 2,
     );
     return Math.min(this.verticalScrollMargin, maxScrollMargin);
   }
@@ -5298,9 +5322,10 @@ module.exports = class TextEditor {
   getHorizontalScrollMargin() {
     return Math.min(
       this.horizontalScrollMargin,
-      Math.floor((this.width / this.getDefaultCharWidth() - 1) / 2)
+      Math.floor((this.width / this.getDefaultCharWidth() - 1) / 2),
     );
   }
+
   setHorizontalScrollMargin(horizontalScrollMargin) {
     this.horizontalScrollMargin = horizontalScrollMargin;
     return this.horizontalScrollMargin;
@@ -5309,6 +5334,7 @@ module.exports = class TextEditor {
   getLineHeightInPixels() {
     return this.lineHeightInPixels;
   }
+
   setLineHeightInPixels(lineHeightInPixels) {
     this.lineHeightInPixels = lineHeightInPixels;
     return this.lineHeightInPixels;
@@ -5317,12 +5343,15 @@ module.exports = class TextEditor {
   getKoreanCharWidth() {
     return this.koreanCharWidth;
   }
+
   getHalfWidthCharWidth() {
     return this.halfWidthCharWidth;
   }
+
   getDoubleWidthCharWidth() {
     return this.doubleWidthCharWidth;
   }
+
   getDefaultCharWidth() {
     return this.defaultCharWidth;
   }
@@ -5343,7 +5372,7 @@ module.exports = class TextEditor {
     defaultCharWidth,
     doubleWidthCharWidth,
     halfWidthCharWidth,
-    koreanCharWidth
+    koreanCharWidth,
   ) {
     if (doubleWidthCharWidth == null) {
       doubleWidthCharWidth = defaultCharWidth;
@@ -5366,7 +5395,7 @@ module.exports = class TextEditor {
       this.koreanCharWidth = koreanCharWidth;
       if (this.isSoftWrapped()) {
         this.displayLayer.reset({
-          softWrapColumn: this.getSoftWrapColumn()
+          softWrapColumn: this.getSoftWrapColumn(),
         });
       }
     }
@@ -5375,14 +5404,14 @@ module.exports = class TextEditor {
 
   setHeight(height) {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::setHeight instead.'
+      'This is now a view method. Call TextEditorElement::setHeight instead.',
     );
     this.getElement().setHeight(height);
   }
 
   getHeight() {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::getHeight instead.'
+      'This is now a view method. Call TextEditorElement::getHeight instead.',
     );
     return this.getElement().getHeight();
   }
@@ -5397,14 +5426,14 @@ module.exports = class TextEditor {
 
   setWidth(width) {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::setWidth instead.'
+      'This is now a view method. Call TextEditorElement::setWidth instead.',
     );
     this.getElement().setWidth(width);
   }
 
   getWidth() {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::getWidth instead.'
+      'This is now a view method. Call TextEditorElement::getWidth instead.',
     );
     return this.getElement().getWidth();
   }
@@ -5437,77 +5466,77 @@ module.exports = class TextEditor {
 
   getScrollTop() {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::getScrollTop instead.'
+      'This is now a view method. Call TextEditorElement::getScrollTop instead.',
     );
     return this.getElement().getScrollTop();
   }
 
   setScrollTop(scrollTop) {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::setScrollTop instead.'
+      'This is now a view method. Call TextEditorElement::setScrollTop instead.',
     );
     this.getElement().setScrollTop(scrollTop);
   }
 
   getScrollBottom() {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::getScrollBottom instead.'
+      'This is now a view method. Call TextEditorElement::getScrollBottom instead.',
     );
     return this.getElement().getScrollBottom();
   }
 
   setScrollBottom(scrollBottom) {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::setScrollBottom instead.'
+      'This is now a view method. Call TextEditorElement::setScrollBottom instead.',
     );
     this.getElement().setScrollBottom(scrollBottom);
   }
 
   getScrollLeft() {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::getScrollLeft instead.'
+      'This is now a view method. Call TextEditorElement::getScrollLeft instead.',
     );
     return this.getElement().getScrollLeft();
   }
 
   setScrollLeft(scrollLeft) {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::setScrollLeft instead.'
+      'This is now a view method. Call TextEditorElement::setScrollLeft instead.',
     );
     this.getElement().setScrollLeft(scrollLeft);
   }
 
   getScrollRight() {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::getScrollRight instead.'
+      'This is now a view method. Call TextEditorElement::getScrollRight instead.',
     );
     return this.getElement().getScrollRight();
   }
 
   setScrollRight(scrollRight) {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::setScrollRight instead.'
+      'This is now a view method. Call TextEditorElement::setScrollRight instead.',
     );
     this.getElement().setScrollRight(scrollRight);
   }
 
   getScrollHeight() {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::getScrollHeight instead.'
+      'This is now a view method. Call TextEditorElement::getScrollHeight instead.',
     );
     return this.getElement().getScrollHeight();
   }
 
   getScrollWidth() {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::getScrollWidth instead.'
+      'This is now a view method. Call TextEditorElement::getScrollWidth instead.',
     );
     return this.getElement().getScrollWidth();
   }
 
   getMaxScrollTop() {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::getMaxScrollTop instead.'
+      'This is now a view method. Call TextEditorElement::getMaxScrollTop instead.',
     );
     return this.getElement().getMaxScrollTop();
   }
@@ -5530,28 +5559,28 @@ module.exports = class TextEditor {
 
   intersectsVisibleRowRange(startRow, endRow) {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::intersectsVisibleRowRange instead.'
+      'This is now a view method. Call TextEditorElement::intersectsVisibleRowRange instead.',
     );
     return this.getElement().intersectsVisibleRowRange(startRow, endRow);
   }
 
   selectionIntersectsVisibleRowRange(selection) {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::selectionIntersectsVisibleRowRange instead.'
+      'This is now a view method. Call TextEditorElement::selectionIntersectsVisibleRowRange instead.',
     );
     return this.getElement().selectionIntersectsVisibleRowRange(selection);
   }
 
   screenPositionForPixelPosition(pixelPosition) {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::screenPositionForPixelPosition instead.'
+      'This is now a view method. Call TextEditorElement::screenPositionForPixelPosition instead.',
     );
     return this.getElement().screenPositionForPixelPosition(pixelPosition);
   }
 
   pixelRectForScreenRange(screenRange) {
     Grim.deprecate(
-      'This is now a view method. Call TextEditorElement::pixelRectForScreenRange instead.'
+      'This is now a view method. Call TextEditorElement::pixelRectForScreenRange instead.',
     );
     return this.getElement().pixelRectForScreenRange(screenRange);
   }
@@ -5584,7 +5613,7 @@ module.exports = class TextEditor {
       languageMode.suggestedIndentForBufferRow(
         bufferRow,
         this.getTabLength(),
-        options
+        options,
       )
     );
   }
@@ -5616,7 +5645,7 @@ module.exports = class TextEditor {
       languageMode.suggestedIndentForEditedBufferRow &&
       languageMode.suggestedIndentForEditedBufferRow(
         bufferRow,
-        this.getTabLength()
+        this.getTabLength(),
       );
     if (indentLevel != null)
       this.setIndentationForBufferRow(bufferRow, indentLevel);
@@ -5639,33 +5668,34 @@ module.exports = class TextEditor {
       commentEndString = commentEndString.trim();
       const startDelimiterColumnRange = columnRangeForStartDelimiter(
         this.buffer.lineForRow(start),
-        commentStartString
+        commentStartString,
       );
       if (startDelimiterColumnRange) {
         const endDelimiterColumnRange = columnRangeForEndDelimiter(
           this.buffer.lineForRow(end),
-          commentEndString
+          commentEndString,
         );
         if (endDelimiterColumnRange) {
           this.buffer.transact(() => {
             this.buffer.delete([
               [end, endDelimiterColumnRange[0]],
-              [end, endDelimiterColumnRange[1]]
+              [end, endDelimiterColumnRange[1]],
             ]);
             this.buffer.delete([
               [start, startDelimiterColumnRange[0]],
-              [start, startDelimiterColumnRange[1]]
+              [start, startDelimiterColumnRange[1]],
             ]);
           });
         }
       } else {
         this.buffer.transact(() => {
-          const indentLength = this.buffer.lineForRow(start).match(/^\s*/)[0]
-            .length;
+          const indentLength = this.buffer
+            .lineForRow(start)
+            .match(/^\s*/)[0].length;
           this.buffer.insert([start, indentLength], commentStartString + ' ');
           this.buffer.insert(
             [end, this.buffer.lineLengthForRow(end)],
-            ' ' + commentEndString
+            ' ' + commentEndString,
           );
 
           // Prevent the cursor from selecting / passing the delimiters
@@ -5677,8 +5707,11 @@ module.exports = class TextEditor {
               if (oldRange.start.column === endLineLength) {
                 const endCol = endLineLength - commentEndString.length - 1;
                 options.selection.setBufferRange(
-                  [[end, endCol], [end, endCol]],
-                  { autoscroll: false }
+                  [
+                    [end, endCol],
+                    [end, endCol],
+                  ],
+                  { autoscroll: false },
                 );
               }
             } else {
@@ -5692,7 +5725,7 @@ module.exports = class TextEditor {
                   : [0, 0];
               options.selection.setBufferRange(
                 oldRange.translate(startDelta, endDelta),
-                { autoscroll: false }
+                { autoscroll: false },
               );
             }
           }
@@ -5718,10 +5751,13 @@ module.exports = class TextEditor {
         for (let row = start; row <= end; row++) {
           const columnRange = columnRangeForStartDelimiter(
             this.buffer.lineForRow(row),
-            commentStartString
+            commentStartString,
           );
           if (columnRange)
-            this.buffer.delete([[row, columnRange[0]], [row, columnRange[1]]]);
+            this.buffer.delete([
+              [row, columnRange[0]],
+              [row, columnRange[1]],
+            ]);
         }
       } else {
         let minIndentLevel = Infinity;
@@ -5739,8 +5775,8 @@ module.exports = class TextEditor {
         minIndentLevel = Number.isFinite(minIndentLevel)
           ? minIndentLevel
           : Number.isFinite(minBlankIndentLevel)
-          ? minBlankIndentLevel
-          : 0;
+            ? minBlankIndentLevel
+            : 0;
 
         const indentString = this.buildIndentString(minIndentLevel);
         for (let row = start; row <= end; row++) {
@@ -5749,16 +5785,16 @@ module.exports = class TextEditor {
             const indentColumn = columnForIndentLevel(
               line,
               minIndentLevel,
-              this.getTabLength()
+              this.getTabLength(),
             );
             this.buffer.insert(
               Point(row, indentColumn),
-              commentStartString + ' '
+              commentStartString + ' ',
             );
           } else {
             this.buffer.setTextInRange(
               new Range(new Point(row, 0), new Point(row, Infinity)),
-              indentString + commentStartString + ' '
+              indentString + commentStartString + ' ',
             );
           }
         }
@@ -5792,7 +5828,7 @@ module.exports = class TextEditor {
 
     return new Range(
       new Point(startRow, 0),
-      new Point(endRow, this.buffer.lineLengthForRow(endRow))
+      new Point(endRow, this.buffer.lineLengthForRow(endRow)),
     );
   }
 };
